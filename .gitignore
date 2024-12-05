@@ -40,3 +40,4 @@ Thumbs.db
 # ruby specific #
 #################
 *.lock
+*.#*
