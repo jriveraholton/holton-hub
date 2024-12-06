@@ -8,8 +8,8 @@ get '/' do
 end
 
 
-post '/create_user' do #creates users based on text file submitted by user
-  users_file = params[:users_file] #key may need to change
+post '/create_users' do #creates users based on text file submitted by user
+  users_file = params[:inputGroupFile04] 
   File.open(users_file) do |file|
     students = file.readlines #creates an array of student data
   end
@@ -32,7 +32,7 @@ post '/create_user' do #creates users based on text file submitted by user
     else
       is_admin = false
     end
-    
+  end
   #generates a default password in the format "gdingholtonarms"
   password = (fname.downcase[0] + lname.downcase + holtonarms).to_s
 
@@ -42,6 +42,29 @@ post '/create_user' do #creates users based on text file submitted by user
   new_user = User.create(firstname: fname, lastname: lname, 
   email: email, secret: password, team_id: team_id, is_admin: is_admin)
   
+  redirect '/'
+end
+
+post '/create_single_user' do #creates a single user based on user-submitted information
+  fname = params[:fname]
+  lname = params[:lname]
+  email = params[:email]
+  is_admin = param[:is_admin] #preferably this is a yes/no checkbox
+  #assigns id 0 to blue team, id 1 to white team
+  if params[:team].downcase == "blue"
+    team_id = 0
+  elsif params[:team].downcase == "white"
+    team_id = 1
+  end
+  #generates a default password in the format "gdingholtonarms"
+  password = (fname.downcase[0] + lname.downcase + holtonarms).to_s
+
+  #generates a username in the format "gding100"
+  username = fname.downcase[0] + lname.downcase + rand(100..9999).to_s
+
+  new_user = User.create(firstname: fname, lastname: lname, 
+  email: email, secret: password, team_id: team_id, is_admin: is_admin)
+
   redirect '/'
 end
 
