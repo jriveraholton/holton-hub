@@ -1,8 +1,128 @@
 require 'sinatra'
 require 'sinatra/activerecord'
+require 'oauth2'
+
+require './s_config.rb'
 
 set :database, {adapter: "sqlite3", database: "holtonhub.sqlite3"}
 
-get '/' do
-  "Holton Hub"
+
+#use sessions to save content for user across application
+enable :sessions
+set :session_secret, SESSION_SECRET 
+
+################################
+###OAuth2 Google Login Functions
+################################
+
+before do
+  pass if request.path_info == '/oauth2callback'
+  pass if request.path_info == '/signout'
+
+  if session[:access_token]
+	access_token = OAuth2::AccessToken.from_hash(client, { 
+			                                       :access_token => session[:access_token], 
+			                                       :refresh_token =>  session[:refresh_token], 
+			                                       :expires_at =>  session[:expires_at], 
+			                                       :header_format => 'OAuth %s' } )
+  end
 end
+
+def client
+  client ||= OAuth2::Client.new(G_API_CLIENT, G_API_SECRET, {
+		                          :site => 'https://accounts.google.com',
+		                          :authorize_url => "/o/oauth2/auth",
+		                          :token_url => "/o/oauth2/token"
+	                            })
+end
+
+#determines if a user exists or should be directed to log in
+def verfiy_user
+  #some token exists, but is it a real user?
+  if session[:access_token] != nil
+	@active_user = User.find_by(secret: session[:access_token])
+    #is no user recognized? Go to the sign_in page
+	if(@active_user == nil)
+	  redirect '/sign_in'
+	end
+  else
+    #they've never signed in
+	redirect '/sign_in'
+  end
+end
+
+#pull the google info based on the logged in user
+def access_token
+  return OAuth2::AccessToken.new(client, session[:access_token], :refresh_token => session[:refresh_token])
+end
+
+def g_redirect_uri
+  uri = URI.parse(request.url)
+  uri.path = '/oauth2callback'
+  uri.query = nil
+  uri.to_s
+end
+
+
+#save newly logged in user into database
+def save_user
+  #get google info
+  info = access_token.get("https://www.googleapis.com/oauth2/v3/userinfo").parsed
+  fresh_user = User.find_by(email: info["email"])
+
+  if fresh_user == nil #if the user doesn't exist already
+    name = info["name"].split
+	fresh_user = User.create(
+	  email: info["email"],
+      firstname: name[0]
+      lastname: name[name.length-1]
+	)
+  end
+  
+  fresh_user.secret = session[:access_token]
+  fresh_user.save
+end
+
+###########################
+
+###########################
+##### Routes ##############
+
+#home route
+get '/' do
+  erb :index
+end
+
+get '/sign_in' do
+  #if the session still knows about the user,
+  #verify they still have the correct credentials and send them to their home page
+  if session[:access_token] != nil
+	@active_user = User.find_by(secret: session[:access_token])
+	if(@active_user != nil)
+	  redirect '/'
+	end
+  end
+
+  #the user needs to login with their unique google url
+  @google_url = client.auth_code.authorize_url(:redirect_uri => g_redirect_uri,:scope => G_API_SCOPES,:access_type => "offline")
+  erb :sign_in
+end
+
+#clear out sesson info when signing out
+get '/signout' do
+  session[:access_token] = nil
+  session[:refresh_token] = nil
+  redirect '/sign_in'
+end
+
+#load session with google info for user
+get '/oauth2callback' do
+  new_token = client.auth_code.get_token(params[:code], :redirect_uri => g_redirect_uri)
+  session[:access_token]  = new_token.token
+  session[:expires_at] = new_token.expires_at
+  session[:refresh_token] = new_token.refresh_token
+  save_user
+  redirect '/sign_in'
+end
+
+##########################################
