@@ -4,7 +4,7 @@ require 'sinatra/activerecord'
 set :database, {adapter: "sqlite3", database: "holtonhub.sqlite3"}
 
 get '/' do
-  "Holton Hub"
+  erb :index
 end
 
 
