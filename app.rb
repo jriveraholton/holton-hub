@@ -78,7 +78,15 @@ def save_user
       lastname: name[name.length-1]
 	)
   end
-  
+  white_id = BwTeam.find_by(team_color: "white").id
+  blue_id = BwTeam.find_by(team_color: "blue").id
+  white_count = User.where(team_id: white_id).count
+  blue_count = User.where(team_id: blue_id).count
+  if white_count >= blue_id
+    fresh_user.team_id = white_id
+  else
+    fresh_user.team_id = blue_id
+  end
   fresh_user.secret = session[:access_token]
   fresh_user.save
 end
