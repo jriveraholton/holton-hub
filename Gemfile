@@ -1,5 +1,5 @@
 source 'http://rubygems.org'
-ruby '3.3.6'
+ruby '3.3.5'
 
 gem 'sinatra'
 gem 'rackup'
