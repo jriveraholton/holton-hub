@@ -1,7 +1,7 @@
-<% if @active_user != nil %>
-	<h1>Welcome <%= @active_user.email %> </h1>
-<% else %>
-	<button class="gsi-material-button">
+<center>
+	<img src="/images/holtonhub.png" style="max-width: 40%; height:auto;" class="rounded-circle mx-auto d-block" alt="Holton Hub Logo">
+	<a href="<%= @google_url%>">
+		<button class="gsi-material-button">
 		<div class="gsi-material-button-state"></div>
 		<div class="gsi-material-button-content-wrapper">
 			<div class="gsi-material-button-icon">
@@ -16,7 +16,6 @@
 			<span class="gsi-material-button-contents">Sign in with Google</span>
 			<span style="display: none;">Sign in with Google</span>
 		</div>
-	</button>
-<% end %>
-
-<a href="/signout">Sign out</a>
+		</button>
+	</a>
+</center>
