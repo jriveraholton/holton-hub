@@ -2,6 +2,7 @@ require 'sinatra'
 require 'sinatra/activerecord'
 require 'oauth2'
 
+require './models.rb'
 require './s_config.rb'
 
 set :database, {adapter: "sqlite3", database: "holtonhub.sqlite3"}
@@ -37,7 +38,7 @@ def client
 end
 
 #determines if a user exists or should be directed to log in
-def verfiy_user
+def verify_user
   #some token exists, but is it a real user?
   if session[:access_token] != nil
 	@active_user = User.find_by(secret: session[:access_token])
@@ -46,7 +47,7 @@ def verfiy_user
 	  redirect '/sign_in'
 	end
   else
-    #they've never signed in
+    #they've never signed in, so go to the sign in page
 	redirect '/sign_in'
   end
 end
@@ -68,27 +69,27 @@ end
 def save_user
   #get google info
   info = access_token.get("https://www.googleapis.com/oauth2/v3/userinfo").parsed
-  fresh_user = User.find_by(email: info["email"])
+  @active_user = User.find_by(email: info["email"])
 
-  if fresh_user == nil #if the user doesn't exist already
+  if @active_user == nil #if the user doesn't exist already
     name = info["name"].split
-	fresh_user = User.create(
+	@active_user = User.create(
 	  email: info["email"],
-      firstname: name[0]
+      firstname: name[0],
       lastname: name[name.length-1]
 	)
+    white_id = BwTeam.find_by(team_color: "white").id
+    blue_id = BwTeam.find_by(team_color: "blue").id
+    white_count = User.where(team_id: white_id).count
+    blue_count = User.where(team_id: blue_id).count
+    if white_count >= blue_id
+      @active_user.team_id = white_id
+    else
+      @active_user.team_id = blue_id
+    end
   end
-  white_id = BwTeam.find_by(team_color: "white").id
-  blue_id = BwTeam.find_by(team_color: "blue").id
-  white_count = User.where(team_id: white_id).count
-  blue_count = User.where(team_id: blue_id).count
-  if white_count >= blue_id
-    fresh_user.team_id = white_id
-  else
-    fresh_user.team_id = blue_id
-  end
-  fresh_user.secret = session[:access_token]
-  fresh_user.save
+  @active_user.secret = session[:access_token]
+  @active_user.save
 end
 
 ###########################
@@ -98,6 +99,10 @@ end
 
 #home route
 get '/' do
+  verify_user #make sure user is logged in, or force them to the login in page
+  if @active_user != nil
+    puts "LOGGED IN: " + @active_user.email
+  end
   erb :index
 end
 
@@ -105,12 +110,15 @@ get '/sign_in' do
   #if the session still knows about the user,
   #verify they still have the correct credentials and send them to their home page
   if session[:access_token] != nil
+    puts "ACCESS TOKEN FOUND"
 	@active_user = User.find_by(secret: session[:access_token])
 	if(@active_user != nil)
+      puts "ACTIVE USER STILL HERE"
 	  redirect '/'
 	end
   end
 
+  puts "NO ACTIVE USER!"
   #the user needs to login with their unique google url
   @google_url = client.auth_code.authorize_url(:redirect_uri => g_redirect_uri,:scope => G_API_SCOPES,:access_type => "offline")
   erb :sign_in
@@ -130,6 +138,8 @@ get '/oauth2callback' do
   session[:expires_at] = new_token.expires_at
   session[:refresh_token] = new_token.refresh_token
   save_user
+  puts "Saved User!!!"
+  puts @active_user.email.to_s
   redirect '/sign_in'
 end
 
