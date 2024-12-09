@@ -17,13 +17,13 @@ To generate the database file from the exisitng migrations run the following com
 bundle exec rake db:migrate
 ```
 
-###Loading the Database with Data
+### Loading the Database with Data
 
 To fill some tables with necessary data, run the following command:
 ```
 bundle exec rake db:seed
 ```
 
-###Secret Keys File
+### Secret Keys File
 
 Don't forget to ask Mr. Rivera about the secret keys file you ***must*** have for google login to work!
