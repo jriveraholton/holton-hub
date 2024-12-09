@@ -1,0 +1,11 @@
+*, html, footer {
+    background-color:navy;
+    color:aliceblue;
+    text-align: left;
+}
+
+h1 {
+    font-size: 20px;
+    font-family:Georgia, Times, serif;
+    margin-left:25px;
+}
