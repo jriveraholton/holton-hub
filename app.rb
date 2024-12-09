@@ -18,12 +18,7 @@ post '/create_users' do #creates users based on text file submitted by user
       fname = data[0]
       lname = data[1]
       email = data[2]
-      # assigns a different ID depending on which team they are -- may need to change the teams
-      if data[3].downcase == "blue"
-        team_id = 0
-      elsif data[3].downcase == "white"
-        team_id = 1
-      end
+      team_id = BwTeam.find_by(team_color: params[:team].downcase).id
       # assigns an admin role to administrators
       if data[4].downcase == "admin"
         is_admin = true
@@ -48,11 +43,7 @@ post '/create_single_user' do #creates a single user based on user-submitted inf
   lname = params[:lname]
   email = params[:email]
   is_admin = param[:is_admin] #preferably this is a yes/no checkbox
-  #assigns id 0 to blue team, id 1 to white team
-  if params[:team].downcase == "blue"
-    team_id = 0
-  elsif params[:team].downcase == "white"
-    team_id = 1
+  team_id = BwTeam.find_by(team_color: params[:team].downcase).id
   end
   #generates a default password in the format "gdingholtonarms"
   password = (fname.downcase[0] + lname.downcase + holtonarms).to_s
