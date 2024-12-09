@@ -1,6 +1,5 @@
 require 'sinatra'
 require 'sinatra/activerecord'
-<<<<<<< HEAD
 require 'oauth2'
 
 require './models.rb'
@@ -152,7 +151,7 @@ post '/create_users' do #creates users based on text file submitted by user
       fname = data[0]
       lname = data[1]
       email = data[2]
-      team_id = BwTeam.find_by(team_color: params[:team].downcase).id
+      team_id = BwTeam.find_by(team_color: data[3].downcase).id
       # assigns an admin role to administrators
       if data[4].downcase == "admin"
         is_admin = true
@@ -175,18 +174,17 @@ post '/create_single_user' do #creates a single user based on user-submitted inf
   email = params[:email]
   is_admin = param[:is_admin] #preferably this is a yes/no checkbox
   team_id = BwTeam.find_by(team_color: params[:team].downcase).id
-  end
   #generates a default password in the format "gdingholtonarms"
   password = (fname.downcase[0] + lname.downcase + holtonarms).to_s
-  
+
   new_user = User.create(firstname: fname, lastname: lname, 
   email: email, secret: password, team_id: team_id, is_admin: is_admin)
 
   redirect '/'
 end
 
-  get '/add_users' do
-    erb :add_users
-  end
+get '/add_users' do
+  erb :add_users
+end
 
   ##########################################
