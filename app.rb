@@ -1,6 +1,6 @@
 require 'sinatra'
 require 'sinatra/activerecord'
-
+require './models.rb'
 set :database, {adapter: "sqlite3", database: "holtonhub.sqlite3"}
 
 get '/' do
@@ -9,11 +9,11 @@ end
 
 
 post '/create_users' do #creates users based on text file submitted by user
-  users_file = params[:inputGroupFile04] 
-  File.open(users_file) do |file|
-    students = file.readlines #creates an array of student data
+  if params[:accountsFile] && params[:accountsFile][:filename] #only reads file if it exists & has been submitted
+    file = params[:accountsFile][:tempfile].read
   end
-
+  
+  students = file.split("\n") #breaks document into a list of student data
   students.each do |student|
     data = student.split(",") # splits individual student data into array
     #format: first name, last name, email, team color, role
@@ -32,15 +32,15 @@ post '/create_users' do #creates users based on text file submitted by user
     else
       is_admin = false
     end
+    #generates a default password in the format "gracedingholtonarms"
+    password = (fname.downcase + lname.downcase + "holtonarms").to_s
+
+    #generates a username in the format "grace.ding.2025"
+    username = email.split("@")[0]
+
+    new_user = User.create(firstname: fname, lastname: lname, 
+    email: email, secret: password, team_id: team_id, is_admin: is_admin)
   end
-  #generates a default password in the format "gdingholtonarms"
-  password = (fname.downcase[0] + lname.downcase + holtonarms).to_s
-
-  #generates a username in the format "gding100"
-  username = fname.downcase[0] + lname.downcase + rand(100..9999).to_s
-
-  new_user = User.create(firstname: fname, lastname: lname, 
-  email: email, secret: password, team_id: team_id, is_admin: is_admin)
   
   redirect '/'
 end
