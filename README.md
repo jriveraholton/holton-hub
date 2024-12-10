@@ -3,7 +3,7 @@
 
 ***This project runs on Ruby 3.3.6***
 
-## Merging Branches with Main
+### Merging Branches with Main
 
 Please make sure to pull from main ***BEFORE*** merging your branches. 
 

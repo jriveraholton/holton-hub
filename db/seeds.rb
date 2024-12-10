@@ -38,3 +38,11 @@ lower = Division.create(name: "Lower School")
 middle = Division.create(name: "Middle School")
 all = Division.create(name: "All School")
 
+#group levels
+
+GroupLevel.create(name: "high commitment", description: "many meetings, attendance required, events", limit: 2)
+GroupLevel.create(name: "interest", description: "casual, activity and fun-oriented", limit: 3)
+GroupLevel.create(name: "varsity", description: "varsity sport", limit: -1)
+GroupLevel.create(name: "junior varsity", description: "jv sport", limit: -1)
+GroupLevel.create(name: "affinity group", description: "activities and learning oriented around shared identities.", limit: -1)
+
