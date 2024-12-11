@@ -34,7 +34,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_05_143247) do
     t.string "name", null: false
   end
 
-  create_table "facultystaff", force: :cascade do |t|
+  create_table "facultystaffs", force: :cascade do |t|
     t.integer "grade"
     t.integer "user_id"
   end

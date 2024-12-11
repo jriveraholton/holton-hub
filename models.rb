@@ -4,7 +4,7 @@ end
 class Student < ActiveRecord::Base
 end
 
-class FacultyStaff < ActiveRecord::Base
+class Facultystaff < ActiveRecord::Base
 end
 
 class BwTeam < ActiveRecord::Base
