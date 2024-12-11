@@ -22,17 +22,18 @@ user6 = User.create(firstname: "Lindsay", lastname:"Kossoff", email:"lindsay.kos
 student6 = Student.create(grade: 12, user_id: user6.id)
 
 user7 = User.create(firstname: "Joseph", lastname:"Rivera", email:"joseph.rivera@holton-arms.edu", team_id: white.id, is_admin: true)
-facstaff1 = FacultyStaff.create(grade: 12, user_id: user7.id)
+#facstaff1 = FacultyStaff.create(grade: 12, user_id: user7.id)
+
 user8 = User.create(firstname: "Tucker", lastname:"Sowers", email:"tucker.sowers@holton-arms.edu", team_id: white.id)
-facstaff2 = FacultyStaff.create(grade: 9, user_id: user8.id)
+#facstaff2 = FacultyStaff.create(grade: 9, user_id: user8.id)
 
-#Seasons
-fall = Season.create(name: "Fall", start_date: Datetime.new(2024, 8, 22))
-winter  = Season.create(name: "Winter", start_date: Datetime.new(2024, 11, 14))
-spring = Season.create(name: "Spring", start_date: Datetime.new(2024, 3, 24))
+# #Seasons
+fall = Season.create(name: "Fall", start_date: DateTime.new(2024, 8, 22))
+winter  = Season.create(name: "Winter", start_date: DateTime.new(2024, 11, 14))
+spring = Season.create(name: "Spring", start_date: DateTime.new(2024, 3, 24))
 
 
-#divisions
+# #divisions
 upper = Division.create(name: "Upper School")
 lower = Division.create(name: "Lower School")
 middle = Division.create(name: "Middle School")
