@@ -100,6 +100,8 @@ get '/' do
   verify_user #make sure user is logged in, or force them to the login in page
   if @active_user != nil
     puts "LOGGED IN: " + @active_user.email
+    @active_team_color = BwTeam.find(@active_user.team_id).team_color.downcase
+    puts "TEAM COLOR: " + @active_team_color.to_s
   end
   erb :index
 end
@@ -187,4 +189,4 @@ get '/add_users' do
   erb :add_users
 end
 
-  ##########################################
+##########################################
