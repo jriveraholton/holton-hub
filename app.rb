@@ -27,15 +27,6 @@ before do
   end
 end
 
-<<<<<<< HEAD
-get '/studentpage' do
-  erb :student_homepage
-end
-
-get '/messages' do
-  erb :messages
-end
-=======
 def client
   client ||= OAuth2::Client.new(G_API_CLIENT, G_API_SECRET, {
 		                          :site => 'https://accounts.google.com',
@@ -196,5 +187,14 @@ get '/add_users' do
   erb :add_users
 end
 
+get '/studentpage' do
+  erb :student_homepage
+end
+
+get '/messages' do
+  erb :messages
+end
+
+post '/messagesent' do
+end 
   ##########################################
->>>>>>> fa5d0de1ed3d593cd3580fd8e6b700f5fd5162df
