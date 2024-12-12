@@ -187,4 +187,19 @@ get '/add_users' do
   erb :add_users
 end
 
+get '/new_event' do
+  erb :new_event
+end
+
+post '/create_event' do
+  name = params[:eventName]
+  date = params[:date].to_datetime #calendar on the frontend
+  blue_pts = params[:blue_pts]
+  white_pts = params[:white_pts]
+  division = Division.find_by(name: params[:division]).id
+  puts division
+  new_event = BwEvent.create(name: name, event_date: date, blue_points: blue_pts, white_points: white_pts, division_id: division) 
+  redirect '/'
+end
+
   ##########################################
