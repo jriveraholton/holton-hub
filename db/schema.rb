@@ -111,5 +111,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_05_143247) do
     t.string "secret"
     t.integer "team_id"
     t.boolean "is_admin", default: false, null: false
+    t.boolean "active", default: true, null: false
   end
 end

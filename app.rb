@@ -44,6 +44,8 @@ def verify_user
 	if(@active_user == nil)
 	  redirect '/sign_in'
 	end
+    @active_team_color = BwTeam.find(@active_user.team_id).team_color.downcase
+#    session[:team_color] = @active_team_color
   else
     #they've never signed in, so go to the sign in page
 	redirect '/sign_in'
@@ -100,7 +102,6 @@ get '/' do
   verify_user #make sure user is logged in, or force them to the login in page
   if @active_user != nil
     puts "LOGGED IN: " + @active_user.email
-    @active_team_color = BwTeam.find(@active_user.team_id).team_color.downcase
     puts "TEAM COLOR: " + @active_team_color.to_s
   end
   erb :index
@@ -112,7 +113,7 @@ get '/sign_in' do
   if session[:access_token] != nil
     puts "ACCESS TOKEN FOUND"
 	@active_user = User.find_by(secret: session[:access_token])
-	if(@active_user != nil)
+	if @active_user != nil and @active_user.active
       puts "ACTIVE USER STILL HERE"
 	  redirect '/'
 	end
@@ -187,6 +188,27 @@ end
 
 get '/add_users' do
   erb :add_users
+end
+
+get '/manage/user_activation' do
+  verify_user
+#  @active_team_color = session[:team_color]
+  puts "ACTIVE_USER: " + @active_user.email
+  puts "TEAM Color: " + @active_team_color.to_s
+  @all_users = User.all
+  erb :user_activation
+end
+
+post '/activation' do
+  fname = params[:fname]
+  lname = params[:lname]
+  active = params[:act]
+  user = User.find_by(firstname: fname, lastname: lname)
+  puts "FOUND USER: " + user.firstname + " " + user.lastname
+  user.active = active
+  user.save
+
+  redirect '/manage/user_activation'
 end
 
 ##########################################
