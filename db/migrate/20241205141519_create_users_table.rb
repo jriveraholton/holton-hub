@@ -7,6 +7,7 @@ class CreateUsersTable < ActiveRecord::Migration[8.0]
       t.string :secret
       t.integer :team_id#, :null => false
       t.boolean :is_admin, :null => false, :default => false
+      t.boolean :active, :null => false, :default => true
     end
   end
 end

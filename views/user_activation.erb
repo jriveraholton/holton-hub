@@ -1,0 +1,30 @@
+<div class="container-fluid">
+	<div class="row justify-content-center" >
+		<div class="col-lg-6">
+			<ul class="list-group" >
+				<% @all_users.each do |user| %>
+					<% if user.email != @active_user.email %>
+						<li class="list-group-item">
+							<div class="row">
+								<div class="col" >
+									<%= "#{user.firstname.titleize} #{user.lastname.titleize}" %>
+								</div>
+								<div class="col" >
+									<% if user.active %>
+										<form method="post" action=<%="/activation?fname=#{user.firstname}&lname=#{user.lastname}&act=false"%>>
+											<button class="btn btn-danger" type="submit"> Deactivate User </button>
+										</form>
+									<% else %>
+										<form method="post" action=<%="/activation?fname=#{user.firstname}&lname=#{user.lastname}&act=true"%>>
+											<button class="btn btn-primary" type="submit"> Activate User </button>
+										</form>
+									<% end %>
+								</div>
+							</div>
+						</li>
+					<% end %>
+				<% end %>
+			</ul>
+		</div>
+	</div>
+</div>
