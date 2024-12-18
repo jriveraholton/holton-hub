@@ -218,10 +218,21 @@ end
 
 get '/manage/user_activation' do
   verify_user
-#  @active_team_color = session[:team_color]
-  puts "ACTIVE_USER: " + @active_user.email
-  puts "TEAM Color: " + @active_team_color.to_s
   @all_users = User.all
+  @all_by_groups = {9 => [], 10 => [], 11 => [], 12 => [], :facstaff => []}
+
+  #figure out which users are students and put them together by grade level
+  #and put all faculty and staff together
+  @all_users.each do |user|
+    stu = Student.find_by(user_id: user.id)
+    fac = Facultystaff.find_by(user_id: user.id)
+    if stu != nil
+      @all_by_groups[stu.grade].push(user)
+    elsif fac != nil
+      @all_by_groups[:facstaff].push(user)
+    end
+  end
+
   erb :user_activation
 end
 
