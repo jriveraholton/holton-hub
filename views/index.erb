@@ -1,1 +1,13 @@
-<p>hello world</p>
+<div class="container-fluid">
+	<div class="row" >
+		<div class="col" >
+			<% if @active_user != nil %>
+				<h1>Welcome <%= @active_user.email %> </h1>
+			<% else %>
+				<h1>No content</h1>
+			<% end %>
+
+			<a class="btn btn-primary" href="/signout">Sign out</a>
+		</div>
+	</div>
+</div>

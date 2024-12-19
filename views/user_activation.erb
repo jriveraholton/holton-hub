@@ -1,0 +1,47 @@
+<div class="container-fluid">
+	<div class="row justify-content-center" >
+		<div class="col-lg-6">
+			<div class="accordion" id="usersAccordion">
+				<% @all_by_groups.each do |group, users| %>
+					<div class="accordion-item">
+						<h2 class="accordion-header">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse<%= group %>" aria-expanded="false" aria-controls="flush-collapse<%= group %>">
+								<% if group.is_a? Integer %>
+									<h6>Grade <%= group %> <%="(#{users.length} Users)" %></h6>
+								<% elsif group == :facstaff %>
+									<h6>Faculty & Staff <%="(#{users.length} Users)" %></h6>
+								<% end %>
+							</button>
+						</h2>
+						<div id="flush-collapse<%= group %>" class="accordion-collapse collapse <% if users.length > 0 %>show<% end %>">
+							<ul class="list-group" >
+								<% users.each do |user| %>
+									<li class="list-group-item">
+										<div class="row">
+											<div class="col" >
+												<%= "#{user.firstname.titleize} #{user.lastname.titleize}" %>
+											</div>
+											<div class="col" >
+												<% if user.email == @active_user.email %>
+													<button class="btn btn-danger" type="submit" disabled> Deactivate User </button>
+												<% elsif user.active %>
+													<form method="post" action=<%="/activation?fname=#{user.firstname}&lname=#{user.lastname}&act=false"%>>
+														<button class="btn btn-danger" type="submit"> Deactivate User </button>
+													</form>
+												<% else %>
+													<form method="post" action=<%="/activation?fname=#{user.firstname}&lname=#{user.lastname}&act=true"%>>
+														<button class="btn btn-primary" type="submit"> Activate User </button>
+													</form>
+												<% end %>
+											</div>
+										</div>
+									</li>
+								<% end %>
+							</ul>						
+						</div>
+					</div>
+				<% end %>
+			</div>
+		</div>
+	</div>
+</div>
