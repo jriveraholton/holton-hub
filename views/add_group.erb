@@ -1,0 +1,65 @@
+<!-- everything needs a name and id (make them the same thing) -->
+
+
+<body onpageshow="myFunction()">
+  <div class="container">
+      <h1>Add Clubs or Athletic Teams</h1>
+      <p>This is the basic information for a club or athletic team. Members will be added later<p>
+
+      <form action="/create_groups" method="post" enctype="multipart/form-data">
+          <select onfocusout="myFunction()" class="form-select" aria-label="Default select example" id="typeSelection" required>
+              <option selected disabled value>What type of group is this</option>
+              <option value="Club">Club</option>
+              <option value="Sport">Sport</option>
+          </select> 
+
+          <br>
+          <input class="form-control" type="text" placeholder="Name of group" aria-label="default input example">
+          <br>
+          <div class="mb-3">
+              <label for="exampleFormControlTextarea1" class="form-label">Description of group</label>
+              <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" required></textarea>
+          </div>
+          <br>
+          <select class="form-select" aria-label="Default select example" id="clubTypes" required>
+              <option selected disabled value>What level of club is this</option>
+              <option value="1">One Time Event</option>
+              <option value="2">High Commitment</option>
+              <option value="3">Affinity Group</option>
+              <option value="4">Allied Space</option>
+              <option value="5">Low Commitment</option>
+          </select> 
+          <select class="form-select" aria-label="Default select example" id="teamTypes"required>
+              <option selected disabled value>What level of team is this</option>
+              <option value="1">Varsity</option>
+              <option value="2">Junior Varsity</option>
+          </select> 
+
+          <br>
+          <input type="submit" value="Submit">
+          </div>
+      </form>
+      
+  </div>
+</body>
+
+<script>
+
+function myFunction() {
+  var x = document.getElementById("typeSelection");
+  var val = x.value
+  if (val === "Club") {
+    clubTypes.style.display = "block";
+    teamTypes.style.display = "none";
+  } else {
+    if (val === "Sport") {
+      teamTypes.style.display = "block";
+      clubTypes.style.display = "none";
+    } else {
+      clubTypes.style.display = "none";
+      teamTypes.style.display = "none";
+    }
+  }
+}
+</script>
+

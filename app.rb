@@ -8,7 +8,7 @@ get '/' do
 end
 
 
-post '/create_user' do #creates users based on text file submitted by user
+post '/create_users' do #creates users based on text file submitted by user
   users_file = params[:users_file] #key may need to change
   File.open(users_file) do |file|
     students = file.readlines #creates an array of student data
@@ -32,7 +32,7 @@ post '/create_user' do #creates users based on text file submitted by user
     else
       is_admin = false
     end
-    
+  end
   #generates a default password in the format "gdingholtonarms"
   password = (fname.downcase[0] + lname.downcase + holtonarms).to_s
 
@@ -47,4 +47,8 @@ end
 
 get '/add_users' do
   erb :add_users
+end
+
+get '/add_group' do 
+  erb :add_group
 end
