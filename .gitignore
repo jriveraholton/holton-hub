@@ -41,3 +41,4 @@ Thumbs.db
 #################
 *.lock
 *.#*
+s_config.rb

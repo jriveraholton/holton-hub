@@ -1,8 +1,45 @@
-.blue-user {
-    background-color: #06277A;
-    color: white;
+/* these classes change the overall color scheme of the pages
+   without having to apply classes to everyone. These are bootstrap
+   CSS variables.
+ */
+
+body.blue-user {
+	--bs-body-bg:navy;
+	--bs-body-color:aliceblue;
 }
-.white-user {
-    background-color: white;
-    color: #06277A;
+
+body.white-user {
+	--bs-body-bg:white;
+	--bs-body-color:navy;
 }
+
+.navbar.blue-user {
+	--bs-navbar-color:aliceblue;
+	--bs-navbar-brand-color:aliceblue;
+	--bs-navbar-active-color:lightblue;
+}
+.navbar.white-user {
+	--bs-navbar-brand-color:navy;
+	--bs-navbar-active-color:blue;
+	--bs-navbar-color:mediumblue;
+}
+
+
+h1 {
+    font-size: 20px;
+    font-family:Georgia, Times, serif;
+    margin-left:25px;
+}
+
+
+#g_logo {
+	height: 20px;
+	margin-right: 12px;
+	min-width: 20px;
+	width: 20px;
+}
+
+.g_container {
+	display:flex;
+}
+
