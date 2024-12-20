@@ -205,6 +205,24 @@ get '/new_event' do
   erb :new_event
 end
 
+get '/bw_events' do
+  @events = BwEvent.all
+  @blue_points = 0
+  @white_points = 0
+  @events.each do |event|
+    @blue_points += event.blue_points
+    @white_points += event.white_points
+  end
+  erb :bw_events
+  
+end
+
+  # verify_user
+  # @access = false
+  # if @active_user.is_admin
+  #   @access = true
+  # end
+  
 post '/create_event' do
   name = params[:eventName]
   date = params[:date].to_datetime #calendar on the frontend

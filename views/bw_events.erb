@@ -1,0 +1,33 @@
+<div class="container" id="bw_points">
+    <div class="row text-center">
+        <div class="col-md-6">
+            <h1>Blue Points</h1> 
+            
+            <p><%= @blue_points %> </p>
+        </div>
+
+        <div class="col-md-6">
+            <h1>White Points</h1> 
+            
+            <p><%= @white_points %> </p>
+        </div> 
+    </div>
+    <div class="row">
+        <% @events.each do |event| %> 
+            <div class="col-md-4 col-lg-3 card mb-2">
+                <div class="card-header" id="event-header"> <%=event.name %> 
+                <!-- add in display edit func if user is an admin-->
+                </div>
+                <div class="card-body" id="event-body">
+                    Date: <%= event.event_date.strftime("%m/%d/%Y") %>
+                    <br>
+                    Blue Points: <%= event.blue_points %>
+                    <br>
+                    Blue Points: <%= event.white_points %>
+                    <br>
+                </div>
+            </div>
+        <% end %>
+    </div>
+
+</div>
