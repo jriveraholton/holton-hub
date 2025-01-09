@@ -209,6 +209,11 @@ get '/bw_events' do
   @events = BwEvent.all
   @blue_points = 0
   @white_points = 0
+  verify_user
+  @access = false
+  if @active_user.is_admin
+    @access = true
+  end
   @events.each do |event|
     @blue_points += event.blue_points
     @white_points += event.white_points
@@ -217,11 +222,13 @@ get '/bw_events' do
   
 end
 
-  # verify_user
-  # @access = false
-  # if @active_user.is_admin
-  #   @access = true
-  # end
+get '/edit_event' do
+  # puts params[:id] 
+  # puts "loading"
+  @event = BwEvent.find_by(id: params[:id])
+  puts @event.name
+  erb :edit_event
+end
   
 post '/create_event' do
   name = params[:eventName]
@@ -229,9 +236,24 @@ post '/create_event' do
   blue_pts = params[:blue_pts]
   white_pts = params[:white_pts]
   division = Division.find_by(name: params[:division]).id
-  puts division
   new_event = BwEvent.create(name: name, event_date: date, blue_points: blue_pts, white_points: white_pts, division_id: division) 
-  redirect '/'
+  redirect '/bw_events'
+end
+
+post '/update_event' do
+  name = params[:eventName]
+  date = params[:date].to_datetime #calendar on the frontend
+  blue_pts = params[:blue_pts]
+  white_pts = params[:white_pts]
+  division = Division.find_by(id: params[:division]).id 
+  @event.update(name: name, event_date: date, blue_points: blue_pts, white_points: white_pts, division_id: division) # this one - should be an edit 
+  redirect '/bw_events'
+end
+
+post '/delete_event' do
+  event = BwEvent.find_by() #fix here
+  event.delete
+  redirect '/bw_events'
 end
 
 get '/manage/user_activation' do
