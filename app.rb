@@ -259,5 +259,11 @@ class HoltonHubApp < Sinatra::Base
     erb :club_droppout
   end
 
+  post '/messagesent' do
+  end 
+
+  get '/currentday' do
+    erb :day_schedule
+  end
   ##########################################
 end
