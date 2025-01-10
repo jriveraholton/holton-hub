@@ -189,8 +189,106 @@ class HoltonHubApp < Sinatra::Base
     redirect '/'
   end
 
-  get '/add_users' do
-    erb :add_users
+post '/create_single_user' do #creates a single user based on user-submitted information
+  fname = params[:fname]
+  lname = params[:lname]
+  email = params[:email]
+  is_admin = param[:is_admin] #preferably this is a yes/no checkbox
+  team_id = BwTeam.find_by(team_color: params[:team].downcase).id
+  #generates a default password in the format "gdingholtonarms"
+  password = (fname.downcase[0] + lname.downcase + holtonarms).to_s
+
+  new_user = User.create(firstname: fname, lastname: lname, 
+  email: email, secret: password, team_id: team_id, is_admin: is_admin)
+
+  redirect '/'
+end
+
+get '/add_users' do
+  erb :add_users
+end
+
+get '/studentpage' do
+  erb :student_homepage
+end
+
+get '/messages' do
+  erb :messages
+end
+
+post '/messagesent' do
+end 
+
+get '/new_event' do
+  erb :new_event
+end
+
+get '/bw_events' do
+  @events = BwEvent.all
+  @blue_points = 0
+  @white_points = 0
+  verify_user
+  @access = false
+  if @active_user.is_admin
+    @access = true
+  end
+  @events.each do |event| #adds up points
+    @blue_points += event.blue_points
+    @white_points += event.white_points
+  end
+  erb :bw_events
+  
+end
+
+get '/edit_event' do
+  # puts params[:id] 
+  # puts "loading"
+  @event = BwEvent.find_by(id: params[:id])
+  erb :edit_event
+end
+  
+post '/create_event' do
+  name = params[:eventName]
+  date = params[:date].to_datetime #calendar on the frontend
+  blue_pts = params[:blue_pts]
+  white_pts = params[:white_pts]
+  division = Division.find_by(name: params[:division]).id
+  new_event = BwEvent.create(name: name, event_date: date, blue_points: blue_pts, white_points: white_pts, division_id: division) 
+  redirect '/bw_events'
+end
+
+post '/update_event' do
+  event = BwEvent.find_by(params[:id])
+  name = params[:eventName]
+  date = params[:date].to_datetime #calendar on the frontend
+  blue_pts = params[:blue_pts]
+  white_pts = params[:white_pts]
+  division = Division.find_by(id: params[:division]).id 
+  event.update(name: name, event_date: date, blue_points: blue_pts, white_points: white_pts, division_id: division) # this one - should be an edit 
+  redirect '/bw_events'
+end
+
+post '/delete_event' do
+  event = BwEvent.find_by(params[:id]) #fix here
+  event.delete
+  redirect '/bw_events'
+end
+
+get '/manage/user_activation' do
+  verify_user
+  @all_users = User.all
+  @all_by_groups = {9 => [], 10 => [], 11 => [], 12 => [], :facstaff => []}
+
+  #figure out which users are students and put them together by grade level
+  #and put all faculty and staff together
+  @all_users.each do |user|
+    stu = Student.find_by(user_id: user.id)
+    fac = Facultystaff.find_by(user_id: user.id)
+    if stu != nil
+      @all_by_groups[stu.grade].push(user)
+    elsif fac != nil
+      @all_by_groups[:facstaff].push(user)
+    end
   end
 
   get '/studentpage' do
