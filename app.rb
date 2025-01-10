@@ -241,17 +241,18 @@ post '/create_event' do
 end
 
 post '/update_event' do
+  event = BwEvent.find_by(params[:id])
   name = params[:eventName]
   date = params[:date].to_datetime #calendar on the frontend
   blue_pts = params[:blue_pts]
   white_pts = params[:white_pts]
   division = Division.find_by(id: params[:division]).id 
-  @event.update(name: name, event_date: date, blue_points: blue_pts, white_points: white_pts, division_id: division) # this one - should be an edit 
+  event.update(name: name, event_date: date, blue_points: blue_pts, white_points: white_pts, division_id: division) # this one - should be an edit 
   redirect '/bw_events'
 end
 
 post '/delete_event' do
-  event = BwEvent.find_by() #fix here
+  event = BwEvent.find_by(params[:id]) #fix here
   event.delete
   redirect '/bw_events'
 end
