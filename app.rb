@@ -197,4 +197,8 @@ end
 
 post '/messagesent' do
 end 
+
+get '/currentday' do
+  erb :day_schedule
+end
   ##########################################
