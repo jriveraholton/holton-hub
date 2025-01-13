@@ -41,10 +41,11 @@ post '/create_user' do #creates users based on text file submitted by user
 
   new_user = User.create(firstname: fname, lastname: lname, 
   email: email, secret: password, team_id: team_id, is_admin: is_admin)
+  end 
   
   redirect '/'
 end
 
-get '/add_users' do
-  erb :add_users
+get '/create_single_user' do
+  erb :create_single_user
 end
