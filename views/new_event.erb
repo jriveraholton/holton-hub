@@ -1,4 +1,6 @@
+
 <div class="container">
+    <% if @access %>
     <h1>Add a New Event</h1>
     <form action="/create_event" method="post" enctype="multipart/form-data">
         <div class="mb-3 row">
@@ -56,5 +58,8 @@
         
 
     </form>
-
+    <% else %>
+    <p>Page not found... return <a href="/">home</a></p>
+    <% end %>
 </div>
+
