@@ -14,21 +14,23 @@
     </div>
     <div class="row">
         <% @events.each do |event| %> 
-            <div class="col-md-4 col-lg-3 card mb-2">
-                <div class="card-header" id="event-header"> <%=event.name %> 
-                <!-- add in display edit func if user is an admin-->
-                </div>
-                <div class="card-body" id="event-body">
-                    Date: <%= event.event_date.strftime("%m/%d/%Y") %>
-                    <br>
-                    Blue Points: <%= event.blue_points %>
-                    <br>
-                    Blue Points: <%= event.white_points %>
-                    <br>
-                    <% if @access %>
-                        <a href="/edit_event?id=<%= event.id%>" class="btn btn-primary" role="button">Edit</a>
-                    <% end %>
-                </div>
+            <div class="col-md-4 col-lg-3">
+				<div class="card mb-2">
+					<div class="card-header" id="event-header"> <%=event.name %> 
+						<!-- add in display edit func if user is an admin-->
+					</div>
+					<div class="card-body" id="event-body">
+						Date: <%= event.event_date.strftime("%m/%d/%Y") %>
+						<br>
+						Blue Points: <%= event.blue_points %>
+						<br>
+						White Points: <%= event.white_points %>
+						<br>
+						<% if @access %>
+							<a href="/edit_event?id=<%= event.id%>" class="btn btn-primary" role="button">Edit</a>
+						<% end %>
+					</div>
+				</div>
             </div>
         <% end %>
     </div>
