@@ -78,21 +78,6 @@ class HoltonHubApp < Sinatra::Base
     @active_user = User.find_by(email: info["email"])
     
     if @active_user == nil #if the user doesn't exist already, they cannot log in
-      # name = info["name"].split
-	  # @active_user = User.create(
-	  #   email: info["email"],
-      #   firstname: name[0],
-      #   lastname: name[name.length-1]
-	  # )
-      # white_id = BwTeam.find_by(team_color: "white").id
-      # blue_id = BwTeam.find_by(team_color: "blue").id
-      # white_count = User.where(team_id: white_id).count
-      # blue_count = User.where(team_id: blue_id).count
-      # if white_count >= blue_id
-      #   @active_user.team_id = white_id
-      # else
-      #   @active_user.team_id = blue_id
-      # end
       redirect '/'
     end
     @active_user.secret = session[:access_token]
@@ -119,9 +104,9 @@ class HoltonHubApp < Sinatra::Base
     #verify they still have the correct credentials and send them to their home page
     if session[:access_token] != nil
    	  @active_user = User.find_by(secret: session[:access_token])
-	  if @active_user != nil and @active_user.active
-	    redirect '/'
-	  end
+      if @active_user != nil and @active_user.active
+        redirect '/'
+      end
     end
 
     #the user needs to login with their unique google url
@@ -189,10 +174,66 @@ class HoltonHubApp < Sinatra::Base
     redirect '/'
   end
 
+
+
   get '/add_users' do
     erb :add_users
   end
 
+  get '/bw_events' do
+    @events = BwEvent.all
+    @blue_points = 0
+    @white_points = 0
+    verify_user
+    
+    @access = false
+    if @active_user.is_admin
+      @access = true
+    end
+    
+    @events.each do |event| #adds up points
+      @blue_points += event.blue_points
+      @white_points += event.white_points
+    end
+    erb :bw_events
+    
+  end
+
+  get '/edit_event' do
+    verify_user
+    # puts params[:id] 
+    # puts "loading"
+    @event = BwEvent.find_by(id: params[:id])
+    erb :edit_event
+  end
+  
+  post '/create_event' do
+    name = params[:eventName]
+    date = params[:date].to_datetime #calendar on the frontend
+    blue_pts = params[:blue_pts]
+    white_pts = params[:white_pts]
+    division = Division.find_by(name: params[:division]).id
+    new_event = BwEvent.create(name: name, event_date: date, blue_points: blue_pts, white_points: white_pts, division_id: division) 
+    redirect '/bw_events'
+  end
+
+  post '/update_event' do
+    event = BwEvent.find_by(id: params[:id])
+    name = params[:eventName]
+    date = params[:date].to_datetime #calendar on the frontend
+    blue_pts = params[:blue_pts]
+    white_pts = params[:white_pts]
+    division = Division.find_by(id: params[:division]).id 
+    event.update(name: name, event_date: date, blue_points: blue_pts, white_points: white_pts, division_id: division) # this one - should be an edit
+    redirect '/bw_events'
+  end
+
+  post '/delete_event' do
+    event = BwEvent.find_by(params[:id]) #fix here
+    event.delete
+    redirect '/bw_events'
+  end
+  
   get '/studentpage' do
     erb :student_homepage
   end
@@ -205,18 +246,8 @@ class HoltonHubApp < Sinatra::Base
   end 
 
   get '/new_event' do
+    verify_user
     erb :new_event
-  end
-
-  post '/create_event' do
-    name = params[:eventName]
-    date = params[:date].to_datetime #calendar on the frontend
-    blue_pts = params[:blue_pts]
-    white_pts = params[:white_pts]
-    division = Division.find_by(name: params[:division]).id
-    puts division
-    new_event = BwEvent.create(name: name, event_date: date, blue_points: blue_pts, white_points: white_pts, division_id: division) 
-    redirect '/'
   end
 
   get '/manage/user_activation' do
@@ -259,5 +290,11 @@ class HoltonHubApp < Sinatra::Base
     erb :club_droppout
   end
 
+  post '/messagesent' do
+  end 
+
+  get '/currentday' do
+    erb :day_schedule
+  end
   ##########################################
 end

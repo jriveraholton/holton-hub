@@ -6,7 +6,7 @@ blue = BwTeam.create(team_color: 'blue')
 user1 = User.create(firstname: "Jane", lastname:"Rollenhagen", email:"janey.rollenhagen.2025@holton-arms.edu", team_id: blue.id)
 student1 = Student.create(grade: 12, user_id: user1.id)
 
-user2 = User.create(firstname: "Grace", lastname:"Ding", email:"grace.ding.2025@holton-arms.edu", team_id: blue.id)
+user2 = User.create(firstname: "Grace", lastname:"Ding", email:"grace.ding.2025@holton-arms.edu", team_id: blue.id, is_admin: true)
 student2 = Student.create(grade: 12, user_id: user2.id)
 
 user3 = User.create(firstname: "Kriti", lastname:"Hota", email:"kriti.hota.2026@holton-arms.edu", team_id: blue.id)
