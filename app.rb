@@ -78,21 +78,6 @@ class HoltonHubApp < Sinatra::Base
     @active_user = User.find_by(email: info["email"])
     
     if @active_user == nil #if the user doesn't exist already, they cannot log in
-      # name = info["name"].split
-	  # @active_user = User.create(
-	  #   email: info["email"],
-      #   firstname: name[0],
-      #   lastname: name[name.length-1]
-	  # )
-      # white_id = BwTeam.find_by(team_color: "white").id
-      # blue_id = BwTeam.find_by(team_color: "blue").id
-      # white_count = User.where(team_id: white_id).count
-      # blue_count = User.where(team_id: blue_id).count
-      # if white_count >= blue_id
-      #   @active_user.team_id = white_id
-      # else
-      #   @active_user.team_id = blue_id
-      # end
       redirect '/'
     end
     @active_user.secret = session[:access_token]
@@ -178,10 +163,10 @@ class HoltonHubApp < Sinatra::Base
     fname = params[:fname]
     lname = params[:lname]
     email = params[:email]
-    is_admin = param[:is_admin] #preferably this is a yes/no checkbox
+    is_admin = params[:is_admin] #preferably this is a yes/no checkbox
     team_id = BwTeam.find_by(team_color: params[:team].downcase).id
     #generates a default password in the format "gdingholtonarms"
-    password = (fname.downcase[0] + lname.downcase + holtonarms).to_s
+    password = (fname.downcase[0] + lname.downcase + "holtonarms").to_s
 
     new_user = User.create(firstname: fname, lastname: lname, 
                            email: email, secret: password, team_id: team_id, is_admin: is_admin)
@@ -223,7 +208,6 @@ class HoltonHubApp < Sinatra::Base
       @white_points += event.white_points
     end
     erb :bw_events
-    
   end
 
   get '/edit_event' do
@@ -301,12 +285,14 @@ class HoltonHubApp < Sinatra::Base
     erb :club_droppout
   end
 
-  post '/messagesent' do
-  end 
-
   get '/today' do
     verify_user
     erb :day_schedule
+  end
+
+  get '/manage/create_user' do
+    verify_user
+    erb :create_single_user
   end
   ##########################################
 end
