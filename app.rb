@@ -178,18 +178,16 @@ class HoltonHubApp < Sinatra::Base
     fname = params[:fname]
     lname = params[:lname]
     email = params[:email]
-    is_admin = param[:is_admin] #preferably this is a yes/no checkbox
+    is_admin = params[:is_admin] #preferably this is a yes/no checkbox
     team_id = BwTeam.find_by(team_color: params[:team].downcase).id
     #generates a default password in the format "gdingholtonarms"
-    password = (fname.downcase[0] + lname.downcase + holtonarms).to_s
+    password = (fname.downcase[0] + lname.downcase + "holtonarms").to_s
 
     new_user = User.create(firstname: fname, lastname: lname, 
                            email: email, secret: password, team_id: team_id, is_admin: is_admin)
 
     redirect '/'
   end
-
-
 
   get '/add_users' do
     erb :add_users
@@ -224,7 +222,6 @@ class HoltonHubApp < Sinatra::Base
       @white_points += event.white_points
     end
     erb :bw_events
-    
   end
 
   get '/edit_event' do
@@ -261,6 +258,18 @@ class HoltonHubApp < Sinatra::Base
     redirect '/bw_events'
   end
 
+  get '/studentpage' do
+    erb :student_homepage
+  end
+
+  get '/messages' do
+    erb :messages
+  end
+
+  get '/new_event' do
+    erb :new_event
+  end
+
   get '/manage/user_activation' do
     verify_user
     @all_users = User.all
@@ -278,78 +287,39 @@ class HoltonHubApp < Sinatra::Base
       end
     end
 
-    get '/studentpage' do
-      erb :student_homepage
-    end
-
-    get '/messages' do
-      erb :messages
-    end
-
-    post '/messagesent' do
-    end 
-
-    get '/new_event' do
-      erb :new_event
-    end
-
-    post '/create_event' do
-      name = params[:eventName]
-      date = params[:date].to_datetime #calendar on the frontend
-      blue_pts = params[:blue_pts]
-      white_pts = params[:white_pts]
-      division = Division.find_by(name: params[:division]).id
-      puts division
-      new_event = BwEvent.create(name: name, event_date: date, blue_points: blue_pts, white_points: white_pts, division_id: division) 
-      redirect '/'
-    end
-
-    get '/manage/user_activation' do
-      verify_user
-      @all_users = User.all
-      @all_by_groups = {9 => [], 10 => [], 11 => [], 12 => [], :facstaff => []}
-
-      #figure out which users are students and put them together by grade level
-      #and put all faculty and staff together
-      @all_users.each do |user|
-        stu = Student.find_by(user_id: user.id)
-        fac = Facultystaff.find_by(user_id: user.id)
-        if stu != nil
-          @all_by_groups[stu.grade].push(user)
-        elsif fac != nil
-          @all_by_groups[:facstaff].push(user)
-        end
-      end
-
-      erb :user_activation
-    end
-
-    post '/activation' do
-      #set the given user based on name to active or inactive
-      fname = params[:fname]
-      lname = params[:lname]
-      active = params[:act]
-      user = User.find_by(firstname: fname, lastname: lname)
-      user.active = active
-      user.save
-
-      redirect '/manage/user_activation'
-    end
-
-    get '/faculty_page' do
-      erb :faculty_page
-    end
-
-    get '/club_droppout' do
-      erb :club_droppout
-    end
-
-    post '/messagesent' do
-    end 
-
-    get '/currentday' do
-      erb :day_schedule
-    end
-    ##########################################
+    erb :user_activation
   end
+
+  post '/activation' do
+    #set the given user based on name to active or inactive
+    fname = params[:fname]
+    lname = params[:lname]
+    active = params[:act]
+    user = User.find_by(firstname: fname, lastname: lname)
+    user.active = active
+    user.save
+
+    redirect '/manage/user_activation'
+  end
+
+  get '/faculty_page' do
+    erb :faculty_page
+  end
+
+  get '/club_droppout' do
+    erb :club_droppout
+  end
+
+  post '/messagesent' do
+  end 
+
+  get '/currentday' do
+    erb :day_schedule
+  end
+
+  get '/manage/create_user' do
+    verify_user
+    erb :create_single_user
+  end
+  ##########################################
 end
