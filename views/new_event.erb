@@ -1,8 +1,8 @@
 
 <div class="container">
-    <% if @access %>
+    <% if @active_user != nil and @active_user.is_admin %>
     <h1>Add a New Event</h1>
-    <form action="/create_event" method="post" enctype="multipart/form-data">
+    <form action="/create_event" method="post" enctype="application/x-www-form-urlencoded">
         <div class="mb-3 row">
             <div class="col-md-2">
                 <label for="eventName" class="form-label">Event name</label>
@@ -52,8 +52,10 @@
             </div>
             </div>
         </div>
-        <div class="mb-3">
-            <button type="submit" class="btn btn-primary mb-3">Submit</button>
+        <div class="d-grid gap-2 d-md-block">
+            <button type="submit" class="btn btn-primary mb-3 me-3">Submit</button>
+            <a href="/bw_events" class="btn btn-secondary mb-3">Cancel</a>            
+        </div>
         </div>
         
 
