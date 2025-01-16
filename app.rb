@@ -176,7 +176,8 @@ class HoltonHubApp < Sinatra::Base
 
 
 
-  get '/add_users' do
+  get '/manage/add_users' do
+    verify_user
     erb :add_users
   end
 
@@ -239,6 +240,7 @@ class HoltonHubApp < Sinatra::Base
   end
 
   get '/messages' do
+    verify_user
     erb :messages
   end
 
@@ -250,7 +252,7 @@ class HoltonHubApp < Sinatra::Base
     erb :new_event
   end
 
-  get '/manage/user_activation' do
+  get '/manage/manage_users' do
     verify_user
     @all_users = User.all
     @all_by_groups = {9 => [], 10 => [], 11 => [], 12 => [], :facstaff => []}
