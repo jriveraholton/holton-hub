@@ -1,0 +1,13 @@
+<main>
+    <form>
+        <% @student_list.each do |st| %>
+            <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+            <label class="form-check-label" for="flexCheckDefault">
+                <%= st.lastname%>, <%= st.firstname%>
+            </label>
+            </div>
+        <% end %>
+        <button type="button" class="btn btn-primary">Add to Club</button>
+    </form>
+</main>

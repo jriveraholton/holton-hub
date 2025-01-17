@@ -187,4 +187,27 @@ get '/add_users' do
   erb :add_users
 end
 
+get '/add_to_clubs' do
+  @student_list = []
+  all_students = Student.all
+  p "length" + all_students.length.to_s
+  all_students.each do |st|
+    user = User.find_by(id: st.user_id)
+    @student_list.push(user)
+  end
+  erb :add_to_clubs
+  # redirect '/'
+end
+
+get '/my_clubs/:club_name' do
+  club = params['club_name']
+  puts club
+  underscore = "_"
+  club.gsub!(underscore, " ")
+  club.capitalize!
+  @current_group = Group.find_by(name: club)
+  puts club
+  erb :group_page
+end
+
   ##########################################
