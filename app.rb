@@ -163,7 +163,7 @@ class HoltonHubApp < Sinatra::Base
     fname = params[:fname]
     lname = params[:lname]
     email = params[:email]
-    is_admin = params[:is_admin] #preferably this is a yes/no checkbox
+    is_admin = params[:is_admin] != nil ? true : false
     team_id = BwTeam.find_by(team_color: params[:team].downcase).id
     #generates a default password in the format "gdingholtonarms"
     password = (fname.downcase[0] + lname.downcase + "holtonarms").to_s
