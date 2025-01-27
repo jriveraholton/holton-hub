@@ -249,11 +249,42 @@ post '/activation' do
 end
 
 get '/faculty_page' do
+  verify_user
   erb :faculty_page
 end
 
 get '/club_droppout' do
-  erb :club_droppout
+  verify_user
+   
+end
+
+get '/my_clubs' do
+  verify_user
+  puts @active_user.inspect
+  student = Student.find_by(user_id: @active_user.id)
+  if student == nil
+    puts "Student not found"
+  end
+  
+  leader = GroupLeader.where(student_id: student.id)
+  if leader == nil
+    puts "Leader not found"
+  end
+  @my_groups = []
+  leader.each do |ld|
+    grp = Group.find_by(id: ld.group_id)
+    @my_groups.push(grp)
+  end
+
+  member = GroupMember.where(student_id: student.id)
+  if member == nil
+    puts "Member not found"
+  end
+  member.each do |mb|
+    grp = Group.find_by(id: mb.group_id)
+    @my_groups.push(grp)
+  end 
+  erb :my_clubs
 end
 
 ##########################################
