@@ -1,4 +1,12 @@
 <div class="container-fluid">
+	<div class="row justify-content-center text-center" >
+		<div class="col-lg-6 mb-3">
+			<div class="btn-group btn-group-lg" role="group" aria-lable="User Management">
+				<a class="btn btn-primary" href="/manage/add_users">Batch Create Users</a>
+				<a class="btn btn-primary" href="/manage/create_user">Create New User</a>
+			</div>
+		</div>
+	</div>
 	<div class="row justify-content-center" >
 		<div class="col-lg-6">
 			<div class="accordion" id="usersAccordion">
@@ -13,7 +21,7 @@
 								<% end %>
 							</button>
 						</h2>
-						<div id="flush-collapse<%= group %>" class="accordion-collapse collapse <% if users.length > 0 %>show<% end %>">
+						<div id="flush-collapse<%= group %>" class="accordion-collapse collapse">
 							<ul class="list-group" >
 								<% users.each do |user| %>
 									<li class="list-group-item">
@@ -23,7 +31,7 @@
 											</div>
 											<div class="col" >
 												<% if user.email == @active_user.email %>
-													<button class="btn btn-danger" type="submit" disabled> Deactivate User </button>
+													<button class="btn btn-secondary" type="submit" disabled> Deactivate User </button>
 												<% elsif user.active %>
 													<form method="post" action=<%="/activation?fname=#{user.firstname}&lname=#{user.lastname}&act=false"%>>
 														<button class="btn btn-danger" type="submit"> Deactivate User </button>
