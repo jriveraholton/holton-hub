@@ -262,8 +262,19 @@ class HoltonHubApp < Sinatra::Base
   post '/messagesent' do
   end 
 
-  get '/currentday' do
+  get '/currentday' do 
+    verify_user
+    fac = Facultystaff.find_by(id: @active_user.id)
+    if fac == nil
+      @fac_member = true
+    else
+      @fac_member = false
+    end
     erb :day_schedule
+  end
+
+  get '/editschedule' do 
+    erb :update_schedule
   end
   ##########################################
 end
