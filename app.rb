@@ -66,10 +66,6 @@ end
 
 
 
-post '/create_users' do #creates users based on text file submitted by user
-  users_file = params[:users_file] #key may need to change
-  File.open(users_file) do |file|
-    students = file.readlines #creates an array of student data
 
 #save newly logged in user into database
 def save_user
@@ -118,12 +114,12 @@ get '/sign_in' do
   #verify they still have the correct credentials and send them to their home page
   if session[:access_token] != nil
     puts "ACCESS TOKEN FOUND"
-	@active_user = User.find_by(secret: session[:access_token])
-	if @active_user != nil and @active_user.active
-      puts "ACTIVE USER STILL HERE"
-	  redirect '/'
-	end
->>>>>>> main
+    @active_user = User.find_by(secret: session[:access_token])
+    if @active_user != nil and @active_user.active
+        puts "ACTIVE USER STILL HERE"
+      redirect '/'
+    end
+
   end
 
   puts "NO ACTIVE USER!"
@@ -182,8 +178,7 @@ post '/create_users' do #creates users based on text file submitted by user
       is_admin = false
     end
   end
-    redirect '/'
-  end
+  redirect '/'
 end
 
 post '/create_single_user' do #creates a single user based on user-submitted information
@@ -192,7 +187,7 @@ post '/create_single_user' do #creates a single user based on user-submitted inf
   email = params[:email]
   is_admin = param[:is_admin] #preferably this is a yes/no checkbox
   team_id = BwTeam.find_by(team_color: params[:team].downcase).id
->>>>>>> main
+
   #generates a default password in the format "gdingholtonarms"
   password = (fname.downcase[0] + lname.downcase + holtonarms).to_s
 
@@ -208,6 +203,32 @@ end
 
 
 get '/add_group' do 
+  @group_types = []
+  all_group_levels = GroupLevel.all
+  all_group_levels.each do |level|
+    @group_types.push(level.name)
+  end
+
+  @sophomores = []
+  @juniors = []
+  @seniors = []
+  all_students = Student.all
+  all_users = User.all
+  all_students.each do |student|
+    if student.grade == 10
+      @sophomores_hash = {:first => all_users.find_by(id: student.user_id).firstname, :last => all_users.find_by(id: student.user_id).lastname, :id => student.user_id}
+      @sophomores.push(@sophomores_hash)
+    end
+    if student.grade == 11
+      @juniors_hash = {:first => all_users.find_by(id: student.user_id).firstname, :last => all_users.find_by(id: student.user_id).lastname, :id => student.user_id}
+      @juniors.push(@juniors_hash)
+    end
+    if student.grade == 12
+      @seniors_hash = {:first => all_users.find_by(id: student.user_id).firstname, :last => all_users.find_by(id: student.user_id).lastname, :id => student.user_id}
+      @seniors.push(@seniors_hash)
+    end
+  end
+
   erb :add_group
 end
 

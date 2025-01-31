@@ -43,3 +43,9 @@ h1 {
 	display:flex;
 }
 
+.class_table{
+	overflow-y:scroll;
+	height:275px;
+	display:block;
+ }
+

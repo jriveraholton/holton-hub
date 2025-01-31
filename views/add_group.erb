@@ -1,63 +1,116 @@
-<!-- everything needs a name and id (make them the same thing) -->
+
+<div class="container">
+  <h1>Add Clubs or Athletic Teams</h1>
+  <p>This is the basic information for a club or athletic team. Members will be added later.<p>
+
+  <form action="/create_groups" method="post" enctype="multipart/form-data">
+    <select class="form-select" aria-label="Default select example" id="typeSelection" name="typeSelection" required>
+      <option selected disabled value>What type of group is this</option>
+      <option value="Club">Club</option>
+      <option value="Sport">Sport</option>
+    </select> 
+    <br>
+    <select class="form-select" aria-label="Default select example" id="groupTypeDropdown" name="groupTypeDropdown" required>
+      <option selected disabled value>What level of group is this</option>
+      <% @group_types.each do |type| %>
+        <option value=<%= type %> > <%= type.capitalize! %> </option>
+      <% end %>
+    </select> 
+
+    <br>
+    <input class="form-control" type="text" placeholder="Name of group" aria-label="default input example" id="groupName" name="groupName" required>
+    <br>
 
 
-<body onpageshow="myFunction()">
-  <div class="container">
-      <h1>Add Clubs or Athletic Teams</h1>
-      <p>This is the basic information for a club or athletic team. Members will be added later<p>
+    <div class="mb-3">
+      <textarea class="form-control" id="groupDescription" name="groupDescription" rows="3" placeholder="Description of group" required></textarea>
+    </div>
 
-      <form action="/create_groups" method="post" enctype="multipart/form-data">
-          <select onfocusout="myFunction()" class="form-select" aria-label="Default select example" id="typeSelection" required>
-              <option selected disabled value>What type of group is this</option>
-              <option value="Club">Club</option>
-              <option value="Sport">Sport</option>
-          </select> 
+    <br>
 
-          <br>
-          <input class="form-control" type="text" placeholder="Name of group" aria-label="default input example">
-          <br>
-          <div class="mb-3">
-              <label for="exampleFormControlTextarea1" class="form-label">Description of group</label>
-              <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" required></textarea>
-          </div>
-          <br>
-          <select class="form-select" aria-label="Default select example" id="clubTypes" required>
-              <option selected disabled value>What level of club is this</option>
-              <option value="1">One Time Event</option>
-              <option value="2">High Commitment</option>
-              <option value="3">Affinity Group</option>
-              <option value="4">Allied Space</option>
-              <option value="5">Low Commitment</option>
-          </select> 
-          <select class="form-select" aria-label="Default select example" id="teamTypes"required>
-              <option selected disabled value>What level of team is this</option>
-              <option value="1">Varsity</option>
-              <option value="2">Junior Varsity</option>
-          </select> 
+    <h3>Enter the group leaders below (sports captains, club presidents, etc...)</h3>
+    <p>Scroll for full grade list</p>
 
-          <br>
-          <input type="submit" value="Submit">
-          </div>
-      </form>
+    <div class="row">
+      <div class="col-lg-4">
+        <h4>Grade 10:</h4>
+        <input type="text" id="sophomore_input" onkeyup="myFunction('sophomore_table', 'sophomore_input')" placeholder="Search for names...">
+        <table id="sophomore_table" class="class_table">
+          <% @sophomores.each do |sophomore| %>
+            <tr>
+              <td>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value=<%= String(sophomore[:id]) %> id=<%= String(sophomore[:id]) %> name="student_leader">
+                  <label class="form-check-label" for=<%= String(sophomore[:id]) %>><%= String(sophomore[:first] + " " + sophomore[:last]) %></label>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </table>
+
+
+
+      </div>
+          
+      <div class="col-lg-4">
+        <h4>Grade 11:</h4>
+        <input type="text" id="junior_input" onkeyup="myFunction('junior_table', 'junior_input')" placeholder="Search for names...">
+        <table id="junior_table" class="class_table">
+          <% @juniors.each do |junior| %>
+            <tr>
+              <td>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value=<%= String(junior[:id]) %> id=<%= String(junior[:id]) %> name="student_leader">
+                  <label class="form-check-label" for=<%= String(junior[:id]) %>><%= String(junior[:first] + " " + junior[:last]) %></label>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </table>
+
+      </div>
+            
+      <div class="col-lg-4">    
+        <h4>Grade 12:</h4>
+        <input type="text" id="senior_input" onkeyup="myFunction('senior_table', 'senior_input')" placeholder="Search for names...">
+        <table id="senior_table" class="class_table">
+          <% @seniors.each do |senior| %>
+            <tr>
+              <td>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value=<%= String(senior[:id]) %> id=<%= String(senior[:id]) %> name="student_leader">
+                  <label class="form-check-label" for=<%= String(senior[:id]) %>><%= String(senior[:first] + " " + senior[:last]) %></label>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </table>
+
+      </div>
+    </div>
+    <br>
+    <input type="submit" value="Submit">
+  </form>
       
-  </div>
-</body>
+</div>
 
 <script>
+function myFunction(tableName, tableId) {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById(tableId);
+  filter = input.value.toUpperCase();
+  table = document.getElementById(tableName);
+  tr = table.getElementsByTagName("tr");
 
-function myFunction() {
-  var x = document.getElementById("typeSelection");
-  var val = x.value
-  if (val === "Club") {
-    clubTypes.style.display = "block";
-    teamTypes.style.display = "none";
-  } else {
-    if (val === "Sport") {
-      teamTypes.style.display = "block";
-      clubTypes.style.display = "none";
-    } else {
-      clubTypes.style.display = "none";
-      teamTypes.style.display = "none";
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
     }
   }
 }
