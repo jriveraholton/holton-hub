@@ -1,0 +1,79 @@
+<!-- consider adding a method to sort/filter clubs -->
+<div class="container" id="all_sports">
+    <div class="row text-center">
+        <h1>All Sports</h1>
+    </div>
+    
+    <div class="row">
+    <hr>
+    <h2>Fall Sports</h2>
+    <% @fall_sports.each do |sport| %>
+        <div class="col-md-3 mb-3">
+            <div class="card border-primary">
+                <img src="basketball.jpg" class="card-img" alt="..."> 
+                <!-- image should end up being a user-uploaded image-->
+                <!-- code needs to be updated once a method to edit sports pages is created -->
+                <div class="card-body" id="sport-body">
+                    <h5 class="card-title" id="sport-name"> <%=sport.name %> </h5>
+                    <hr>
+                    <p class="card-text">
+                        <div style="float: left; width: 50%;"><%= Season.find((GroupSeason.find_by(group_id: sport.id).season_id)).name %></div>
+                        <div style="float: right; width: 50%; text-align: right;"><i><%= GroupLevel.find(sport.level_id).name.titleize %></i></div>
+                        <!-- finds season via group-season relation table-->
+                    </p>
+                
+                    <a href="/all_sports/<%= sport.name.sub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See record</a>
+                </div>
+            </div>
+        </div>
+    <% end %>
+    </div> 
+    <div class="row">
+    <hr>
+    <h2>Winter Sports</h2>
+    <% @winter_sports.each do |sport| %>
+        <div class="col-md-3 mb-3">
+            <div class="card border-primary">
+                <img src="basketball.jpg" class="card-img" alt="..."> 
+                <!-- image should end up being a user-uploaded image-->
+                <!-- code needs to be updated once a method to edit sports pages is created -->
+                <div class="card-body" id="sport-body">
+                    <h5 class="card-title" id="sport-name"> <%=sport.name %> </h5>
+                    <hr>
+                    <p class="card-text">
+                        <div style="float: left; width: 50%;"><%= Season.find((GroupSeason.find_by(group_id: sport.id).season_id)).name %></div>
+                        <div style="float: right; width: 50%; text-align: right;"><i><%= GroupLevel.find(sport.level_id).name.titleize %></i></div>
+                        <!-- finds season via group-season relation table-->
+                    </p>
+                
+                    <a href="/all_sports/<%= sport.name.sub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See record</a>
+                </div>
+            </div>
+        </div>
+    <% end %>
+    </div> 
+    <div class="row">
+        <hr>
+        <h2>Spring Sports</h2>
+        <% @spring_sports.each do |sport| %>
+        <div class="col-md-3 mb-3">
+            <div class="card border-primary">
+                <img src="basketball.jpg" class="card-img" alt="..."> 
+                <!-- image should end up being a user-uploaded image-->
+                <!-- code needs to be updated once a method to edit sports pages is created -->
+                <div class="card-body" id="sport-body">
+                    <h5 class="card-title" id="sport-name"> <%=sport.name %> </h5>
+                    <hr>
+                    <p class="card-text">
+                        <div style="float: left; width: 50%;"><%= Season.find((GroupSeason.find_by(group_id: sport.id).season_id)).name %></div>
+                        <div style="float: right; width: 50%; text-align: right;"><i><%= GroupLevel.find(sport.level_id).name.titleize %></i></div>
+                        <!-- finds season via group-season relation table-->
+                    </p>
+                
+                    <a href="/all_sports/<%= sport.name.sub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See record</a>
+                </div>
+            </div>
+        </div>
+    <% end %>
+    </div> 
+</div>

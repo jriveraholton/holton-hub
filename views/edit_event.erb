@@ -1,67 +1,68 @@
 <div class="container">
     <% if @active_user != nil and @active_user.is_admin %>
-		<h1>Edit Event</h1>
-		<form action="/update_event?id=<%= @event.id %>" method="post" enctype="application/x-www-form-urlencoded">
-			<div class="mb-3 row">
-				<div class="col-md-2">
-					<label for="eventName" class="col-form-label">Event name</label>
-				</div>
-				<div class="col-md-10">   
-					<input type="text" class="form-control" id="eventName" name="eventName" value="<%= @event.name %>">
-				</div>
-			</div>
-			<div class="mb-3 row">
-				<div class="col-md-2">
-					<label for="datepicker" class="col-form-label">Date: </label>
-				</div>
-				<div class="col-md-6">
-					<input id="datepicker" name="date" class="form-control" type="date" value="<%= @event.event_date.strftime("%Y-%m-%d") %>">
-				</div>
-			</div>
-			<div class="mb-3 row">
-				<div class="col-md-2">
-					<label for="division" class="col-form-label">Participating Division: </label>
-				</div>
-				<div class="col-md-4">
-					<select id="division" name="division" class="form-select" aria-label="Divison select">
-						<option selected value="<%= @event.division_id %>"> <%= Division.find_by(id: @event.division_id).name %> </option>
-						<option value="<%= Division.find_by(name: "All School").id %>">All School</option>
-						<option value="<%= Division.find_by(name: "Upper School").id %>">Upper School</option>
-						<option value="<%= Division.find_by(name: "Middle School").id %>">Middle School</option>
-						<option value="<%= Division.find_by(name: "Lower School").id %>">Lower School</option>
-					</select>
-				</div>
-			</div>
-			<div class="mb-3 row">
-				<div class="col-md-2">
-					<label for="blue_pts" class="form-label">Points Awarded</label>
-				</div>
-				<div class="col-md-4">
-					<div class="input-group">
-						<span class="input-group-text" id="blue_pts">Blue Team</span>
-						<input type="number" class="form-control" placeholder="e.g. 3"  min="0"
-							   aria-label="pts" aria-describedby="blue_pts" id="blue_pts" name="blue_pts" value="<%= @event.blue_points %>"> 
-					</div>
-				</div>
-				<div class="col-md-4">
-					<div class="input-group">
-						<span class="input-group-text" id="blue_pts">White Team</span>
-						<input type="number" class="form-control" placeholder="e.g. 0"  min="0"
-							   aria-label="pts" aria-describedby="white_pts" id="white_pts" name="white_pts" value="<%= @event.white_points %>"> 
-					</div>
-				</div>
-			</div>
-			<div class="d-grid gap-2 d-md-block">
+    <h1>Edit Event</h1>
+
+    <form action="/update_event?id=<%= @event.id %>" method="post" enctype="application/x-www-form-urlencoded">
+        <div class="mb-3 row">
+            <div class="col-md-2">
+                <label for="eventName" class="col-form-label">Event name</label>
+            </div>
+            <div class="col-md-10">   
+                <input type="text" class="form-control" id="eventName" name="eventName" value="<%= @event.name %>">
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <div class="col-md-2">
+                <label for="datepicker" class="col-form-label">Date: </label>
+            </div>
+            <div class="col-md-6">
+                <input id="datepicker" name="date" class="form-control" type="date" value="<%= @event.event_date.strftime("%Y-%m-%d") %>">
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <div class="col-md-2">
+            <label for="division" class="col-form-label">Participating Division: </label>
+            </div>
+            <div class="col-md-4">
+            <select id="division" name="division" class="form-select" aria-label="Divison select">
+                <option selected value="<%= @event.division_id %>"> <%= Division.find_by(id: @event.division_id).name %> </option>
+                <option value="<%= Division.find_by(name: "All School").id %>">All School</option>
+                <option value="<%= Division.find_by(name: "Upper School").id %>">Upper School</option>
+                <option value="<%= Division.find_by(name: "Middle School").id %>">Middle School</option>
+                <option value="<%= Division.find_by(name: "Lower School").id %>">Lower School</option>
+            </select>
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <div class="col-md-2">
+                <label for="blue_pts" class="form-label">Points Awarded</label>
+            </div>
+            <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text" id="blue_pts">Blue Team</span>
+                <input type="number" class="form-control" placeholder="e.g. 3"  min="0"
+                    aria-label="pts" aria-describedby="blue_pts" id="blue_pts" name="blue_pts" value="<%= @event.blue_points %>"> 
+            </div>
+            </div>
+            <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text" id="blue_pts">White Team</span>
+                <input type="number" class="form-control" placeholder="e.g. 0"  min="0"
+                    aria-label="pts" aria-describedby="white_pts" id="white_pts" name="white_pts" value="<%= @event.white_points %>"> 
+            </div>
+            </div>
+        </div>
+        <div class="d-grid gap-2 d-md-block">
                 <button type="submit" class="btn btn-primary mb-3 me-3">Submit</button>
                 <a href="/bw_events" class="btn btn-secondary mb-3">Cancel</a>
-				
-			</div>
-		</form>
-		<form action="/delete_event?id=<%= @event.id %>" method="post">
-			<div class="mb-3">
-				<button type="submit" class="btn btn-outline-danger"  onclick="return confirm('Are you sure you want to delete this event?');">Delete</button>
-			</div>    
-		</form>
+            
+        </div>
+    </form>
+    <form action="/delete_event?id=<%= @event.id %>" method="post">
+        <div class="mb-3">
+            <button type="submit" class="btn btn-outline-danger"  onclick="return confirm('Are you sure you want to delete this event?');">Delete</button>
+        </div>    
+    </form>
     <% else %>
 		<p>Page not found... return <a href="/">home</a></p>
     <% end %>

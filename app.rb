@@ -53,7 +53,7 @@ class HoltonHubApp < Sinatra::Base
     #    session[:team_color] = @active_team_color
     else
       #they've never signed in, so go to the sign in page
-	  redirect '/sign_in'
+	    redirect '/sign_in'
     end
   end
 
@@ -286,6 +286,14 @@ class HoltonHubApp < Sinatra::Base
     erb :club_droppout
   end
 
+  post '/push_club_meeting' do
+    #still need to build frontend 
+    location = params[:location]
+    date = params[:date]
+    id = params[:id] #need to specifically pass as ID
+    meeting = GroupMeetings.create(location: location, event_date: date, group_id: id)
+  end
+
   get '/today' do
     verify_user
     erb :day_schedule
@@ -294,6 +302,37 @@ class HoltonHubApp < Sinatra::Base
   get '/manage/create_user' do
     verify_user
     erb :create_single_user
+  end
+  
+  get '/all_clubs' do
+    verify_user
+    @all_clubs = Group.where(group_type: "club").order(:name)
+    erb :all_clubs
+  end
+
+  get '/all_sports' do
+    verify_user
+    #iterates thru and sorts all sports based on season
+    @all_sports = Group.where(group_type: "sport").order(level: :desc) #still trying to sort by varsity/jv and sort alphabetically... later problem
+    @fall_sports = []
+    @winter_sports = []
+    @spring_sports = []
+    #there should be a way to do this w/o hardcoding every season
+    @all_sports.each do |sport|
+      if GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Fall").id
+        @fall_sports << sport
+      elsif GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Winter").id
+        @winter_sports << sport
+      elsif GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Spring").id
+        @spring_sports << sport
+      end  
+    end
+    # @fall_sports1 = Group.where(GroupSeason.find_by(group_id: ))
+    # @fall_sports = GroupSeason.where(season_id: Season.find_by(name: "Fall"))
+    # @fall_sports = Group.where(GroupSeason.find_by(:group_id))
+    # fall_sports_ids.each do |id|
+    #   @fall_sports << Group.find(id)
+    erb :all_sports
   end
   ##########################################
 end
