@@ -165,12 +165,20 @@ class HoltonHubApp < Sinatra::Base
     email = params[:email]
     is_admin = params[:is_admin] != nil ? true : false
     team_id = BwTeam.find_by(team_color: params[:team].downcase).id
+    role = params[:role]
+    grade = params[:grade]
+
+    
     #generates a default password in the format "gdingholtonarms"
     password = (fname.downcase[0] + lname.downcase + "holtonarms").to_s
 
     new_user = User.create(firstname: fname, lastname: lname, 
                            email: email, secret: password, team_id: team_id, is_admin: is_admin)
-
+    if role == "Student" 
+      Student.create(user_id: new_user.id, grade: Integer(grade)) 
+    else 
+      Facultystaff.create(user_id: new_user.id, grade: Integer(grade))
+    end
     redirect '/'
   end
 
