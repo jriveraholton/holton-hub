@@ -56,6 +56,11 @@ class HoltonHubApp < Sinatra::Base
 	    redirect '/sign_in'
     end
   end
+  def check_admin #use for pages w/ admin-only access
+    if not @active_user.is_admin
+      redirect '/error'
+    end
+  end
 
   #pull the google info based on the logged in user
   def access_token
@@ -130,6 +135,10 @@ class HoltonHubApp < Sinatra::Base
     save_user
 
     redirect '/sign_in'
+  end
+
+  not_found do
+    erb :error
   end
 
   post '/create_users' do #creates users based on text file submitted by user
@@ -213,6 +222,7 @@ class HoltonHubApp < Sinatra::Base
 
   get '/edit_event' do
     verify_user
+    check_admin
     @event = BwEvent.find_by(id: params[:id])
     erb :edit_event
   end
@@ -247,6 +257,7 @@ class HoltonHubApp < Sinatra::Base
 
   get '/manage/manage_users' do
     verify_user
+    check_admin
     @all_users = User.all
     @all_by_groups = {9 => [], 10 => [], 11 => [], 12 => [], :facstaff => []}
 
@@ -301,6 +312,7 @@ class HoltonHubApp < Sinatra::Base
 
   get '/manage/create_user' do
     verify_user
+    check_admin
     erb :create_single_user
   end
   
