@@ -2,12 +2,13 @@
     <h1>Add Accounts</h1>
     <p>Please upload a text file of the users you would like to add</p>
     <p>Include their first name, last name, email, team color, and role</p>
-
+    <!-- FINISH -->
     <form action="/create_users" method="post" enctype="multipart/form-data">
         <div class="input-group">
-            <input type="file" class="form-control" id="accountsFile" name="accountsFile" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+            <input type="file" class="form-control" id="accountsFile" name="accountsFile" aria-describedby="inputGroupFileAddon04" aria-label="Upload" required>
             <!-- <button class="btn btn-outline-secondary" type="submit" id="accountsFile">Submit</button> -->
-            <input type="submit" value="Upload">
+            
+            <input type="submit" value="Upload" class="btn" id="accountsFile">
         </div>
 
     </form>
