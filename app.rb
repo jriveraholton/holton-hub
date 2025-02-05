@@ -206,7 +206,7 @@ get '/add_group' do
   @group_types = []
   all_group_levels = GroupLevel.all
   all_group_levels.each do |level|
-    @group_types.push(level.name)
+    @group_types.push(level)
   end
 
   @sophomores = []
@@ -231,6 +231,18 @@ get '/add_group' do
 
   erb :add_group
 end
+
+post "/create_groups" do
+  puts(params)
+  group = Group.create(name: params[:groupName], description: params[:groupDescription], group_type: params[:typeSelection], level_id: params[:groupLevelDropdown])
+
+  @student_leaders = []
+  params[:student_leader].each do |leader|
+    
+  end
+  redirect '/'
+end
+
 
 get '/studentpage' do
   erb :student_homepage

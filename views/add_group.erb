@@ -6,14 +6,14 @@
   <form action="/create_groups" method="post" enctype="multipart/form-data">
     <select class="form-select" aria-label="Default select example" id="typeSelection" name="typeSelection" required>
       <option selected disabled value>What type of group is this</option>
-      <option value="Club">Club</option>
-      <option value="Sport">Sport</option>
+      <option value="club">Club</option>
+      <option value="sport">Sport</option>
     </select> 
     <br>
-    <select class="form-select" aria-label="Default select example" id="groupTypeDropdown" name="groupTypeDropdown" required>
+    <select class="form-select" aria-label="Default select example" id="groupLevelDropdown" name="groupTypeDropdown" required>
       <option selected disabled value>What level of group is this</option>
       <% @group_types.each do |type| %>
-        <option value=<%= type %> > <%= type.capitalize! %> </option>
+        <option value=<%= type.id %> > <%= type.name.capitalize! %> </option>
       <% end %>
     </select> 
 
@@ -40,7 +40,7 @@
             <tr>
               <td>
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value=<%= String(sophomore[:id]) %> id=<%= String(sophomore[:id]) %> name="student_leader">
+                  <input class="form-check-input" type="checkbox" value=<%= String(sophomore[:id]) %> id=<%= String(sophomore[:id]) %> name="student_leader[]">
                   <label class="form-check-label" for=<%= String(sophomore[:id]) %>><%= String(sophomore[:first] + " " + sophomore[:last]) %></label>
                 </div>
               </td>
@@ -60,7 +60,7 @@
             <tr>
               <td>
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value=<%= String(junior[:id]) %> id=<%= String(junior[:id]) %> name="student_leader">
+                  <input class="form-check-input" type="checkbox" value=<%= String(junior[:id]) %> id=<%= String(junior[:id]) %> name="student_leader[]">
                   <label class="form-check-label" for=<%= String(junior[:id]) %>><%= String(junior[:first] + " " + junior[:last]) %></label>
                 </div>
               </td>
@@ -78,7 +78,7 @@
             <tr>
               <td>
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value=<%= String(senior[:id]) %> id=<%= String(senior[:id]) %> name="student_leader">
+                  <input class="form-check-input" type="checkbox" value=<%= String(senior[:id]) %> id=<%= String(senior[:id]) %> name="student_leader[]">
                   <label class="form-check-label" for=<%= String(senior[:id]) %>><%= String(senior[:first] + " " + senior[:last]) %></label>
                 </div>
               </td>
