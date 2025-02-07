@@ -10,7 +10,7 @@
       <option value="sport">Sport</option>
     </select> 
     <br>
-    <select class="form-select" aria-label="Default select example" id="groupLevelDropdown" name="groupTypeDropdown" required>
+    <select class="form-select" aria-label="Default select example" id="groupTypeDropdown" name="groupTypeDropdown" required>
       <option selected disabled value>What level of group is this</option>
       <% @group_types.each do |type| %>
         <option value=<%= type.id %> > <%= type.name.capitalize! %> </option>

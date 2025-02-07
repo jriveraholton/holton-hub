@@ -2,7 +2,6 @@
    without having to apply classes to everyone. These are bootstrap
    CSS variables.
  */
-
 body.blue-user {
 	--bs-body-bg:navy;
 	--bs-body-color:aliceblue;
@@ -16,12 +15,21 @@ body.white-user {
 .navbar.blue-user {
 	--bs-navbar-color:aliceblue;
 	--bs-navbar-brand-color:aliceblue;
+	--bs-navbar-brand-hover-color: lightblue;
 	--bs-navbar-active-color:lightblue;
+	--bs-navbar-hover-color:lightblue;
+	--bs-navbar-toggler-border-color:aliceblue;
+	--bs-accordion-color:aliceblue;
 }
+
 .navbar.white-user {
 	--bs-navbar-brand-color:navy;
 	--bs-navbar-active-color:blue;
 	--bs-navbar-color:mediumblue;
+}
+
+.blue-user.navbar-toggler {
+	background-color:white;
 }
 
 
@@ -43,9 +51,17 @@ h1 {
 	display:flex;
 }
 
+
 .class_table{
 	overflow-y:scroll;
 	height:275px;
 	display:block;
- }
+}
 
+#event-body {
+	background: rgba(255, 255, 255, 0.2);
+}
+
+#event-header {
+	background: rgba(255, 255, 255, 0.4)
+}
