@@ -1,0 +1,28 @@
+<div class="container">
+    <div class="row">
+        <h1>Add Club Members</h1>
+    </div>
+    <div class="row">
+        <p>Please upload a text file of club members for the selected club</p>
+        <p>Submit a CSV of only their emails</p>
+    </div>
+    <div class="row">
+        <form action="/add_club_users" method="post" enctype="multipart/form-data">
+            <div class="mb-3 col-md-4">
+                <select id="club" name="club" class="form-select" aria-label="Club select">
+                <option selected disabled value>Select club to add members</option>
+                <% @all_clubs.each do |club|%>
+                    <option value="<%= club.id %>"><%=club.name.titleize%></option>
+                <% end %>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="members_list" class="form-label">Upload members list</label>
+                <input class="form-control" type="file" id="members_list" name="members_list" required>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary mb-3 me-3">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>

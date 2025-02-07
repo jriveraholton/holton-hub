@@ -191,11 +191,6 @@ class HoltonHubApp < Sinatra::Base
     redirect '/'
   end
 
-  get '/manage/add_users' do
-    verify_user
-    erb :add_users
-  end
-
   get '/student' do
     # NEED TO ONLY AUTHORIZE IF STUDENT!!!!
     erb :student
@@ -283,6 +278,10 @@ class HoltonHubApp < Sinatra::Base
     erb :user_management
   end
 
+  get '/manage/add_users' do
+    verify_user
+    erb :add_users
+  end
 
   post '/activation' do
     #set the given user based on name to active or inactive
@@ -294,6 +293,34 @@ class HoltonHubApp < Sinatra::Base
     user.save
 
     redirect '/manage/manage_users'
+  end
+
+  get '/manage/create_user' do
+    verify_user
+    check_admin
+    erb :create_single_user
+  end
+
+  get '/manage/add_club_members' do
+    verify_user
+    check_admin
+    @all_clubs = Group.where(group_type: "club").order(level_id: :asc, name: :asc)
+    erb :add_batch_club_members
+  end
+
+  post '/add_club_users' do
+    club_id = params[:club].to_i
+    file = params[:members_list][:tempfile].read
+    students = file.split("\r")
+    students.each do |email|
+
+      use = User.find_by(email: email.delete("\n"))
+      stu = Student.find_by(user_id: use.id)
+      if GroupMember.find_by(student_id: stu.id, group_id: club_id) == nil
+        GroupMember.create(student_id: stu.id, group_id: club_id)
+      end
+    end
+    redirect '/all_clubs'
   end
 
   get '/faculty_page' do
@@ -317,23 +344,17 @@ class HoltonHubApp < Sinatra::Base
     verify_user
     erb :day_schedule
   end
-
-  get '/manage/create_user' do
-    verify_user
-    check_admin
-    erb :create_single_user
-  end
   
   get '/all_clubs' do
     verify_user
-    @all_clubs = Group.where(group_type: "club").order(:name)
+    @all_clubs = Group.where(group_type: "club").order(level_id: :asc, name: :asc)
     erb :all_clubs
   end
 
   get '/all_sports' do
     verify_user
     #iterates thru and sorts all sports based on season
-    @all_sports = Group.where(group_type: "sport").order(level: :desc) #still trying to sort by varsity/jv and sort alphabetically... later problem
+    @all_sports = Group.where(group_type: "sport").order(level_id: :asc, name: :asc) #still trying to sort by varsity/jv and sort alphabetically... later problem
     @fall_sports = []
     @winter_sports = []
     @spring_sports = []
