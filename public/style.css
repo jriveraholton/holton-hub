@@ -56,6 +56,16 @@ h1 {
 	background: rgba(173, 216, 230, 0.2);
 }
 
+.class_table{
+	overflow-y:scroll;
+	height:275px;
+	display:block;
+}
+
+#event-body {
+	background: rgba(255, 255, 255, 0.2);
+}
+
 .card-header {
 	background: rgba(173, 216, 230, 0.4);
 }

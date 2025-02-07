@@ -354,5 +354,55 @@ class HoltonHubApp < Sinatra::Base
     #   @fall_sports << Group.find(id)
     erb :all_sports
   end
+
+  get '/add_group' do
+    @group_types = []
+    all_group_levels = GroupLevel.all
+    all_group_levels.each do |level|
+      @group_types.push(level)
+    end
+ 
+    #create hashes that have all of the necessary information for students by grade
+    @sophomores = []
+    @juniors = []
+    @seniors = []
+    all_students = Student.all
+    all_users = User.all
+    all_students.each do |student|
+      if student.grade == 10
+        @sophomores_hash = {:first => all_users.find_by(id: student.user_id).firstname, :last => all_users.find_by(id: student.user_id).lastname, :id => student.user_id}
+        @sophomores.push(@sophomores_hash)
+      end
+      if student.grade == 11
+        @juniors_hash = {:first => all_users.find_by(id: student.user_id).firstname, :last => all_users.find_by(id: student.user_id).lastname, :id => student.user_id}
+        @juniors.push(@juniors_hash)
+      end
+      if student.grade == 12
+        @seniors_hash = {:first => all_users.find_by(id: student.user_id).firstname, :last => all_users.find_by(id: student.user_id).lastname, :id => student.user_id}
+        @seniors.push(@seniors_hash)
+      end
+    end
+ 
+ 
+    erb :add_group
+  end
+ 
+ 
+  post "/create_groups" do
+    #create the group from form data and put into the schema
+    group = Group.create(name: params[:groupName], description: params[:groupDescription], group_type: params[:typeSelection], level_id: Integer(params[:groupTypeDropdown]))
+    
+
+    #assign students to be leaders of the recently created group
+    if params[:student_leader] != nil
+      all_students = Student.all
+      params[:student_leader].each do |leader_id|
+        leader = GroupLeader.create(student_id: leader_id, group_id: group.id)
+      end
+    end
+    redirect '/'
+  end
+
   ##########################################
 end
+
