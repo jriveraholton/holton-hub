@@ -53,7 +53,12 @@ class HoltonHubApp < Sinatra::Base
     #    session[:team_color] = @active_team_color
     else
       #they've never signed in, so go to the sign in page
-	  redirect '/sign_in'
+	    redirect '/sign_in'
+    end
+  end
+  def check_admin #use for pages w/ admin-only access
+    if not @active_user.is_admin
+      redirect '/error'
     end
   end
 
@@ -132,6 +137,10 @@ class HoltonHubApp < Sinatra::Base
     redirect '/sign_in'
   end
 
+  not_found do
+    erb :error
+  end
+
   post '/create_users' do #creates users based on text file submitted by user
     if params[:accountsFile] && params[:accountsFile][:filename] #only reads file if it exists & has been submitted
       file = params[:accountsFile][:tempfile].read
@@ -165,12 +174,20 @@ class HoltonHubApp < Sinatra::Base
     email = params[:email]
     is_admin = params[:is_admin] != nil ? true : false
     team_id = BwTeam.find_by(team_color: params[:team].downcase).id
+    role = params[:role]
+    grade = params[:grade]
+
+    
     #generates a default password in the format "gdingholtonarms"
     password = (fname.downcase[0] + lname.downcase + "holtonarms").to_s
 
     new_user = User.create(firstname: fname, lastname: lname, 
                            email: email, secret: password, team_id: team_id, is_admin: is_admin)
-
+    if role == "Student" 
+      Student.create(user_id: new_user.id, grade: Integer(grade)) 
+    else 
+      Facultystaff.create(user_id: new_user.id, grade: Integer(grade))
+    end
     redirect '/'
   end
 
@@ -213,6 +230,7 @@ class HoltonHubApp < Sinatra::Base
 
   get '/edit_event' do
     verify_user
+    check_admin
     @event = BwEvent.find_by(id: params[:id])
     erb :edit_event
   end
@@ -247,6 +265,7 @@ class HoltonHubApp < Sinatra::Base
 
   get '/manage/manage_users' do
     verify_user
+    check_admin
     @all_users = User.all
     @all_by_groups = {9 => [], 10 => [], 11 => [], 12 => [], :facstaff => []}
 
@@ -281,6 +300,14 @@ class HoltonHubApp < Sinatra::Base
     erb :club_droppout
   end
 
+  post '/push_club_meeting' do
+    #still need to build frontend 
+    location = params[:location]
+    date = params[:date]
+    id = params[:id] #need to specifically pass as ID
+    meeting = GroupMeetings.create(location: location, event_date: date, group_id: id)
+  end
+
   get '/today' do
     verify_user
     erb :day_schedule
@@ -288,6 +315,7 @@ class HoltonHubApp < Sinatra::Base
 
   get '/manage/create_user' do
     verify_user
+    check_admin
     erb :create_single_user
   end
 
@@ -325,5 +353,85 @@ class HoltonHubApp < Sinatra::Base
     puts "number of groups: " + @my_groups.length.to_s
     erb :my_clubs
   end
+
+  get '/all_clubs' do
+    verify_user
+    @all_clubs = Group.where(group_type: "club").order(:name)
+    erb :all_clubs
+  end
+
+  get '/all_sports' do
+    verify_user
+    #iterates thru and sorts all sports based on season
+    @all_sports = Group.where(group_type: "sport").order(level: :desc) #still trying to sort by varsity/jv and sort alphabetically... later problem
+    @fall_sports = []
+    @winter_sports = []
+    @spring_sports = []
+    #there should be a way to do this w/o hardcoding every season
+    @all_sports.each do |sport|
+      if GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Fall").id
+        @fall_sports << sport
+      elsif GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Winter").id
+        @winter_sports << sport
+      elsif GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Spring").id
+        @spring_sports << sport
+      end  
+    end
+    # @fall_sports1 = Group.where(GroupSeason.find_by(group_id: ))
+    # @fall_sports = GroupSeason.where(season_id: Season.find_by(name: "Fall"))
+    # @fall_sports = Group.where(GroupSeason.find_by(:group_id))
+    # fall_sports_ids.each do |id|
+    #   @fall_sports << Group.find(id)
+    erb :all_sports
+  end
+
+  get '/add_group' do
+    @group_types = []
+    all_group_levels = GroupLevel.all
+    all_group_levels.each do |level|
+      @group_types.push(level)
+    end
+ 
+    #create hashes that have all of the necessary information for students by grade
+    @sophomores = []
+    @juniors = []
+    @seniors = []
+    all_students = Student.all
+    all_users = User.all
+    all_students.each do |student|
+      if student.grade == 10
+        @sophomores_hash = {:first => all_users.find_by(id: student.user_id).firstname, :last => all_users.find_by(id: student.user_id).lastname, :id => student.user_id}
+        @sophomores.push(@sophomores_hash)
+      end
+      if student.grade == 11
+        @juniors_hash = {:first => all_users.find_by(id: student.user_id).firstname, :last => all_users.find_by(id: student.user_id).lastname, :id => student.user_id}
+        @juniors.push(@juniors_hash)
+      end
+      if student.grade == 12
+        @seniors_hash = {:first => all_users.find_by(id: student.user_id).firstname, :last => all_users.find_by(id: student.user_id).lastname, :id => student.user_id}
+        @seniors.push(@seniors_hash)
+      end
+    end
+ 
+ 
+    erb :add_group
+  end
+ 
+ 
+  post "/create_groups" do
+    #create the group from form data and put into the schema
+    group = Group.create(name: params[:groupName], description: params[:groupDescription], group_type: params[:typeSelection], level_id: Integer(params[:groupTypeDropdown]))
+    
+
+    #assign students to be leaders of the recently created group
+    if params[:student_leader] != nil
+      all_students = Student.all
+      params[:student_leader].each do |leader_id|
+        leader = GroupLeader.create(student_id: leader_id, group_id: group.id)
+      end
+    end
+    redirect '/'
+  end
   ##########################################
 end
+

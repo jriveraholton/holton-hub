@@ -15,13 +15,13 @@ body.white-user {
 .navbar.blue-user {
 	--bs-navbar-color:aliceblue;
 	--bs-navbar-brand-color:aliceblue;
-	--bs-navbar-brand-hover-color: lightblue;
+	--bs-navbar-brand-hover-color: rgb(173, 216, 230);
 	--bs-navbar-active-color:lightblue;
 	--bs-navbar-hover-color:lightblue;
 	--bs-navbar-toggler-border-color:aliceblue;
 	--bs-accordion-color:aliceblue;
-	--bs-accordion
 }
+
 .navbar.white-user {
 	--bs-navbar-brand-color:navy;
 	--bs-navbar-active-color:blue;
@@ -52,10 +52,20 @@ h1 {
 }
 
 
+.card-body {
+	background: rgba(173, 216, 230, 0.2);
+}
+
+.class_table{
+	overflow-y:scroll;
+	height:275px;
+	display:block;
+}
+
 #event-body {
 	background: rgba(255, 255, 255, 0.2);
 }
 
-#event-header {
-	background: rgba(255, 255, 255, 0.4)
+.card-header {
+	background: rgba(173, 216, 230, 0.4);
 }

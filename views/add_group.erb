@@ -1,0 +1,118 @@
+
+<div class="container">
+  <h1>Add Clubs or Athletic Teams</h1>
+  <p>This is the basic information for a club or athletic team. Members will be added later.<p>
+
+  <form action="/create_groups" method="post" enctype="multipart/form-data">
+    <select class="form-select" aria-label="Default select example" id="typeSelection" name="typeSelection" required>
+      <option selected disabled value>What type of group is this</option>
+      <option value="club">Club</option>
+      <option value="sport">Sport</option>
+    </select> 
+    <br>
+    <select class="form-select" aria-label="Default select example" id="groupTypeDropdown" name="groupTypeDropdown" required>
+      <option selected disabled value>What level of group is this</option>
+      <% @group_types.each do |type| %>
+        <option value=<%= type.id %> > <%= type.name.capitalize! %> </option>
+      <% end %>
+    </select> 
+
+    <br>
+    <input class="form-control" type="text" placeholder="Name of group" aria-label="default input example" id="groupName" name="groupName" required>
+    <br>
+
+
+    <div class="mb-3">
+      <textarea class="form-control" id="groupDescription" name="groupDescription" rows="3" placeholder="Description of group" required></textarea>
+    </div>
+
+    <br>
+
+    <h3>Enter the group leaders below (sports captains, club presidents, etc...)</h3>
+    <p>Scroll for full grade list</p>
+
+    <div class="row">
+      <div class="col-lg-4">
+        <h4>Grade 10:</h4>
+        <input type="text" id="sophomore_input" onkeyup="myFunction('sophomore_table', 'sophomore_input')" placeholder="Search for names...">
+        <table id="sophomore_table" class="class_table">
+          <% @sophomores.each do |sophomore| %>
+            <tr>
+              <td>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value=<%= String(sophomore[:id]) %> id=<%= String(sophomore[:id]) %> name="student_leader[]">
+                  <label class="form-check-label" for=<%= String(sophomore[:id]) %>><%= String(sophomore[:first] + " " + sophomore[:last]) %></label>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </table>
+
+
+
+      </div>
+          
+      <div class="col-lg-4">
+        <h4>Grade 11:</h4>
+        <input type="text" id="junior_input" onkeyup="myFunction('junior_table', 'junior_input')" placeholder="Search for names...">
+        <table id="junior_table" class="class_table">
+          <% @juniors.each do |junior| %>
+            <tr>
+              <td>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value=<%= String(junior[:id]) %> id=<%= String(junior[:id]) %> name="student_leader[]">
+                  <label class="form-check-label" for=<%= String(junior[:id]) %>><%= String(junior[:first] + " " + junior[:last]) %></label>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </table>
+
+      </div>
+            
+      <div class="col-lg-4">    
+        <h4>Grade 12:</h4>
+        <input type="text" id="senior_input" onkeyup="myFunction('senior_table', 'senior_input')" placeholder="Search for names...">
+        <table id="senior_table" class="class_table">
+          <% @seniors.each do |senior| %>
+            <tr>
+              <td>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value=<%= String(senior[:id]) %> id=<%= String(senior[:id]) %> name="student_leader[]">
+                  <label class="form-check-label" for=<%= String(senior[:id]) %>><%= String(senior[:first] + " " + senior[:last]) %></label>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </table>
+
+      </div>
+    </div>
+    <br>
+    <input type="submit" value="Submit">
+  </form>
+      
+</div>
+
+<script>
+function myFunction(tableName, tableId) {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById(tableId);
+  filter = input.value.toUpperCase();
+  table = document.getElementById(tableName);
+  tr = table.getElementsByTagName("tr");
+
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
