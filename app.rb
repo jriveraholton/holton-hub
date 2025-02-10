@@ -277,11 +277,6 @@ class HoltonHubApp < Sinatra::Base
     redirect '/manage/manage_users'
   end
 
-  get '/faculty_page' do
-  # THIS IS NOT COMPLETE --- NEEDS TO CHECK IF USER IS FACULTY ??
-    erb :faculty_page
-  end
-
   get '/club_droppout' do
     erb :club_droppout
   end
@@ -296,11 +291,6 @@ class HoltonHubApp < Sinatra::Base
     erb :create_single_user
   end
 
-  get '/faculty_page' do
-    verify_user
-    erb :faculty_page
-  end
-
   get '/club_droppout' do
     verify_user
     
@@ -308,30 +298,31 @@ class HoltonHubApp < Sinatra::Base
 
   get '/my_clubs' do
     verify_user
-    puts @active_user.inspect
     student = Student.find_by(user_id: @active_user.id)
-    if student == nil
-      puts "Student not found"
-    end
-    
-    leader = GroupLeader.where(student_id: student.id)
-    if leader == nil
-      puts "Leader not found"
-    end
     @my_groups = []
-    leader.each do |ld|
-      grp = Group.find_by(id: ld.group_id)
-      @my_groups.push(grp)
+
+    if student != nil
+      leader = GroupLeader.where(student_id: student.id)
+      leader.each do |ld|
+        grp = Group.find_by(id: ld.group_id)
+        @my_groups.push(grp)
+      end
+
+      member = GroupMember.where(student_id: student.id)
+      member.each do |mb|
+        grp = Group.find_by(id: mb.group_id)
+        @my_groups.push(grp)
+      end 
+    else
+      fac = Facultystaff.find_by(user_id: @active_user.id)  
+      group_adivsor = GroupAdvisor.where(facultystaff_id: fac.id)
+      group_adivsor.each do |ga|
+        grp = Group.find_by(id: ga.group_id)
+        @my_groups.push(grp)
+      end
     end
 
-    member = GroupMember.where(student_id: student.id)
-    if member == nil
-      puts "Member not found"
-    end
-    member.each do |mb|
-      grp = Group.find_by(id: mb.group_id)
-      @my_groups.push(grp)
-    end 
+    puts "number of groups: " + @my_groups.length.to_s
     erb :my_clubs
   end
   ##########################################

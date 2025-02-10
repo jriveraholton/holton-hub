@@ -47,6 +47,11 @@ soccer = Group.create(name: " Varsity Soccer", description: "Team dedicated to p
 cheese = Group.create(name: "Cheese Club", description: "All things cheese related!", group_type: "club", level_id: interest.id)
 softball = Group.create(name: "Softball", description: "Baseball with an bigger ball.", group_type: "sport", level_id: varsity.id)
 
+#group leaders
+GroupLeader.create(group_id: cheese.id, student_id: student5.id)
+GroupMember.create(group_id: debate.id, student_id: student5.id)
+GroupAdvisor.create(group_id: cheese.id, facultystaff_id: facstaff1.id)
+
 #group seasons
 GroupSeason.create(group_id: soccer.id, season_id: fall.id)
 GroupSeason.create(group_id: softball.id, season_id: spring.id)
