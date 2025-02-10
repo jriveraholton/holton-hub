@@ -4,7 +4,8 @@
   <p>This is the basic information for a club or athletic team. Members will be added later.<p>
 
   <form action="/create_groups" method="post" enctype="multipart/form-data">
-    <select class="form-select" aria-label="Default select example" id="typeSelection" name="typeSelection" required>
+
+    <select class="form-select" aria-label="Default select example" onfocusout="ifSport()" id="typeSelection" name="typeSelection" required>
       <option selected disabled value>What type of group is this</option>
       <option value="club">Club</option>
       <option value="sport">Sport</option>
@@ -14,6 +15,15 @@
       <option selected disabled value>What level of group is this</option>
       <% @group_types.each do |type| %>
         <option value=<%= type.id %> > <%= type.name.capitalize! %> </option>
+      <% end %>
+    </select> 
+
+    <br>
+
+    <select class="form-select" aria-label="Default select example" id="sportsSeason" name="sportsSeason">
+      <option selected disabled value>What season is this sport in</option>
+      <% @sports_seasons.each do |season| %>
+        <option value=<%= season.id %>><%= season.name %></option>
       <% end %>
     </select> 
 
@@ -114,5 +124,19 @@ function myFunction(tableName, tableId) {
     }
   }
 }
+
+function ifSport() {
+ var x = document.getElementById("typeSelection");
+ var val = x.value;
+ if (val === "sport") {
+   sportsSeason.style.display = "block";
+ } else{
+  sportsSeason.style.display = "none";
+ }
+}
+
+
+
+
 </script>
 

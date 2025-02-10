@@ -361,6 +361,8 @@ class HoltonHubApp < Sinatra::Base
     all_group_levels.each do |level|
       @group_types.push(level)
     end
+
+    @sports_seasons = Season.all
  
     #create hashes that have all of the necessary information for students by grade
     @sophomores = []
@@ -391,14 +393,16 @@ class HoltonHubApp < Sinatra::Base
   post "/create_groups" do
     #create the group from form data and put into the schema
     group = Group.create(name: params[:groupName], description: params[:groupDescription], group_type: params[:typeSelection], level_id: Integer(params[:groupTypeDropdown]))
-    
-
     #assign students to be leaders of the recently created group
     if params[:student_leader] != nil
       all_students = Student.all
       params[:student_leader].each do |leader_id|
         leader = GroupLeader.create(student_id: leader_id, group_id: group.id)
       end
+    end
+    #if the group is a sport, give it a season
+    if params[:sportsSeason] != nil
+      GroupSeason.create(group_id: group.id, season_id: params[:sportsSeason])
     end
     redirect '/'
   end
