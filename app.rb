@@ -101,6 +101,8 @@ class HoltonHubApp < Sinatra::Base
       puts "LOGGED IN: " + @active_user.email
       puts "TEAM COLOR: " + @active_team_color.to_s
     end
+    @all_sports = Group.where(group_type: "sport").order(level_id: :asc, name: :asc) 
+    @all_clubs = Group.where(group_type: "club", active: true).order(level_id: :asc, name: :asc)
     erb :index
   end
 
@@ -301,26 +303,75 @@ class HoltonHubApp < Sinatra::Base
     erb :create_single_user
   end
 
-  get '/manage/add_club_members' do
+  get '/manage/manage_groups' do
     verify_user
     check_admin
-    @all_clubs = Group.where(group_type: "club").order(level_id: :asc, name: :asc)
-    erb :add_batch_club_members
+    @all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc) 
+    @all_clubs = Group.where(group_type: "club", active: true).order(level_id: :asc, name: :asc)
+    @archived_groups = Group.where(active: false).order(group_type: :asc, level_id: :asc, name: :asc)
+    erb :group_management
   end
 
-  post '/add_club_users' do
-    club_id = params[:club].to_i
+  get "/manage/edit_group" do
+    verify_user
+    check_admin
+    @group = Group.find(params[:id])
+    erb :edit_group
+  end 
+
+  post "/manage/update_group" do
+    group = Group.find(params[:id])
+    group.update(name: params[:groupName], level_id: params[:level].to_i)
+    if group.group_type == "sport"
+      season = GroupSeason.find_by(group_id: group.id)
+      season.update(season_id: params[:season].to_i)
+    end
+    redirect '/manage/manage_groups'
+  end
+
+  post "/manage/delete_group" do
+    group = Group.find(params[:id])
+    group.update(active: false)
+    redirect '/manage/manage_groups'
+  end 
+
+  post "/manage/restore_group" do
+    group = Group.find(params[:id])
+    group.update(active: true)
+    puts group.name
+    redirect '/manage/manage_groups'
+  end 
+
+  post "/manage/trash_group" do
+    group = Group.find(params[:id])
+    if not group.active
+      group.delete
+      redirect '/manage/manage_groups'
+    else
+      erb :error
+    end
+    
+  end
+
+  get '/manage/add_group_members' do
+    verify_user
+    check_admin
+    erb :add_batch_group_members
+  end
+
+  post '/add_group_members' do
+    group_id = params[:group].to_i
     file = params[:members_list][:tempfile].read
     students = file.split("\r")
+  
     students.each do |email|
-
       use = User.find_by(email: email.delete("\n"))
       stu = Student.find_by(user_id: use.id)
-      if GroupMember.find_by(student_id: stu.id, group_id: club_id) == nil
-        GroupMember.create(student_id: stu.id, group_id: club_id)
+      if GroupMember.find_by(student_id: stu.id, group_id: group_id) == nil
+        GroupMember.create(student_id: stu.id, group_id: group_id)
       end
     end
-    redirect '/all_clubs'
+    redirect '/all_clubs' #eventually redirect to the group you are adding members to
   end
 
   get '/faculty_page' do
@@ -347,14 +398,16 @@ class HoltonHubApp < Sinatra::Base
   
   get '/all_clubs' do
     verify_user
-    @all_clubs = Group.where(group_type: "club").order(level_id: :asc, name: :asc)
+    @high_commitment = Group.where(group_type: "club", active: true, level_id: GroupLevel.find_by(name: "high commitment").id).order(name: :asc)
+    @interest = Group.where(group_type: "club", active: true, level_id: GroupLevel.find_by(name: "interest").id).order(name: :asc)
+    @affinity_groups = Group.where(group_type: "club", active: true, level_id: GroupLevel.find_by(name: "affinity group").id).order(name: :asc)
     erb :all_clubs
   end
 
   get '/all_sports' do
     verify_user
+    @all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc)
     #iterates thru and sorts all sports based on season
-    @all_sports = Group.where(group_type: "sport").order(level_id: :asc, name: :asc) #still trying to sort by varsity/jv and sort alphabetically... later problem
     @fall_sports = []
     @winter_sports = []
     @spring_sports = []

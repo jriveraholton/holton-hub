@@ -1,16 +1,20 @@
 <div class="container">
     <div class="row">
-        <h1>Add Club Members</h1>
+        <h1>Add Group Members</h1>
     </div>
     <div class="row">
-        <p>Please upload a text file of club members for the selected club</p>
+        <p>Please upload a text file of members for the selected club/sport</p>
         <p>Submit a CSV of only their emails</p>
     </div>
     <div class="row">
-        <form action="/add_club_users" method="post" enctype="multipart/form-data">
+        <form action="/add_group_members" method="post" enctype="multipart/form-data">
             <div class="mb-3 col-md-4">
-                <select id="club" name="club" class="form-select" aria-label="Club select">
-                <option selected disabled value>Select club to add members</option>
+                <select id="group" name="group" class="form-select" aria-label="Group select">
+                <option selected disabled value>Select group to add members</option>
+                <% @all_sports.each do |sport|%>
+                    <option value="<%= sport.id %>"><%=sport.name.titleize%></option>
+                <% end %>
+                <hr>
                 <% @all_clubs.each do |club|%>
                     <option value="<%= club.id %>"><%=club.name.titleize%></option>
                 <% end %>

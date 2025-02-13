@@ -1,15 +1,24 @@
 <div class="container" id="all_clubs">
-    <div class="row text-center">    
+    <div class="row text-center mb-3">    
         <h1>All Clubs</h1>
+        
     </div>
+    <% if @active_user.is_admin %>
+        <div class="row justify-content-md-center text-center mb-3">
+            <div class="col">
+            <a href="/manage/manage_groups" class="btn btn-primary" role="button">Manage Groups</a>    
+            </div>
+        </div>
+    <% end %>
     <div class="row">
-        <% @all_clubs.each do |club| %> 
-            <div class="col-md-4 col-lg-3 mb-3">
+    <hr>
+        <h2>High-Commitment Clubs</h2>
+        <% @high_commitment.each do |club| %> 
+            <div class="col-md-3 mb-3">
                 <div class="card border-primary">
                     <h5 class="card-header" id="club-header"> <%=club.name %> 
                     </h5>
                     <div class="card-body" max-height="5rem" id="club-body">
-                    <p style="text-align:center;">Level: <i><%= GroupLevel.find(club.level_id).name.titleize %></i></p>
                     <div class="overflow-y-auto">
                         <%= club.description %>
                     </div>
@@ -19,5 +28,40 @@
             </div>
         <% end %>
     </div>
-
+    <div class="row">
+    <hr>
+        <h2>Affinity Groups</h2>
+        <% @affinity_groups.each do |club| %> 
+            <div class="col-md-3 mb-3">
+                <div class="card border-primary">
+                    <h5 class="card-header" id="club-header"> <%=club.name %> 
+                    </h5>
+                    <div class="card-body" max-height="5rem" id="club-body">
+                    <div class="overflow-y-auto">
+                        <%= club.description %>
+                    </div>
+                    <center><a href="/all_clubs/<%= club.name.sub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See more</a></center> 
+                    </div>
+                </div>
+            </div>
+        <% end %>
+    </div>
+    <div class="row">
+    <hr>
+        <h2>Interest-based Clubs</h2>
+        <% @interest.each do |club| %> 
+            <div class="col-md-3 mb-3">
+                <div class="card border-primary">
+                    <h5 class="card-header" id="club-header"> <%=club.name %> 
+                    </h5>
+                    <div class="card-body" max-height="5rem" id="club-body">
+                    <div class="overflow-y-auto">
+                        <%= club.description %>
+                    </div>
+                    <center><a href="/all_clubs/<%= club.name.sub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See more</a></center> 
+                    </div>
+                </div>
+            </div>
+        <% end %>
+    </div>
 </div>

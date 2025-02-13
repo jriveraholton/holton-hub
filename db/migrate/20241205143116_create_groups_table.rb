@@ -6,6 +6,7 @@ class CreateGroupsTable < ActiveRecord::Migration[8.0]
       t.text :description, :null => false
       t.string :group_type, :null => false
       t.integer :level_id, :null => false
+      t.boolean :active, :null => false, :default => true
     end
   end
 end
