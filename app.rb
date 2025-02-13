@@ -53,7 +53,7 @@ class HoltonHubApp < Sinatra::Base
     #    session[:team_color] = @active_team_color
     else
       #they've never signed in, so go to the sign in page
-	    redirect '/sign_in'
+	  redirect '/sign_in'
     end
   end
   def check_admin #use for pages w/ admin-only access
@@ -144,27 +144,40 @@ class HoltonHubApp < Sinatra::Base
   post '/create_users' do #creates users based on text file submitted by user
     if params[:accountsFile] && params[:accountsFile][:filename] #only reads file if it exists & has been submitted
       file = params[:accountsFile][:tempfile].read
-      students = file.split("\n") #breaks document into a list of student data
-      students.each do |student|
-        data = student.split(",") # splits individual student data into array
-        #format: first name, last name, email, team color, role
-        fname = data[0]
-        lname = data[1]
-        email = data[2]
-        team_id = BwTeam.find_by(team_color: data[3].downcase).id
-        # assigns an admin role to administrators
-        if data[4].downcase == "admin"
-          is_admin = true
-        else
-          is_admin = false
-        end
-        #generates a default password in the format "gracedingholtonarms"
-        password = (fname.downcase + lname.downcase + "holtonarms").to_s
+      accounts = file.split("\n") #breaks document into a list of account data
+      accounts.each do |acct|
+        data = acct.split(",") # splits individual student data into array
+        #format: first name, last name, email, team color, grade, role, [admin]
+        fname = data[0].strip
+        lname = data[1].strip
+        email = data[2].strip
+        grade_level = Integer(data[4])
+        role = data[5].downcase.strip
+        
+        if User.find_by(email: email) == nil #user does not yet exist        
+          team_id = BwTeam.find_by(team_color: data[3].downcase.strip).id
+          # assigns an admin role to administrators
+          if data.length > 6 and data[6].downcase.strip == "admin"
+            is_admin = true
+          else
+            is_admin = false
+          end
+          
+          #generates a default password in the format "gracedingholtonarms"
+          password = (fname.downcase + lname.downcase + "holtonarms").to_s
 
-        new_user = User.create(firstname: fname, lastname: lname, 
-                               email: email, secret: password, team_id: team_id, is_admin: is_admin)
+          new_user = User.create(firstname: fname, lastname: lname, 
+                                 email: email, secret: password, team_id: team_id, is_admin: is_admin)
+
+          #determine if the user is a student or a faculty/staff member and create the appropriate record
+          if role == 'student'
+            stu = Student.create(user_id: new_user.id, grade: grade_level)
+          else
+            fac = Facultystaff.create(user_id: new_user.id, grade: grade_level)
+          end
+        end
       end
-      redirect '/'
+      redirect '/manage/manage_users'
     end
   end
 
@@ -188,7 +201,7 @@ class HoltonHubApp < Sinatra::Base
     else 
       Facultystaff.create(user_id: new_user.id, grade: Integer(grade))
     end
-    redirect '/'
+    redirect '/manage/manage_users'
   end
 
   get '/manage/add_users' do
@@ -234,7 +247,7 @@ class HoltonHubApp < Sinatra::Base
     @event = BwEvent.find_by(id: params[:id])
     erb :edit_event
   end
-    
+  
   post '/create_event' do
     name = params[:eventName]
     date = params[:date].to_datetime #calendar on the frontend
@@ -297,7 +310,7 @@ class HoltonHubApp < Sinatra::Base
   end
 
   get '/faculty_page' do
-  # THIS IS NOT COMPLETE --- NEEDS TO CHECK IF USER IS FACULTY ??
+    # THIS IS NOT COMPLETE --- NEEDS TO CHECK IF USER IS FACULTY ??
     erb :faculty_page
   end
 
@@ -363,7 +376,7 @@ class HoltonHubApp < Sinatra::Base
     end
 
     @sports_seasons = Season.all
- 
+    
     #create hashes that have all of the necessary information for students by grade
     @sophomores = []
     @juniors = []
@@ -384,12 +397,12 @@ class HoltonHubApp < Sinatra::Base
         @seniors.push(@seniors_hash)
       end
     end
- 
- 
+    
+    
     erb :add_group
   end
- 
- 
+  
+  
   post "/create_groups" do
     #create the group from form data and put into the schema
     group = Group.create(name: params[:groupName], description: params[:groupDescription], group_type: params[:typeSelection], level_id: Integer(params[:groupTypeDropdown]))

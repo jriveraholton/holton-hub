@@ -1,16 +1,34 @@
 <div class="container">
-    <h1>Add Accounts</h1>
-    <p>Please upload a text file of the users you would like to add</p>
-    <p>Include their first name, last name, email, team color, and role</p>
-    <!-- FINISH -->
-    <form action="/create_users" method="post" enctype="multipart/form-data">
-        <div class="input-group">
-            <input type="file" class="form-control" id="accountsFile" name="accountsFile" aria-describedby="inputGroupFileAddon04" aria-label="Upload" required>
-            <!-- <button class="btn btn-outline-secondary" type="submit" id="accountsFile">Submit</button> -->
-            
-            <input type="submit" value="Upload" class="btn" id="accountsFile">
-        </div>
+	<div class="row">
+		<h1>Add Accounts</h1>
+		<p>Please upload a CSV text file of the users you would like to add.</p>
+		<p>Include their first name, last name, email, team color, grade, and role.</p>
+		<p>
+			<ul>
+				<li>
+					Possible <strong>Team</strong> Values
+					<ul>
+						<li>blue</li>
+						<li>white</li>
+					</ul>
+				</li>
+				<li>
+					Possible <strong>Role</strong> Values
+					<ul>
+						<li>facultystaff</li>
+						<li>student</li>
+					</ul>
+				</li>
+			</ul>
+		</p>
+		<form action="/create_users" method="post" enctype="multipart/form-data">
+			<div class="input-group">
+				<input type="file" class="form-control" id="accountsFile" name="accountsFile" aria-describedby="inputGroupFileAddon04" aria-label="Upload" required>
+				<!-- <button class="btn btn-outline-secondary" type="submit" id="accountsFile">Submit</button> -->
+				
+				<input type="submit" value="Upload" class="btn" id="accountsFile">
+			</div>
 
-    </form>
-
+		</form>
+	</div>
 </div>

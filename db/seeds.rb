@@ -19,6 +19,8 @@ user7 = User.create(firstname: "Joseph", lastname:"Rivera", email:"joseph.rivera
 facstaff1 = Facultystaff.create(grade: 12, user_id: user7.id)
 user8 = User.create(firstname: "Tucker", lastname:"Sowers", email:"tucker.sowers@holton-arms.edu", team_id: white.id, is_admin: true)
 facstaff2 = Facultystaff.create(grade: 9, user_id: user8.id)
+user9 = User.create(firstname: "Kate", lastname:"Mitchell", email:"kate.mitchell@holton-arms.edu", team_id: white.id, is_admin: true)
+facstaff3 = Facultystaff.create(grade: 12, user_id: user9.id)
 
 #Seasons
 fall = Season.create(name: "Fall", start_date: DateTime.new(2024, 8, 22))
