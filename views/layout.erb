@@ -34,11 +34,6 @@
 									<li><a class="dropdown-item" href="/all_clubs">Clubs List</a></li>
 									<li><a class="dropdown-item" href="/all_sports">Sports List</a></li>
 									<li><hr class="dropdown-divider"></li>
-									<% if @active_user != nil and @active_user.is_admin %>
-										<li>
-											<a class="dropdown-item" href="/">Manage Groups</a>
-										</li>
-									<% end %>
 								</ul>
 						</li>
 						<!-- end groups dropdown -->
@@ -46,8 +41,12 @@
 	
 						
 						<% if @active_user != nil and @active_user.is_admin %>
-							<li class="nav-item">
-								<a class="nav-link" href="/manage/manage_users">Manage Users</a>
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" href="#">Manage</a>
+									<ul class="dropdown-menu">
+										<li><a class="dropdown-item" href="/manage/manage_users">Manage Users</a></li>
+										<li><a class="dropdown-item" href="/manage/manage_groups">Manage Groups</a></li>
+									</ul>
 							</li>
 						<% end %>
 					</ul>

@@ -141,74 +141,6 @@ class HoltonHubApp < Sinatra::Base
     erb :error
   end
 
-  post '/create_users' do #creates users based on text file submitted by user
-    if params[:accountsFile] && params[:accountsFile][:filename] #only reads file if it exists & has been submitted
-      file = params[:accountsFile][:tempfile].read
-      accounts = file.split("\n") #breaks document into a list of account data
-      accounts.each do |acct|
-        data = acct.split(",") # splits individual student data into array
-        #format: first name, last name, email, team color, grade, role, [admin]
-        fname = data[0].strip
-        lname = data[1].strip
-        email = data[2].strip
-        grade_level = Integer(data[4])
-        role = data[5].downcase.strip
-        
-        if User.find_by(email: email) == nil #user does not yet exist        
-          team_id = BwTeam.find_by(team_color: data[3].downcase.strip).id
-          # assigns an admin role to administrators
-          if data.length > 6 and data[6].downcase.strip == "admin"
-            is_admin = true
-          else
-            is_admin = false
-          end
-          
-          #generates a default password in the format "gracedingholtonarms"
-          password = (fname.downcase + lname.downcase + "holtonarms").to_s
-
-          new_user = User.create(firstname: fname, lastname: lname, 
-                                 email: email, secret: password, team_id: team_id, is_admin: is_admin)
-
-          #determine if the user is a student or a faculty/staff member and create the appropriate record
-          if role == 'student'
-            stu = Student.create(user_id: new_user.id, grade: grade_level)
-          else
-            fac = Facultystaff.create(user_id: new_user.id, grade: grade_level)
-          end
-        end
-      end
-      redirect '/manage/manage_users'
-    end
-  end
-
-  post '/create_single_user' do #creates a single user based on user-submitted information
-    fname = params[:fname]
-    lname = params[:lname]
-    email = params[:email]
-    is_admin = params[:is_admin] != nil ? true : false
-    team_id = BwTeam.find_by(team_color: params[:team].downcase).id
-    role = params[:role]
-    grade = params[:grade]
-
-    
-    #generates a default password in the format "gdingholtonarms"
-    password = (fname.downcase[0] + lname.downcase + "holtonarms").to_s
-
-    new_user = User.create(firstname: fname, lastname: lname, 
-                           email: email, secret: password, team_id: team_id, is_admin: is_admin)
-    if role == "Student" 
-      Student.create(user_id: new_user.id, grade: Integer(grade)) 
-    else 
-      Facultystaff.create(user_id: new_user.id, grade: Integer(grade))
-    end
-    redirect '/manage/manage_users'
-  end
-
-  get '/manage/add_users' do
-    verify_user
-    erb :add_users
-  end
-
   get '/student' do
     # NEED TO ONLY AUTHORIZE IF STUDENT!!!!
     erb :student
@@ -276,6 +208,70 @@ class HoltonHubApp < Sinatra::Base
     redirect '/bw_events'
   end
 
+  ## USER MANAGEMENT ##
+  post '/create_users' do #creates users based on text file submitted by user
+    if params[:accountsFile] && params[:accountsFile][:filename] #only reads file if it exists & has been submitted
+      file = params[:accountsFile][:tempfile].read
+      accounts = file.split("\n") #breaks document into a list of account data
+      accounts.each do |acct|
+        data = acct.split(",") # splits individual student data into array
+        #format: first name, last name, email, team color, grade, role, [admin]
+        fname = data[0].strip
+        lname = data[1].strip
+        email = data[2].strip
+        grade_level = Integer(data[4])
+        role = data[5].downcase.strip
+        
+        if User.find_by(email: email) == nil #user does not yet exist        
+          team_id = BwTeam.find_by(team_color: data[3].downcase.strip).id
+          # assigns an admin role to administrators
+          if data.length > 6 and data[6].downcase.strip == "admin"
+            is_admin = true
+          else
+            is_admin = false
+          end
+          
+          #generates a default password in the format "gracedingholtonarms"
+          password = (fname.downcase + lname.downcase + "holtonarms").to_s
+
+          new_user = User.create(firstname: fname, lastname: lname, 
+                                 email: email, secret: password, team_id: team_id, is_admin: is_admin)
+
+          #determine if the user is a student or a faculty/staff member and create the appropriate record
+          if role == 'student'
+            stu = Student.create(user_id: new_user.id, grade: grade_level)
+          else
+            fac = Facultystaff.create(user_id: new_user.id, grade: grade_level)
+          end
+        end
+      end
+      redirect '/manage/manage_users'
+    end
+  end
+
+  post '/create_single_user' do #creates a single user based on user-submitted information
+    fname = params[:fname]
+    lname = params[:lname]
+    email = params[:email]
+    is_admin = params[:is_admin] != nil ? true : false
+    team_id = BwTeam.find_by(team_color: params[:team].downcase).id
+    role = params[:role]
+    grade = params[:grade]
+
+    
+    #generates a default password in the format "gdingholtonarms"
+    password = (fname.downcase[0] + lname.downcase + "holtonarms").to_s
+
+    new_user = User.create(firstname: fname, lastname: lname, 
+                           email: email, secret: password, team_id: team_id, is_admin: is_admin)
+    if role == "Student" 
+      Student.create(user_id: new_user.id, grade: Integer(grade)) 
+    else 
+      Facultystaff.create(user_id: new_user.id, grade: Integer(grade))
+    end
+    redirect '/manage/manage_users'
+  end
+
   get '/manage/manage_users' do
     verify_user
     check_admin
@@ -296,6 +292,10 @@ class HoltonHubApp < Sinatra::Base
     erb :user_management
   end
 
+  get '/manage/add_users' do
+    verify_user
+    erb :add_users
+  end
 
   post '/activation' do
     #set the given user based on name to active or inactive
@@ -307,6 +307,19 @@ class HoltonHubApp < Sinatra::Base
     user.save
 
     redirect '/manage/manage_users'
+  end
+
+  get '/manage/create_user' do
+    verify_user
+    check_admin
+    erb :create_single_user
+  end
+
+  ## END USER MANAGEMENT ##
+
+  get '/faculty_page' do
+  # THIS IS NOT COMPLETE --- NEEDS TO CHECK IF USER IS FACULTY ??
+    erb :faculty_page
   end
 
   get '/club_droppout' do
@@ -326,17 +339,7 @@ class HoltonHubApp < Sinatra::Base
     erb :day_schedule
   end
 
-  get '/manage/create_user' do
-    verify_user
-    check_admin
-    erb :create_single_user
-  end
-
-  get '/club_droppout' do
-    verify_user
-    
-  end
-
+  ## GROUPS ##
   get '/my_clubs' do
     verify_user
     student = Student.find_by(user_id: @active_user.id)
@@ -371,9 +374,12 @@ class HoltonHubApp < Sinatra::Base
     erb :my_clubs
   end
 
+  
   get '/all_clubs' do
     verify_user
-    @all_clubs = Group.where(group_type: "club").order(:name)
+    @high_commitment = Group.where(group_type: "club", active: true, level_id: GroupLevel.find_by(name: "high commitment").id).order(name: :asc)
+    @interest = Group.where(group_type: "club", active: true, level_id: GroupLevel.find_by(name: "interest").id).order(name: :asc)
+    @affinity_groups = Group.where(group_type: "club", active: true, level_id: GroupLevel.find_by(name: "affinity group").id).order(name: :asc)
     erb :all_clubs
   end
 
@@ -411,8 +417,8 @@ class HoltonHubApp < Sinatra::Base
 
   get '/all_sports' do
     verify_user
+    @all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc)
     #iterates thru and sorts all sports based on season
-    @all_sports = Group.where(group_type: "sport").order(level: :desc) #still trying to sort by varsity/jv and sort alphabetically... later problem
     @fall_sports = []
     @winter_sports = []
     @spring_sports = []
@@ -469,7 +475,7 @@ class HoltonHubApp < Sinatra::Base
   end
   
   
-  post "/create_groups" do
+  post "/create_group" do
     #create the group from form data and put into the schema
     group = Group.create(name: params[:groupName], description: params[:groupDescription], group_type: params[:typeSelection], level_id: Integer(params[:groupTypeDropdown]))
     #assign students to be leaders of the recently created group
@@ -484,6 +490,80 @@ class HoltonHubApp < Sinatra::Base
       GroupSeason.create(group_id: group.id, season_id: params[:sportsSeason])
     end
     redirect '/'
+  end
+
+  get '/manage/manage_groups' do
+    verify_user
+    check_admin
+    @all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc) 
+    @all_clubs = Group.where(group_type: "club", active: true).order(level_id: :asc, name: :asc)
+    @archived_groups = Group.where(active: false).order(group_type: :asc, level_id: :asc, name: :asc)
+    erb :group_management
+  end
+
+  get "/manage/edit_group" do
+    verify_user
+    check_admin
+    @group = Group.find(params[:id])
+    erb :edit_group
+  end 
+
+  post "/manage/update_group" do
+    group = Group.find(params[:id])
+    group.update(name: params[:groupName], level_id: params[:level].to_i)
+    if group.group_type == "sport"
+      season = GroupSeason.find_by(group_id: group.id)
+      season.update(season_id: params[:season].to_i)
+    end
+    redirect '/manage/manage_groups'
+  end
+
+  post "/manage/delete_group" do
+    group = Group.find(params[:id])
+    group.update(active: false)
+    redirect '/manage/manage_groups'
+  end 
+
+  post "/manage/restore_group" do
+    group = Group.find(params[:id])
+    group.update(active: true)
+    puts group.name
+    redirect '/manage/manage_groups'
+  end 
+
+  post "/manage/trash_group" do
+    group = Group.find(params[:id])
+    if not group.active
+      group.delete
+      redirect '/manage/manage_groups'
+    else
+      erb :error
+    end
+    
+  end
+
+  get '/manage/add_group_members' do
+    verify_user
+    check_admin
+    @all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc) 
+    @all_clubs = Group.where(group_type: "club", active: true).order(level_id: :asc, name: :asc)
+    
+    erb :add_batch_group_members
+  end
+
+  post '/add_group_members' do
+    group_id = params[:group].to_i
+    file = params[:members_list][:tempfile].read
+    students = file.split("\n")
+  
+    students.each do |email|
+      use = User.find_by(email: email.delete("\r"))
+      stu = Student.find_by(user_id: use.id)
+      if GroupMember.find_by(student_id: stu.id, group_id: group_id) == nil
+        GroupMember.create(student_id: stu.id, group_id: group_id)
+      end
+    end
+    redirect '/all_clubs' #eventually redirect to the group you are adding members to
   end
   ##########################################
 end

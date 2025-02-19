@@ -1,4 +1,5 @@
 <div class="container">
+<<<<<<< HEAD
 	<div class="row">
 		<h1>Add Accounts</h1>
 		<p>Please upload a CSV text file of the users you would like to add.</p>
@@ -31,4 +32,25 @@
 
 		</form>
 	</div>
+=======
+    <div class="row">
+        <h1>Add Accounts</h1>
+    </div>
+    <div class="row">
+        <p>Please upload a text file of the users you would like to add</p>
+        <p>Include their first name, last name, email, team color, and role</p>
+    </div>
+    <!-- FINISH -->
+    <div class="row">
+    <form action="/create_users" method="post" enctype="multipart/form-data">
+        <div class="input-group">
+            <input type="file" class="form-control" id="accountsFile" name="accountsFile" aria-describedby="inputGroupFileAddon04" aria-label="Upload" required>
+            <!-- <button class="btn btn-outline-secondary" type="submit" id="accountsFile">Submit</button> -->
+            
+            <input type="submit" value="Upload" class="btn" id="accountsFile">
+        </div>
+
+    </form>
+    </div>
+>>>>>>> batch_add_clubmembers
 </div>

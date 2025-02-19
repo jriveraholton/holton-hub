@@ -41,7 +41,7 @@ interest = GroupLevel.create(name: "interest", description: "casual, activity an
 varsity = GroupLevel.create(name: "varsity", description: "varsity sport", limit: -1)
 GroupLevel.create(name: "junior varsity", description: "jv sport", limit: -1)
 GroupLevel.create(name: "affinity group", description: "activities and learning oriented around shared identities.", limit: -1)
-
+GroupLevel.create(name: "club sport", description: "club sport", limit: -1)
 
 #groups
 debate = Group.create(name: "Debate Team", description: "Group dediated to competitive debate events and activities", group_type: "club", level_id: high.id)
