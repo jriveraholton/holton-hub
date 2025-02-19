@@ -101,8 +101,6 @@ class HoltonHubApp < Sinatra::Base
       puts "LOGGED IN: " + @active_user.email
       puts "TEAM COLOR: " + @active_team_color.to_s
     end
-    @all_sports = Group.where(group_type: "sport").order(level_id: :asc, name: :asc) 
-    @all_clubs = Group.where(group_type: "club", active: true).order(level_id: :asc, name: :asc)
     erb :index
   end
 
@@ -356,16 +354,19 @@ class HoltonHubApp < Sinatra::Base
   get '/manage/add_group_members' do
     verify_user
     check_admin
+    @all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc) 
+    @all_clubs = Group.where(group_type: "club", active: true).order(level_id: :asc, name: :asc)
+    
     erb :add_batch_group_members
   end
 
   post '/add_group_members' do
     group_id = params[:group].to_i
     file = params[:members_list][:tempfile].read
-    students = file.split("\r")
+    students = file.split("\n")
   
     students.each do |email|
-      use = User.find_by(email: email.delete("\n"))
+      use = User.find_by(email: email.delete("\r"))
       stu = Student.find_by(user_id: use.id)
       if GroupMember.find_by(student_id: stu.id, group_id: group_id) == nil
         GroupMember.create(student_id: stu.id, group_id: group_id)
