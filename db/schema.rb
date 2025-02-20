@@ -81,6 +81,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_16_151215) do
     t.text "description", null: false
     t.string "group_type", null: false
     t.integer "level_id", null: false
+    t.boolean "active", default: true, null: false
   end
 
   create_table "message_message_tags", force: :cascade do |t|

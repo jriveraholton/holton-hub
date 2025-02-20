@@ -1,0 +1,32 @@
+<div class="container">
+    <div class="row">
+        <h1>Add Group Members</h1>
+    </div>
+    <div class="row">
+        <p>Please upload a text file of members for the selected club/sport</p>
+        <p>Submit a CSV of only their emails</p>
+    </div>
+    <div class="row">
+        <form action="/add_group_members" method="post" enctype="multipart/form-data">
+            <div class="mb-3 col-md-4">
+                <select id="group" name="group" class="form-select" aria-label="Group select">
+                <option selected disabled value>Select group to add members</option>
+                <% @all_sports.each do |sport|%>
+                    <option value="<%= sport.id %>"><%=sport.name.titleize%></option>
+                <% end %>
+                <hr>
+                <% @all_clubs.each do |club|%>
+                    <option value="<%= club.id %>"><%=club.name.titleize%></option>
+                <% end %>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="members_list" class="form-label">Upload members list</label>
+                <input class="form-control" type="file" id="members_list" name="members_list" required>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary mb-3 me-3">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
