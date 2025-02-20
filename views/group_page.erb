@@ -1,4 +1,52 @@
 <main>
-        <h1> <%= @current_group.name %> <hr> </h1>
-        <p>
+    <h1> <%= @current_group.name.titleize %> <hr> </h1>
+    <p><center>
+        <a class="btn btn-primary" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">About</a>
+    </p>
+            <div class="row">
+                <div class="col">
+                    <div class="collapse multi-collapse" id="multiCollapseExample1">
+                        <div class="card card-body">
+                            <%= @current_group.description %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <div class="card">
+            <div class="card-body">
+                <% @club_members.each do |st| %>
+                    <%= st.lastname + ", " + st.firstname %> <br>
+                <% end %>
+            </div>
+        </div>
+    <p
+        <br><br>
+            <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                    <img src="..." class="d-block w-100" alt="...">
+                    </div>
+                    <div class="carousel-item">
+                    <img src="..." class="d-block w-100" alt="...">
+                    </div>
+                    <div class="carousel-item">
+                    <img src="..." class="d-block w-100" alt="...">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+            <br>
+        <div class="row justify-content-md-center text-center mb-3">
+            <div class="col">
+                <a href="/add_to_clubs/<%= @current_group.name.gsub!(" ", "_") %>" class="btn btn-primary mx-auto" role="button">Add Members</a>    
+            </div>
+        </div>
+    </p>
 </main>

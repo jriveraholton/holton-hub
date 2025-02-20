@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_05_143247) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_16_151215) do
   create_table "bw_event_divisions", force: :cascade do |t|
     t.integer "bw_event_id", null: false
     t.integer "division_id", null: false
@@ -34,7 +34,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_05_143247) do
     t.string "name", null: false
   end
 
-  create_table "facultystaff", force: :cascade do |t|
+  create_table "facultystaffs", force: :cascade do |t|
     t.integer "grade"
     t.integer "user_id"
   end
@@ -66,6 +66,11 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_05_143247) do
     t.integer "group_id", null: false
   end
 
+  create_table "group_messagetags", force: :cascade do |t|
+    t.integer "group_id", null: false
+    t.integer "messagetag_id", null: false
+  end
+
   create_table "group_seasons", force: :cascade do |t|
     t.integer "group_id", null: false
     t.integer "season_id", null: false
@@ -74,7 +79,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_05_143247) do
   create_table "groups", force: :cascade do |t|
     t.string "name", null: false
     t.text "description", null: false
-    t.string "type", null: false
+    t.string "group_type", null: false
     t.integer "level_id", null: false
   end
 
@@ -111,5 +116,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_05_143247) do
     t.string "secret"
     t.integer "team_id"
     t.boolean "is_admin", default: false, null: false
+    t.boolean "active", default: true, null: false
   end
 end

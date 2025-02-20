@@ -1,0 +1,63 @@
+<div class="container">
+    <% if @active_user != nil and @active_user.is_admin %>
+		<h1>Add a New Event</h1>
+		<form action="/create_event" method="post" enctype="application/x-www-form-urlencoded">
+			<div class="mb-3 row">
+				<div class="col-md-2">
+					<label for="eventName" class="form-label">Event name</label>
+				</div>
+				<div class="col-md-10">   
+					<input type="text" class="form-control" id="eventName" name="eventName" placeholder="Field Day, Spirit Stick, etc.">
+				</div>
+			</div>
+			<div class="mb-3 row">
+				<div class="col-md-2">
+					<label for="datepicker" class="form-label">Date: </label>
+				</div>
+				<div class="col-md-6">
+					<input id="datepicker" name="date" class="form-control" type="date">
+				</div>
+			</div>
+			<div class="mb-3 row">
+				<div class="col-md-2">
+					<label for="division" class="form-label">Participating Division: </label>
+				</div>
+				<div class="col-md-4">
+					<select id="division" name="division" class="form-select" aria-label="Divison select">
+						<option selected>Select</option>
+						<option value="All School">All School</option>
+						<option value="Upper School">Upper School</option>
+						<option value="Middle School">Middle School</option>
+						<option value="Lower School">Lower School</option>
+					</select>
+				</div>
+			</div>
+			<div class="mb-3 row">
+				<div class="col-md-2">
+					<label for="blue_pts" class="form-label">Points Awarded</label>
+				</div>
+				<div class="col-md-4">
+					<div class="input-group">
+						<span class="input-group-text" id="blue_pts">Blue Team</span>
+						<input type="number" class="form-control" placeholder="e.g. 3"  min="0"
+							   aria-label="pts" aria-describedby="blue_pts" id="blue_pts" name="blue_pts"> 
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="input-group">
+						<span class="input-group-text" id="blue_pts">White Team</span>
+						<input type="number" class="form-control" placeholder="e.g. 0"  min="0"
+							   aria-label="pts" aria-describedby="white_pts" id="white_pts" name="white_pts"> 
+					</div>
+				</div>
+			</div>
+			<div class="d-grid gap-2 d-md-block">
+				<button type="submit" class="btn btn-primary mb-3 me-3">Submit</button>
+				<a href="/bw_events" class="btn btn-secondary mb-3">Cancel</a>            
+			</div>
+		</form>
+	<% else %>
+		<p>Page not found... return <a href="/">home</a></p>
+	<% end %>
+</div>
+
