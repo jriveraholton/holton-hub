@@ -44,10 +44,14 @@ GroupLevel.create(name: "affinity group", description: "activities and learning 
 GroupLevel.create(name: "club sport", description: "club sport", limit: -1)
 
 #groups
-debate = Group.create(name: "Debate Team", description: "Group dediated to competitive debate events and activities", group_type: "club", level_id: high.id)
-soccer = Group.create(name: " Varsity Soccer", description: "Team dedicated to playing futbol.", group_type: "sport", level_id: varsity.id)
-cheese = Group.create(name: "Cheese Club", description: "All things cheese related!", group_type: "club", level_id: interest.id)
-softball = Group.create(name: "Softball", description: "Baseball with an bigger ball.", group_type: "sport", level_id: varsity.id)
+debate = Group.create(name: "debate team", description: "Group dedicated to competitive debate events and activities", group_type: "club", level_id: high.id)
+soccer = Group.create(name: "varsity soccer", description: "Team dedicated to playing futbol.", group_type: "sport", level_id: varsity.id)
+cheese = Group.create(name: "cheese club", description: "All things cheese related!", group_type: "club", level_id: interest.id)
+softball = Group.create(name: "softball", description: "Baseball with an bigger ball.", group_type: "sport", level_id: varsity.id)
+
+#sports results
+softball_game = Game.create(name: "vs. Holy Child", team_id: softball.id, date: DateTime.new(2001,2,3, 1), advantage: true, result: "win")
+softball_game = Game.create(name: "vs. Holy Child", team_id: softball.id, date: DateTime.new(2002,3,5, 2), advantage: true, result: "win")
 
 #group leaders/members
 GroupLeader.create(group_id: cheese.id, student_id: student5.id)

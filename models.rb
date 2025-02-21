@@ -28,6 +28,9 @@ end
 class MessageMessageTag < ActiveRecord::Base
 end
 
+class Game < ActiveRecord::Base
+end
+
 class Group < ActiveRecord::Base
 end
 

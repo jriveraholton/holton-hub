@@ -1,0 +1,16 @@
+<main>
+    <form action="/adding_members/<%= @current_group.name.gsub!(" ", "_") %>" method="post">
+        <label class="form-check-label" for="flexCheckDefault">
+
+        </label>
+        <% @student_list.each do |st| %>
+            <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="<%= st.lastname%>, <%= st.firstname%>" id="flexCheckDefault" name="user[]">
+            <label class="form-check-label" for="flexCheckDefault">
+                <%= st.lastname%>, <%= st.firstname%>
+            </label>
+            </div>
+        <% end %>
+        <button type="submit" class="btn btn-primary">Add to Club</button>
+    </form>
+</main>
