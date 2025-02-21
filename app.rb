@@ -587,8 +587,77 @@ class HoltonHubApp < Sinatra::Base
     end
   end
 
-  post '/update_sport_page' do
+  get '/add_to_clubs/:club_name' do
+    club = params['club_name']
+    puts club
+    underscore = "_"
+    club.gsub!(underscore, " ")
+    club.downcase!
+    @current_group = Group.find_by(name: club)
+    @student_list = []
+    all_students = Student.all
+    p "length" + all_students.length.to_s
+    all_students.each do |st|
+      user = User.find_by(id: st.user_id)
+      @student_list.push(user)
+    end
+    erb :add_to_clubs
+    # redirect '/'
+  end
 
+  post '/adding_members/:club_name' do
+    club = params['club_name']
+    puts club
+    underscore = "_"
+    club.gsub!(underscore, " ")
+    club.downcase!
+    @current_group = Group.find_by(name: club)
+    puts "USERS: " + params[:user].to_s
+    selected_users = params[:user]
+    selected_users.each do |st|
+      split_name = st.split(", ")
+      user = User.find_by(firstname: split_name[1], lastname: split_name[0])
+      puts user.inspect
+      puts split_name[1]
+      puts split_name[0]
+      student = Student.find_by(user_id: user.id)
+      if GroupMember.find_by(student_id: student.id, group_id: @current_group.id) == nil
+        GroupMember.create(student_id: student.id, group_id: @current_group.id)
+      end
+    end
+    redirect '/my_clubs/'+params['club_name'].to_s
+  end
+
+  get '/my_clubs/:club_name' do
+    club = params['club_name']
+    puts club
+    underscore = "_"
+    club.gsub!(underscore, " ")
+    club.downcase!
+    @current_group = Group.find_by(name: club)
+    puts club
+    @club_members = []
+    @club_leaders = []
+    members = GroupMember.where(group_id: @current_group.id)
+    leaders = GroupLeader.where(group_id: @current_group.id)
+    members.each do |gm|
+      student = Student.find_by(id: gm.student_id)
+      user = User.find_by(id: student.user_id)
+      @club_members << user
+    end
+    leaders.each do |gl|
+      @club_leaders << Student.find_by(id: gl.student_id)
+    end
+    erb :group_page
+  end
+
+  get '/my_sports/:sport_name' do
+    sport = params['sport_name']
+    underscore = "_"
+    sport.gsub!(underscore, " ")
+    sport.downcase!
+    @current_group = Group.find_by(name: sport)
+    erb :sports_page
   end
 
   ##########################################

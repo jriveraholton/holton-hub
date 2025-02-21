@@ -1,0 +1,121 @@
+<main>
+    <h1> <%= @current_group.name.titleize %></h1> <hr>
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link" href="#home" data-bs-toggle="tab">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#rosterid">Roster</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#resultsid">Results</a>
+            </li>
+        </ul>
+    <p>
+        <div class="tab-content">
+            <div id="home" class="tab-pane" role="tab"> 
+                <main>
+                <br><br>
+                <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                        <img src="..." class="d-block w-100" alt="...">
+                        </div>
+                        <div class="carousel-item">
+                        <img src="..." class="d-block w-100" alt="...">
+                        </div>
+                        <div class="carousel-item">
+                        <img src="..." class="d-block w-100" alt="...">
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+                <br>
+            <div class="row justify-content-md-center text-center mb-3">
+                <div class="col">
+                    <a href="/add_to_clubs/<%= @current_group.name.gsub!(" ", "_") %>" class="btn btn-primary mx-auto" role="button">Add Members</a>    
+                </div>
+            </div>                
+            </main>
+            </div>
+            <div id="rosterid" class="tab-pane" role="tab"> 
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Member</th>
+                            <th scope="col">Role</th>
+                        </tr>
+                    </thead>
+                        <tbody class="table-group-divider">
+                            <tr>
+                                <th scope="row">1</th>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">3</th>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                </table>
+            </div>
+            <div id="resultsid" class="tab-pane" role="tab">
+                    <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Time</th>
+                            <th scope="col">Advantage</th>
+                            <th scope="col">Score</th>
+                            <th scope="col">Details</th>
+                        </tr>
+                    </thead>
+                        <tbody class="table-group-divider">
+                            <tr>
+                                <th scope="row">1</th>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">3</th>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+    </p>
+</main>
+
