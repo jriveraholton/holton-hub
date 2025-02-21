@@ -600,7 +600,9 @@ class HoltonHubApp < Sinatra::Base
       puts split_name[1]
       puts split_name[0]
       student = Student.find_by(user_id: user.id)
-      GroupMember.create(student_id: student.id, group_id: @current_group.id)
+      if GroupMember.find_by(student_id: student.id, group_id: @current_group.id) == nil
+        GroupMember.create(student_id: student.id, group_id: @current_group.id)
+      end
     end
     redirect '/my_clubs/'+params['club_name'].to_s
   end
