@@ -424,6 +424,9 @@ class HoltonHubApp < Sinatra::Base
     @spring_sports = []
     #there should be a way to do this w/o hardcoding every season
     @all_sports.each do |sport|
+      puts sport.name
+      puts sport.group_type
+      puts sport.id
       if GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Fall").id
         @fall_sports << sport
       elsif GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Winter").id
@@ -565,6 +568,29 @@ class HoltonHubApp < Sinatra::Base
     end
     redirect '/all_clubs' #eventually redirect to the group you are adding members to
   end
+
+  get '/all_sports/:name/edit' do
+    verify_user
+    name = params[:name].sub("_", " ")
+    @sport = Group.find_by(name: name)
+    leaders = GroupLeader.where(group_id: @sport.id)
+    is_leader = false
+    leaders.each do |leader|
+      if leader.id == @active_user.id 
+        is_leader = true
+      end
+    end
+    if is_leader or @active_user.is_admin
+      erb :edit_sport_page
+    else
+      erb :error
+    end
+  end
+
+  post '/update_sport_page' do
+
+  end
+
   ##########################################
 end
 
