@@ -1,0 +1,45 @@
+<div class="container">
+    <div class="row">
+        <h1>Add Your Account</h1>
+    </div>
+    <div class="row">  
+        <form action="/create_single_user" method="Post">
+            <div class="mb-3">
+                <label for="fnameinput" class="form-label">First Name</label>
+                <input type="text" name="fname" class="form-control" id="fnameinput" placeholder="First Name">
+            </div>
+            <div class="mb-3">
+                <label for="lnameinput" class="form-label">Last Name</label>
+                <input type="text" name="lname" class="form-control" id="lnameinput" placeholder="Last Name">
+            </div>
+            <div class="mb-3">
+                <label for="emailinput" class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" id="emailinput" placeholder="Email">
+            </div>
+        <div class="row">
+            <h2>Please Select:</h1>
+        </div>
+    </select>
+        <div class="row">
+        <div class="col">
+                <select class="form-select" aria-label="Default select example" name="team">
+                <option selected>Team</option>
+                <option value="white">White</option>
+                <option value="blue">Blue</option>
+            </select>
+        </div>
+
+                </div>
+                <div class="col">
+                    <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="admincheck" name="is_admin" ><end>
+                            <label class="form-check-label" for="admincheck">Admin</label>
+                    </div>
+                <div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div> 

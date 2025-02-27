@@ -1,0 +1,4 @@
+Hannah,Warfield,hannah.warfield.2026@holton-arms.edu,white,student
+Remy,Caspar,remy.caspar.2026@holton-arms.edu,blue,student
+Rosie,Lee,rosie.lee.2028@holton-arms.edu,white,student
+Shay,Squeglia,shay.squeglia@holton-arms.edu,white,admin

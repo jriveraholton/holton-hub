@@ -46,9 +46,9 @@ class HoltonHubApp < Sinatra::Base
     if session[:access_token] != nil
 	  @active_user = User.find_by(secret: session[:access_token])
       #is no user recognized? Go to the sign_in page
-	  if(@active_user == nil)
-	    redirect '/sign_in'
-	  end
+      if(@active_user == nil)
+        redirect '/sign_in'
+      end
       @active_team_color = BwTeam.find(@active_user.team_id).team_color.downcase
     #    session[:team_color] = @active_team_color
     else
@@ -78,21 +78,6 @@ class HoltonHubApp < Sinatra::Base
     @active_user = User.find_by(email: info["email"])
     
     if @active_user == nil #if the user doesn't exist already, they cannot log in
-      # name = info["name"].split
-	  # @active_user = User.create(
-	  #   email: info["email"],
-      #   firstname: name[0],
-      #   lastname: name[name.length-1]
-	  # )
-      # white_id = BwTeam.find_by(team_color: "white").id
-      # blue_id = BwTeam.find_by(team_color: "blue").id
-      # white_count = User.where(team_id: white_id).count
-      # blue_count = User.where(team_id: blue_id).count
-      # if white_count >= blue_id
-      #   @active_user.team_id = white_id
-      # else
-      #   @active_user.team_id = blue_id
-      # end
       redirect '/'
     end
     @active_user.secret = session[:access_token]
@@ -109,9 +94,9 @@ class HoltonHubApp < Sinatra::Base
     verify_user #make sure user is logged in, or force them to the login in page
     if @active_user != nil
       puts "LOGGED IN: " + @active_user.email
-      puts "TEAM COLOR: " + @active_team_color.to_s
+      puts "TEAM COLOR: " + @active_team_color.to_s 
     end
-    erb :index
+    erb :index 
   end
 
   get '/sign_in' do
@@ -119,9 +104,9 @@ class HoltonHubApp < Sinatra::Base
     #verify they still have the correct credentials and send them to their home page
     if session[:access_token] != nil
    	  @active_user = User.find_by(secret: session[:access_token])
-	  if @active_user != nil and @active_user.active
-	    redirect '/'
-	  end
+      if @active_user != nil and @active_user.active
+        redirect '/'
+      end
     end
 
     #the user needs to login with their unique google url
@@ -178,10 +163,10 @@ class HoltonHubApp < Sinatra::Base
     fname = params[:fname]
     lname = params[:lname]
     email = params[:email]
-    is_admin = param[:is_admin] #preferably this is a yes/no checkbox
+    is_admin = params[:is_admin] != nil ? true : false
     team_id = BwTeam.find_by(team_color: params[:team].downcase).id
     #generates a default password in the format "gdingholtonarms"
-    password = (fname.downcase[0] + lname.downcase + holtonarms).to_s
+    password = (fname.downcase[0] + lname.downcase + "holtonarms").to_s
 
     new_user = User.create(firstname: fname, lastname: lname, 
                            email: email, secret: password, team_id: team_id, is_admin: is_admin)
@@ -189,15 +174,20 @@ class HoltonHubApp < Sinatra::Base
     redirect '/'
   end
 
-  get '/add_users' do
+  get '/manage/add_users' do
+    verify_user
     erb :add_users
   end
 
-  get '/studentpage' do
-    erb :student_homepage
+  get '/student' do
+    # NEED TO ONLY AUTHORIZE IF STUDENT!!!!
+    verify_user
+    erb :student
   end
 
   get '/messages' do
+    verify_user
+    @groups = MessageTag.all
     erb :messages
   end
 
@@ -205,21 +195,59 @@ class HoltonHubApp < Sinatra::Base
   end 
 
   get '/new_event' do
+    verify_user
     erb :new_event
   end
 
+  get '/bw_events' do
+    @events = BwEvent.all 
+    # @events.order(:event_date).reverse
+    # puts "sorted"
+    @blue_points = 0
+    @white_points = 0
+    verify_user
+    @events.each do |event| #adds up points
+      @blue_points += event.blue_points
+      @white_points += event.white_points
+    end
+    erb :bw_events
+  end
+
+  get '/edit_event' do
+    verify_user
+    @event = BwEvent.find_by(id: params[:id])
+    erb :edit_event
+  end
+    
   post '/create_event' do
     name = params[:eventName]
     date = params[:date].to_datetime #calendar on the frontend
     blue_pts = params[:blue_pts]
     white_pts = params[:white_pts]
     division = Division.find_by(name: params[:division]).id
-    puts division
     new_event = BwEvent.create(name: name, event_date: date, blue_points: blue_pts, white_points: white_pts, division_id: division) 
-    redirect '/'
+    redirect '/bw_events'
   end
 
-  get '/manage/user_activation' do
+  post '/update_event' do
+    event = BwEvent.find_by(id: params[:id])
+    puts "Event ID" + params[:id].to_s
+    name = params[:eventName]
+    date = params[:date].to_datetime #calendar on the frontend
+    blue_pts = params[:blue_pts]
+    white_pts = params[:white_pts]
+    division = Division.find_by(id: params[:division]).id 
+    event.update(name: name, event_date: date, blue_points: blue_pts, white_points: white_pts, division_id: division) # this one - should be an edit 
+    redirect '/bw_events'
+  end
+
+  post '/delete_event' do
+    event = BwEvent.find_by(id: params[:id]) 
+    event.delete
+    redirect '/bw_events'
+  end
+
+  get '/manage/manage_users' do
     verify_user
     @all_users = User.all
     @all_by_groups = {9 => [], 10 => [], 11 => [], 12 => [], :facstaff => []}
@@ -235,9 +263,9 @@ class HoltonHubApp < Sinatra::Base
         @all_by_groups[:facstaff].push(user)
       end
     end
-
-    erb :user_activation
+    erb :user_management
   end
+
 
   post '/activation' do
     #set the given user based on name to active or inactive
@@ -248,10 +276,11 @@ class HoltonHubApp < Sinatra::Base
     user.active = active
     user.save
 
-    redirect '/manage/user_activation'
+    redirect '/manage/manage_users'
   end
 
   get '/faculty_page' do
+  # THIS IS NOT COMPLETE --- NEEDS TO CHECK IF USER IS FACULTY ??
     erb :faculty_page
   end
 
@@ -259,22 +288,49 @@ class HoltonHubApp < Sinatra::Base
     erb :club_droppout
   end
 
-  post '/messagesent' do
-  end 
-
-  get '/currentday' do 
+  get '/today' do
     verify_user
     fac = Facultystaff.find_by(id: @active_user.id)
     if fac == nil
       @fac_member = true
     else
-      @fac_member = false
+      @fac_member = false 
     end
     erb :day_schedule
   end
 
-  get '/editschedule' do 
-    erb :update_schedule
+  get '/manage/create_user' do
+    verify_user
+    erb :create_single_user
+  end
+
+  get '/edit_schedule' do 
+    verify_user
+    erb :edit_schedule
+  end
+
+  post '/uploadcalander' do
+    if params[:accountsFile] && params[:accountsFile][:filename] #only reads file if it exists & has been submitted
+      file = params[:accountsFile][:tempfile].read
+    end
+    lines = file.split("\n") 
+    lines.each do |line| 
+      data = line.split(",")
+      if data[3] == "US"
+        description = data[1]
+        day1_time = data[11,12] #blue 
+        day2_time = data[13,14] #blue 
+        day3_time = data[15.16] #blue 
+        day4_time = data[17,18] #blue 
+        day5_time = data[19,20] #blue 
+        day6_time = data[21,22] #white 
+        day7_time = data[23,24] #white 
+        day8_time = data[25,26] #white 
+        day9_time = data[27,28] #white 
+        day10_time = data[29,30] #white  
+      end
+    end
+    redirect '/today'
   end
   ##########################################
 end

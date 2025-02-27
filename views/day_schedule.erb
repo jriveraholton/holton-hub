@@ -59,7 +59,8 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-  <form>
+
+  <form action="/" method="post">
   <div class="container">
     <select class="form-select form-select-lg mb-3" aria-label="Large select example">
       <option selected>Day</option>
@@ -162,8 +163,11 @@
 </div>
 </div>
 </div>
-<% if @fac_member == true  %>
+<% if @fac_member == true  %> 
   <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Edit Schedule</button>
+  <a href="https://holtonhub.org/edit_schedule">
+  <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Upload Schedule</button>
+  </a>
 <% end %> 
 
 </div>

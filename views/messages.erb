@@ -5,64 +5,76 @@
                 <label for="exampleFormControlTextarea1" class="form-label">Message</label>
                 <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
             </div>
-
-  #      <div class="btn-group" role="group">
-   #         <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Select</button>
-    #        <ul class="dropdown-menu">
-     #      <li class="list-group-item">
-  #            <input class="form-check-input me-1" type="checkbox" value="" id="Classof2025">
-   #           <label class="form-check-label " for="Classof2025">Class of 2025</label>
-    #        </li>
-     #       <li class="list-group-item">
-      #        <input class="form-check-input me-1" type="checkbox" value="" id="Classof2026">
-       #       <label class="form-check-label" for="Classof2026">Class of 2026</label>
-        #    </li>
-         #   <li class="list-group-item">
-          #    <input class="form-check-input me-1" type="checkbox" value="" id="Classof2027">
-  #            <label class="form-check-label" for="Classof2027">Class of 2027</label>
-   #         </li>
-    #        <li class="list-group-item">
-     #         <input class="form-check-input me-1" type="checkbox" value="" id="Classof2028">
-      #        <label class="form-check-label" for="Classof2028">Class of 2028</label>
-       #     </li>
-        #    <li class="list-group-item">
- #             <input class="form-check-input me-1" type="checkbox" value="" id="MathDepartment">
-  #            <label class="form-check-label" for="MathDepartment">Math Department</label>
-   #         </li>
-    #        <li class="list-group-item">
-     #         <input class="form-check-input me-1" type="checkbox" value="" id="EnglishDepartment">
-      #        <label class="form-check-label" for="EnglishDepartment">English Department</label>
-       #     </li>
-        #    <li class="list-group-item">
-         #     <input class="form-check-input me-1" type="checkbox" value="" id="HistoryDepartment">
-          #    <label class="form-check-label" for="HistoryDepartment">History Department</label>
-           # </li>
-            #<li class="list-group-item">
-#              <input class="form-check-input me-1" type="checkbox" value="" id="ScienceDepartment">
- #             <label class="form-check-label" for="ScienceDepartment">Science Department</label>
-  #          </li>
-   #         <li class="list-group-item">
-    #          <input class="form-check-input me-1" type="checkbox" value="" id="ComputerScienceDepartment">
-     #         <label class="form-check-label" for="ComputerScienceDepartment">Computer Science Department</label>
-      #      </li>
-       #     <li class="list-group-item">
-        #      <input class="form-check-input me-1" type="checkbox" value="" id="WorldLanguageDepartment">
-         #     <label class="form-check-label" for="WorldLanguageDepartment">World Language Department</label>
-          #  </li>
-           # <li class="list-group-item">
-            #  <input class="form-check-input me-1" type="checkbox" value="" id="Administration">
-             # <label class="form-check-label" for="Administration">Administration</label>
-#            </li>
- #         </ul>
-  #      </ul>
-   #       </div>
-    #    </div>
-
-         <div>
-            <%= form_for @message_tags do |f| %>
-            <%= f.select :recipient_tag, [["Class of 2025", 0 ], ["Class of 2026", 1 ]] %>
+<!--
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Select</button>
+            <ul class="dropdown-menu">
+            <ul class="list-group">
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox" value="" id="Classof2025">
+              <label class="form-check-label " for="Classof2025">Class of 2025</label>
+            </li>
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox" value="" id="Classof2026">
+              <label class="form-check-label" for="Classof2026">Class of 2026</label>
+            </li>
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox" value="" id="Classof2027">
+              <label class="form-check-label" for="Classof2027">Class of 2027</label>
+            </li>
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox" value="" id="Classof2028">
+              <label class="form-check-label" for="Classof2028">Class of 2028</label>
+            </li>
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox" value="" id="MathDepartment">
+              <label class="form-check-label" for="MathDepartment">Math Department</label>
+            </li>
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox" value="" id="EnglishDepartment">
+              <label class="form-check-label" for="EnglishDepartment">English Department</label>
+            </li>
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox" value="" id="HistoryDepartment">
+              <label class="form-check-label" for="HistoryDepartment">History Department</label>
+            </li>
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox" value="" id="ScienceDepartment">
+              <label class="form-check-label" for="ScienceDepartment">Science Department</label>
+            </li>
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox" value="" id="ComputerScienceDepartment">
+              <label class="form-check-label" for="ComputerScienceDepartment">Computer Science Department</label>
+            </li>
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox" value="" id="WorldLanguageDepartment">
+              <label class="form-check-label" for="WorldLanguageDepartment">World Language Department</label>
+            </li>
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox" value="" id="Administration">
+              <label class="form-check-label" for="Administration">Administration</label>
+            </li>
+          </ul>
+        </ul>
           </div>
-           
+        </div>
+        -->
+        <div class="btn-group" role="group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          Select
+        </button>
+        <ul class="dropdown-menu">
+          <ul class="list-group">
+            <% @groups.each do |group| %>
+              <li class="list-group-item">
+                <input class="form-check-input me-1" type="checkbox" value="" id="<%=group.recipient_tag%>">
+                <label class="form-check-label" for="<%=group.recipient_tag%>"><%=group.recipient_tag%></label>
+              </li>
+            <% end %>
+          </ul>
+        </ul>
+      </div>
+    </div>
 
             <br>
             <button type='submit' class='btn btn-primary' href="/messagesent">Send</button>

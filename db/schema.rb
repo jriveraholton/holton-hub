@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_05_143247) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_03_153654) do
   create_table "bw_event_divisions", force: :cascade do |t|
     t.integer "bw_event_id", null: false
     t.integer "division_id", null: false
@@ -28,6 +28,12 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_05_143247) do
     t.string "team_color", null: false
     t.integer "captain_id"
     t.integer "win_count", default: 0, null: false
+  end
+
+  create_table "dailyschedule", force: :cascade do |t|
+    t.string "week_type", null: false
+    t.date "date", null: false
+    t.string "day_of_the_week", null: false
   end
 
   create_table "divisions", force: :cascade do |t|
@@ -66,6 +72,11 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_05_143247) do
     t.integer "group_id", null: false
   end
 
+  create_table "group_messagetags", force: :cascade do |t|
+    t.integer "group_id", null: false
+    t.integer "messagetag_id", null: false
+  end
+
   create_table "group_seasons", force: :cascade do |t|
     t.integer "group_id", null: false
     t.integer "season_id", null: false
@@ -74,7 +85,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_05_143247) do
   create_table "groups", force: :cascade do |t|
     t.string "name", null: false
     t.text "description", null: false
-    t.string "type", null: false
+    t.string "group_type", null: false
     t.integer "level_id", null: false
   end
 
@@ -92,6 +103,18 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_05_143247) do
     t.text "content", null: false
     t.datetime "sent_at", null: false
     t.integer "author_id", null: false
+  end
+
+  create_table "schedule", force: :cascade do |t|
+    t.integer "dailyschedule_id", null: false
+    t.integer "block_id", null: false
+  end
+
+  create_table "schedule_block", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.datetime "start_time", null: false
+    t.string "duration", null: false
   end
 
   create_table "seasons", force: :cascade do |t|

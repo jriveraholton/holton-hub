@@ -51,3 +51,6 @@ end
 
 class GroupLevel < ActiveRecord::Base
 end
+
+class GroupMessagetag < ActiveRecord::Base
+end
