@@ -42,10 +42,10 @@ GroupLevel.create(name: "affinity group", description: "activities and learning 
 
 
 #groups
-debate = Group.create(name: "Debate Team", description: "Group dediated to competitive debate events and activities", group_type: "club", level_id: high.id)
+debate = Group.create(name: "debate team", description: "Group dediated to competitive debate events and activities", group_type: "club", level_id: high.id)
 soccer = Group.create(name: " Varsity Soccer", description: "Team dedicated to playing futbol.", group_type: "sport", level_id: varsity.id)
-cheese = Group.create(name: "Cheese Club", description: "All things cheese related!", group_type: "club", level_id: interest.id)
-softball = Group.create(name: "Softball", description: "Baseball with an bigger ball.", group_type: "sport", level_id: varsity.id)
+cheese = Group.create(name: "cheese club", description: "All things cheese related!", group_type: "club", level_id: interest.id)
+softball = Group.create(name: "softball", description: "Baseball with an bigger ball.", group_type: "sport", level_id: varsity.id)
 
 #group seasons
 GroupSeason.create(group_id: soccer.id, season_id: fall.id)

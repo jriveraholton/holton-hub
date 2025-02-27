@@ -1,0 +1,51 @@
+<div class="container">
+    <div class="row">
+        <h1>Edit Your Club Page:</h1> 
+    </div>
+
+    <div class="col-md-8">
+        <form action="<%= @updatepath %>" method="Post" enctype="multipart/form-data">
+            <div class="row-md-3">
+               <h2>
+                <%= @groupedit.name.titleize %>
+               </h2>
+            </div>
+                    <input type="file" class="form-control" id="imageFile" name="imageFile" aria-describedby="inputGroupFileAddon04" aria-label="Upload" accept=".jpg" required>
+                    <img src="/clubs/<%= @imagepath %>" alt="club picture" class="groupimage">
+            <div class="row">
+                    <h3>   </h3> 
+           <h8> ***please use .jpg files*** </h8>
+           <div class="row">
+                    <h3>   </h3> 
+        <h6>Club Description:</h2>
+            <div class="mb-3">
+                <textarea class="form-control" id="description" name="description" rows="3"><%=@groupedit.description%>
+                </textarea>
+            </div>
+        <div class="col">
+            <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</div>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     
+</div>

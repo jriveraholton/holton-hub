@@ -303,5 +303,31 @@ class HoltonHubApp < Sinatra::Base
     verify_user
     erb :create_single_user
   end
+
+  get '/my_clubs/:club_name/editclub' do
+    verify_user
+    groupname=params["club_name"].downcase.gsub("_"," ")
+    @updatepath="/my_clubs/"+params[:club_name].to_s+"/update_club"
+    @imagepath=params["club_name"]+".jpg"
+    @groupedit=Group.find_by(name: groupname)
+    erb :edit_clubs
+  end
+
+  post '/my_clubs/:club_name/update_club' do 
+    if params[:imageFile]
+      filename = params[:imageFile][:filename] 
+      puts filename
+      file = params[:imageFile][:tempfile]
+      puts "foundfile"
+      File.open(File.join("./public/clubs", params[:club_name].to_s + File.extname(filename)), 'wb') do |f|
+      #File.open(File.join("/public/clubs/", filename), 'wb') do |f|
+        f.write (file.read)
+      end
+    end
+    groupname=params["club_name"].downcase.gsub("_"," ")
+    @groupedit=Group.find_by(name: groupname)
+    @groupedit.update(description: params["description"].strip) 
+    redirect "/my_clubs/" + params[:club_name] + "/editclub"
+  end 
   ##########################################
 end

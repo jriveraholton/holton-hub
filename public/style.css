@@ -59,3 +59,8 @@ h1 {
 #event-header {
 	background: rgba(255, 255, 255, 0.4)
 }
+
+.groupimage {
+	width: 33%;
+	border: 5px black solid;
+}
