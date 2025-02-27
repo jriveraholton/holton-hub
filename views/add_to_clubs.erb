@@ -1,16 +1,18 @@
-<main>
-    <form action="/adding_members/<%= @current_group.name.gsub!(" ", "_") %>" method="post">
-        <label class="form-check-label" for="flexCheckDefault">
-
-        </label>
-        <% @student_list.each do |st| %>
-            <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="<%= st.lastname%>, <%= st.firstname%>" id="flexCheckDefault" name="user[]">
-            <label class="form-check-label" for="flexCheckDefault">
-                <%= st.lastname%>, <%= st.firstname%>
-            </label>
-            </div>
-        <% end %>
-        <button type="submit" class="btn btn-primary">Add to Club</button>
-    </form>
-</main>
+<div class="container">
+	<div class="row" >
+		<h2>Students</h2>
+	</div>
+	<div class="row">
+		<form action="/adding_members/<%= @current_group.name.gsub!(" ", "_") %>" method="post">
+			<% @student_list.each do |st| %>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value="<%= st.lastname%>, <%= st.firstname%>" id="check<%= st.lastname %><%=st.firstname %>" name="user[]">
+					<label class="form-check-label" for="check<%= st.lastname %><%=st.firstname %>">
+						<%= st.lastname%>, <%= st.firstname%>
+					</label>
+				</div>
+			<% end %>
+			<button type="submit" class="btn btn-primary">Add to Club</button>
+		</form>
+	</div>
+</div>

@@ -588,6 +588,7 @@ class HoltonHubApp < Sinatra::Base
   end
 
   get '/add_to_clubs/:club_name' do
+    verify_user
     club = params['club_name']
     puts club
     underscore = "_"
@@ -629,6 +630,7 @@ class HoltonHubApp < Sinatra::Base
   end
 
   get '/my_clubs/:club_name' do
+    verify_user
     club = params['club_name']
     puts club
     underscore = "_"
@@ -652,6 +654,7 @@ class HoltonHubApp < Sinatra::Base
   end
 
   get '/my_sports/:sport_name' do
+    verify_user
     sport = params['sport_name']
     underscore = "_"
     sport.gsub!(underscore, " ")
