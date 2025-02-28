@@ -44,16 +44,16 @@ class HoltonHubApp < Sinatra::Base
   def verify_user
     #some token exists, but is it a real user?
     if session[:access_token] != nil
-	  @active_user = User.find_by(secret: session[:access_token])
+	    @active_user = User.find_by(secret: session[:access_token])
       #is no user recognized? Go to the sign_in page
       if(@active_user == nil)
         redirect '/sign_in'
       end
       @active_team_color = BwTeam.find(@active_user.team_id).team_color.downcase
-    #    session[:team_color] = @active_team_color
+      #session[:team_color] = @active_team_color
     else
       #they've never signed in, so go to the sign in page
-	  redirect '/sign_in'
+	    redirect '/sign_in'
     end
   end
   def check_admin #use for pages w/ admin-only access
@@ -156,6 +156,7 @@ class HoltonHubApp < Sinatra::Base
 
   get '/new_event' do
     verify_user
+    check_admin
     erb :new_event
   end
 
@@ -326,13 +327,6 @@ class HoltonHubApp < Sinatra::Base
     erb :club_droppout
   end
 
-  post '/push_club_meeting' do
-    #still need to build frontend 
-    location = params[:location]
-    date = params[:date]
-    id = params[:id] #need to specifically pass as ID
-    meeting = GroupMeetings.create(location: location, event_date: date, group_id: id)
-  end
 
   get '/today' do
     verify_user
@@ -348,25 +342,31 @@ class HoltonHubApp < Sinatra::Base
     if student != nil
       leader = GroupLeader.where(student_id: student.id)
       leader.each do |ld|
-        grp = Group.find_by(id: ld.group_id)
-        if grp.group_type == "club" 
-          @my_groups.push(grp)
+        grp = Group.find_by(id: ld.group_id, active: true)
+        if grp != nil
+          if grp.group_type == "club" 
+            @my_groups.push(grp)
+          end
         end
       end
       member = GroupMember.where(student_id: student.id)
       member.each do |mb|
-        grp = Group.find_by(id: mb.group_id)
-        if grp.group_type == "club"
-          @my_groups.push(grp)
+        grp = Group.find_by(id: mb.group_id, active: true)
+        if grp != nil
+          if grp.group_type == "club"
+            @my_groups.push(grp)
+          end
         end
       end 
     else
       fac = Facultystaff.find_by(user_id: @active_user.id)  
       group_adivsor = GroupAdvisor.where(facultystaff_id: fac.id)
       group_adivsor.each do |ga|
-        grp = Group.find_by(id: ga.group_id)
-        if grp.group_type == "club" 
-          @my_groups.push(grp)
+        grp = Group.find_by(id: ga.group_id, active: true)
+        if grp != nil
+          if grp.group_type == "club" 
+            @my_groups.push(grp)
+          end
         end
       end
     end
@@ -424,9 +424,7 @@ class HoltonHubApp < Sinatra::Base
     @spring_sports = []
     #there should be a way to do this w/o hardcoding every season
     @all_sports.each do |sport|
-      puts sport.name
-      puts sport.group_type
-      puts sport.id
+
       if GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Fall").id
         @fall_sports << sport
       elsif GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Winter").id
@@ -444,6 +442,8 @@ class HoltonHubApp < Sinatra::Base
   end
 
   get '/add_group' do
+    verify_user
+    check_admin
     @group_types = []
     all_group_levels = GroupLevel.all
     all_group_levels.each do |level|
@@ -492,7 +492,7 @@ class HoltonHubApp < Sinatra::Base
     if params[:sportsSeason] != nil
       GroupSeason.create(group_id: group.id, season_id: params[:sportsSeason])
     end
-    redirect '/'
+    redirect '/manage/manage_groups'
   end
 
   get '/manage/manage_groups' do
@@ -569,25 +569,27 @@ class HoltonHubApp < Sinatra::Base
     redirect '/all_clubs' #eventually redirect to the group you are adding members to
   end
 
-  get '/all_sports/:name/edit' do
-    verify_user
-    name = params[:name].sub("_", " ")
-    @sport = Group.find_by(name: name)
-    leaders = GroupLeader.where(group_id: @sport.id)
-    is_leader = false
-    leaders.each do |leader|
-      if leader.id == @active_user.id 
-        is_leader = true
-      end
-    end
-    if is_leader or @active_user.is_admin
-      erb :edit_sport_page
-    else
-      erb :error
-    end
-  end
+  #potentially redundant route - revisit
+  # get '/all_sports/:name/edit' do
+  #   verify_user
+  #   name = params[:name].gsub("_", " ")
+  #   @sport = Group.find_by(name: name)
+  #   leaders = GroupLeader.where(group_id: @sport.id)
+  #   is_leader = false
+  #   leaders.each do |leader|
+  #     if leader.id == @active_user.id 
+  #       is_leader = true
+  #     end
+  #   end
+  #   if is_leader or @active_user.is_admin
+  #     erb :edit_sport_page
+  #   else
+  #     erb :error
+  #   end
+  # end
 
-  get '/add_to_clubs/:club_name' do
+  get '/all_clubs/:club_name/add_member' do
+    verify_user
     club = params['club_name']
     puts club
     underscore = "_"
@@ -617,49 +619,135 @@ class HoltonHubApp < Sinatra::Base
     selected_users.each do |st|
       split_name = st.split(", ")
       user = User.find_by(firstname: split_name[1], lastname: split_name[0])
-      puts user.inspect
-      puts split_name[1]
-      puts split_name[0]
+      # puts user.inspect
+      # puts split_name[1]
+      # puts split_name[0]
       student = Student.find_by(user_id: user.id)
       if GroupMember.find_by(student_id: student.id, group_id: @current_group.id) == nil
         GroupMember.create(student_id: student.id, group_id: @current_group.id)
       end
     end
-    redirect '/my_clubs/'+params['club_name'].to_s
+    redirect '/all_clubs/'+params['club_name'].to_s
   end
 
-  get '/my_clubs/:club_name' do
-    club = params['club_name']
-    puts club
+  get '/all_clubs/:club_name' do
+    verify_user
+    club = params[:club_name]
+    
     underscore = "_"
     club.gsub!(underscore, " ")
     club.downcase!
     @current_group = Group.find_by(name: club)
-    puts club
-    @club_members = []
-    @club_leaders = []
-    members = GroupMember.where(group_id: @current_group.id)
-    leaders = GroupLeader.where(group_id: @current_group.id)
-    members.each do |gm|
-      student = Student.find_by(id: gm.student_id)
-      user = User.find_by(id: student.user_id)
-      @club_members << user
+    if @current_group.active
+      @club_members = []
+      @club_leaders = []
+      members = GroupMember.where(group_id: @current_group.id)
+      leaders = GroupLeader.where(group_id: @current_group.id)
+      members.each do |gm|
+        student = Student.find_by(id: gm.student_id)
+        user = User.find_by(id: student.user_id)
+        @club_members << user
+      end
+      leaders.each do |gl|
+        @club_leaders << Student.find_by(id: gl.student_id)
+      end
+      erb :club_page
+    else
+      erb :error
     end
-    leaders.each do |gl|
-      @club_leaders << Student.find_by(id: gl.student_id)
-    end
-    erb :group_page
   end
 
-  get '/my_sports/:sport_name' do
+  get '/all_sports/:sport_name' do
+    verify_user
     sport = params['sport_name']
-    underscore = "_"
-    sport.gsub!(underscore, " ")
-    sport.downcase!
+    sport.gsub!('_', " ")
     @current_group = Group.find_by(name: sport)
-    erb :sports_page
+    if @current_group.active
+      @record = Game.where(team_id: @current_group.id).order(date: :desc)
+      erb :sports_page
+    else
+      erb :error
+    end
   end
 
+  get '/all_clubs/:name/add_meeting' do
+    verify_user
+    name = params[:name].gsub("_", " ")
+    @current_group = Group.find_by(name: name)
+    if GroupLeader.find_by(group_id: @current_group.id, student_id: @active_user.id) != nil
+      erb :add_club_meeting
+    else
+      erb :error
+    end
+  end
+
+  post '/push_club_meeting' do
+    #still need to build frontend 
+    location = params[:location]
+    date = params[:date]
+    id = params[:id].to_i #need to specifically pass as ID
+    desc = params[:description]
+    meeting = GroupMeeting.create(location: location, event_date: date, group_id: id.to_i, description: desc)
+    redirect "/meetings"
+  end
+
+  get '/all_sports/:name/add_game' do
+    verify_user
+    name = params[:name].gsub("_", " ")
+    @current_group = Group.find_by(name: name)
+    erb :add_game
+  end
+
+  post '/push_game_record' do
+    name = params[:name]
+    id = params[:id].to_i
+    date = params[:date].to_datetime
+    home = params[:advantage]
+    h_score = params[:hscore]
+    a_score = params[:ascore]
+    details = params[:details]
+    result = params[:result]
+    id = params[:id].to_i 
+    Game.create(name: name, team_id: id, date: date, advantage: home, home_score: h_score, away_score: a_score, details: details, result: result, status: true)
+    redirect "/all_sports/"+ Group.find_by(id: id).name.gsub(" ", "_").to_s
+  end
+  
+  get '/all_sports/:name/edit' do #edit game records
+    verify_user
+    #need to add check admin functionality
+    @game = Game.find_by(id: params[:id].to_i)
+    erb :edit_game
+  end
+
+  post '/edit_game' do
+    game = Game.find_by(id: params[:id].to_i)
+    if params[:cancel] == 'on'
+      status = false
+    else
+      status = true
+    end
+    name = params[:name]
+    id = params[:id]
+    date = params[:date].to_datetime
+    home = params[:advantage]
+    h_score = params[:hscore]
+    a_score = params[:ascore]
+    details = params[:details]
+    result = params[:result]
+    id = params[:id].to_i 
+    game.update(status: status, name: name, date: date, advantage: home, 
+    home_score: h_score, away_score: a_score, details: details, result: result)
+    sport = Group.find(game.team_id)
+    redirect "/all_sports/"+ sport.name.gsub(" ", "_").to_s
+  end
+
+  post '/delete_game' do
+    game = Game.find_by(id: params[:id])
+    sport = Group.find(game.team_id)
+    game.delete
+    redirect "/all_sports/"+ sport.name.gsub(" ", "_").to_s
+  end
   ##########################################
 end
+
 

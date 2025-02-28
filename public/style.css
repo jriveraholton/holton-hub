@@ -69,3 +69,15 @@ h1 {
 .card-header {
 	background: rgba(173, 216, 230, 0.4);
 }
+
+/* tr {
+	background-color: #fff;
+	color: navy;
+} */
+tr.strike {
+	text-decoration: line-through;
+}
+
+/* td {
+	background: #fff;
+} */

@@ -1,8 +1,18 @@
-<main>
-    <h1> <%= @current_group.name.titleize %></h1> <hr>
+<div class="container">
+    <div class="row mb-3 align-items-end">
+        <div class="col-auto">
+        <a href="/all_sports" class="btn btn-outline-secondary" role="button"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-return-left" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5"/>
+        </svg></a>
+        </div>
+        <div class="col">
+        <h1> <%= @current_group.name.titleize %></h1> 
+        </div>
+    </div>
+    <div class="row mb-3">
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link" href="#home" data-bs-toggle="tab">Home</a>
+                <a class="nav-link active" href="#home" data-bs-toggle="tab">Home</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#rosterid">Roster</a>
@@ -11,9 +21,8 @@
                 <a class="nav-link" data-bs-toggle="tab" href="#resultsid">Results</a>
             </li>
         </ul>
-    <p>
         <div class="tab-content">
-            <div id="home" class="tab-pane" role="tab"> 
+            <div id="#home" class="tab-pane" role="tab"> 
                 <main>
                 <br><br>
                 <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
@@ -38,11 +47,7 @@
                     </button>
                 </div>
                 <br>
-            <div class="row justify-content-md-center text-center mb-3">
-                <div class="col">
-                    <a href="/add_to_clubs/<%= @current_group.name.gsub!(" ", "_") %>" class="btn btn-primary mx-auto" role="button">Add Members</a>    
-                </div>
-            </div>                
+                            
             </main>
             </div>
             <div id="rosterid" class="tab-pane" role="tab"> 
@@ -74,48 +79,35 @@
                 </table>
             </div>
             <div id="resultsid" class="tab-pane" role="tab">
-                    <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Date</th>
-                            <th scope="col">Time</th>
-                            <th scope="col">Advantage</th>
-                            <th scope="col">Score</th>
-                            <th scope="col">Details</th>
+                <a href="/all_sports/<%=@current_group.name.gsub(" ", "_")%>/add_game" class="btn btn-primary m-3">Add Game</a>
+                <table class="table table-primary table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Advantage</th>
+                        <th scope="col">Score</th>
+                        <th scope="col">Details</th>
+                    </tr>
+                </thead>
+                    <tbody class="table-group-divider">
+                    <% @record.each do |game| %>
+                        <tr <% if not game.status %> class="strike" <% end %>>
+                            <td><% if not game.status %> (<em>CANCELED</em>) <%end%><%= game.name %> (<a href="/all_sports/<%= @current_group.name.gsub(" ", "_")%>/edit?id=<%= game.id.to_s %>">edit</a>)</td>
+                            <td><%= game.date.strftime("%m/%d/%Y") %></td>
+                            <td><%= game.date.strftime("%I:%M %p") %></td>
+                            <td><%= game.advantage ? 'Home' : 'Away' %></td>
+                            <td><%= game.home_score.to_s + " - " + game.away_score.to_s%> </td>
+                            <td><%= game.details %></td>
+                            
                         </tr>
-                    </thead>
-                        <tbody class="table-group-divider">
-                            <tr>
-                                <th scope="row">1</th>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">2</th>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">3</th>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
-    </p>
-</main>
+                    <%end %>
+                    </tbody>
+                    
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
