@@ -69,3 +69,8 @@ h1 {
 .card-header {
 	background: rgba(173, 216, 230, 0.4);
 }
+
+.groupimage {
+	width: 33%;
+	border: 5px black solid;
+}
