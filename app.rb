@@ -443,6 +443,8 @@ class HoltonHubApp < Sinatra::Base
   end
 
   get '/add_group' do
+    verify_user
+    check_admin
     @group_types = []
     all_group_levels = GroupLevel.all
     all_group_levels.each do |level|
@@ -687,6 +689,32 @@ class HoltonHubApp < Sinatra::Base
     @groupedit.update(description: params["description"].strip) 
     redirect "/my_clubs/" + params[:club_name] + "/editclub"
   end 
+
+  get '/meetings' do 
+    verify_user
+
+    @groups = Group.all
+    all_meetings = GroupMeeting.all
+
+    my_group_list = GroupLeader.where(student_id: @active_user.id) + GroupMember.where(student_id: @active_user.id)
+    @my_groups = []
+    @meetings = []
+
+    all_meetings.each do |meeting|
+      if  meeting.event_date > Time.now()
+        @meetings.push(meeting)
+      end
+    end
+
+
+    my_group_list.each do |group|
+      @my_groups.push(@groups.find_by(id: group.group_id).id)
+    end
+
+    @meetings = @meetings.sort_by {|meeting| meeting.event_date}
+
+    erb :meetings
+  end
   ##########################################
 end
 
