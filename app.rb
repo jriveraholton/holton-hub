@@ -809,7 +809,6 @@ class HoltonHubApp < Sinatra::Base
       end
     end
 
-
     my_group_list.each do |group|
       @my_groups.push(@groups.find_by(id: group.group_id).id)
     end
@@ -817,6 +816,30 @@ class HoltonHubApp < Sinatra::Base
     @meetings = @meetings.sort_by {|meeting| meeting.event_date}
 
     erb :meetings
+  end
+
+  get '/meetings/edit' do
+    verify_user
+    @meeting = GroupMeeting.find_by(id: params[:id])
+    if GroupLeader.find_by(group_id: @meeting.group_id, student_id: @active_user.id) != nil
+      erb :edit_meeting
+    else
+      erb :error
+    end
+  end
+
+  post '/update_meeting' do
+    meeting = GroupMeeting.find_by(id: params[:id])
+    location = params[:location]
+    date = params[:date].to_datetime #calendar on the frontend
+    desc = params[:desc]
+    meeting.update(location: location, event_date: date, description: desc) # this one - should be an edit 
+    redirect '/meetings'
+  end
+  post '/delete_meeting' do
+    meeting = GroupMeeting.find_by(id: params[:id])
+    meeting.delete
+    redirect '/meetings'
   end
   ##########################################
 end
