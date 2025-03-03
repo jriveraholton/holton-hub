@@ -747,6 +747,46 @@ class HoltonHubApp < Sinatra::Base
     game.delete
     redirect "/all_sports/"+ sport.name.gsub(" ", "_").to_s
   end
+
+  get '/all_sports/:sport_name/add_image' do
+    verify_user
+    # restrict to admins/leaders
+    sport = params['sport_name']
+    sport.gsub!('_', " ")
+    @current_group = Group.find_by(name: sport)
+    if @current_group.active
+      erb :add_sport_image
+    else
+      erb :error
+    end
+  end
+
+  post '/upload_sport_image' do
+    id = params[:id]
+    sport = Group.find(id)
+    sport_name = sport.name.gsub(" ", "_")
+    puts File.dirname(__FILE__)
+
+    photo = params[:imageUpload][:tempfile].read
+    # path = Pathname.new('../public/' + sport_name + ".txt")
+    path = File.dirname(__FILE__) + '/public/sports/'+sport_name + '.jpg'
+    File.open(path, 'wb') do |f|
+      f.write(photo)
+    end
+    # if params[:imageFile]
+    #   filename = params[:imageFile][:filename] 
+    #   puts filename
+    #   file = params[:imageFile][:tempfile]
+    #   puts "foundfile"
+    #   File.open(File.join("./public/clubs", params[:club_name].to_s + File.extname(filename)), 'wb') do |f|
+    #   #File.open(File.join("/public/clubs/", filename), 'wb') do |f|
+    #     f.write (file.read)
+    #   end
+    # end
+    # photo.write_to_file '/public/' + sport_name + ".jpg"
+    redirect '/all_sports/' + sport_name
+  end
+
   ##########################################
 end
 
