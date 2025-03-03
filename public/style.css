@@ -70,7 +70,28 @@ h1 {
 	background: rgba(173, 216, 230, 0.4);
 }
 
+<<<<<<< HEAD
 .groupimage {
 	width: 33%;
 	border: 5px black solid;
 }
+=======
+/* tr {
+	background-color: #fff;
+	color: navy;
+} */
+tr.strike {
+	text-decoration: line-through;
+}
+
+/* td {
+	background: #fff;
+} */
+
+.sportPhoto {
+	width: 80%;
+	/* height: 80vh; */
+	margin: 0 auto;
+	
+} 
+>>>>>>> sports-page-editing

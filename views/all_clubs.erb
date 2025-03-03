@@ -16,7 +16,7 @@
         <% @high_commitment.each do |club| %> 
             <div class="col-md-3 mb-3">
                 <div class="card border-primary">
-                    <h5 class="card-header" id="club-header"> <%=club.name %> 
+                    <h5 class="card-header" id="club-header"> <%=club.name.titleize %> 
                     </h5>
                     <div class="card-body" max-height="5rem" id="club-body">
                     <div class="overflow-y-auto">
@@ -34,7 +34,7 @@
         <% @affinity_groups.each do |club| %> 
             <div class="col-md-3 mb-3">
                 <div class="card border-primary">
-                    <h5 class="card-header" id="club-header"> <%=club.name %> 
+                    <h5 class="card-header" id="club-header"> <%=club.name.titleize %> 
                     </h5>
                     <div class="card-body" max-height="5rem" id="club-body">
                     <div class="overflow-y-auto">
@@ -52,7 +52,7 @@
         <% @interest.each do |club| %> 
             <div class="col-md-3 mb-3">
                 <div class="card border-primary">
-                    <h5 class="card-header" id="club-header"> <%=club.name %> 
+                    <h5 class="card-header" id="club-header"> <%=club.name.titleize %> 
                     </h5>
                     <div class="card-body" max-height="5rem" id="club-body">
                     <div class="overflow-y-auto">

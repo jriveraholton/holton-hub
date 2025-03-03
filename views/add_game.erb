@@ -1,0 +1,76 @@
+<div class="container">
+	<h1>Add <%= @current_group.name.titleize %> Game</h1>
+	<form action="/push_game_record?id=<%= @current_group.id %>" method="post" enctype="application/x-www-form-urlencoded">
+		<div class="mb-3 row">
+            <div class="col-md-2">
+                <label for="name" class="form-label">Name: </label>
+            </div>
+            <div class="col-md-10">   
+                <input type="text" class="form-control" id="name" name="name" placeholder="Scrimmage v., ISL Semifinals, etc." required>
+            </div>
+		</div>
+		<div class="mb-3 row">
+			<div class="col-md-2">
+				<label for="datepicker" class="form-label">Date: </label>
+			</div>
+			<div class="col-md-6">
+				<input id="datepicker" name="date" class="form-control" type="datetime-local" required>
+			</div>
+		</div>
+		<div class="mb-3 row">
+			<div class="col-md-2">
+				<label for="advantage" class="form-label">Advantage (if applicable): </label>
+			</div>
+			<div class="col-md-4">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="advantage" id="home" value="<%= true %>">
+                    <label class="form-check-label" for="home">Home</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="advantage" id="away" value="<%= false %>">
+                    <label class="form-check-label" for="away">Away</label>
+                </div>
+            </div>
+        </div>
+		<div class="mb-3 row">
+			<div class="col-md-2">
+				<label for="blue_pts" class="form-label">Points (if applicable):</label>
+			</div>
+			<div class="col-md-4">
+				<div class="input-group">
+					<span class="input-group-text" id="hscore">Home</span>
+					<input type="number" class="form-control" placeholder="e.g. 3"  min="0"
+							aria-label="pts" aria-describedby="home_pts" id="hscore" name="hscore"> 
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="input-group">
+					<span class="input-group-text" id="ascore">Opponent</span>
+					<input type="number" class="form-control" placeholder="e.g. 0"  min="0"
+							aria-label="pts" aria-describedby="white_pts" id="ascore" name="ascore"> 
+				</div>
+			</div>
+		</div>
+        <div class="mb-3 row">
+            <div class="col-md-2">
+                <label for="result" class="form-label">Result (if applicable): </label>
+            </div>
+            <div class="col-md-3">   
+                <input type="text" class="form-control" id="result" name="result" placeholder="Win, 1st, etc.">
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <div class="col-md-2">
+                <label for="details" class="form-label">Details (if applicable): </label>
+            </div>
+            <div class="col-md-10">   
+                <input type="text" class="form-control" id="details" name="details" placeholder="Link to results, etc.">
+            </div>
+        </div>
+		<div class="d-grid gap-2 d-md-block">
+			<button type="submit" class="btn btn-primary mb-3 me-3">Submit</button>
+            <a href="javascript:history.back()" class="btn btn-secondary mb-3">Cancel</a>                  
+		</div>
+	</form>
+</div>
+
