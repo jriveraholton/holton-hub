@@ -443,7 +443,7 @@ class HoltonHubApp < Sinatra::Base
     erb :all_sports
   end
 
-  get '/add_group' do
+  get '/manage/manage_groups/add_group' do
     @group_types = []
     all_group_levels = GroupLevel.all
     all_group_levels.each do |level|
@@ -588,24 +588,26 @@ class HoltonHubApp < Sinatra::Base
   end
 
   get '/add_to_clubs/:club_name' do
+    verify_user
     club = params['club_name']
     puts club
     underscore = "_"
     club.gsub!(underscore, " ")
     club.downcase!
     @current_group = Group.find_by(name: club)
-    @student_list = []
-    all_students = Student.all
-    p "length" + all_students.length.to_s
-    all_students.each do |st|
+    student_list= Student.all
+    @all_students = {9 => [], 10 => [], 11 => [], 12 => []}
+
+    student_list.each do |st|
       user = User.find_by(id: st.user_id)
-      @student_list.push(user)
+      @all_students[st.grade].push(user)
     end
     erb :add_to_clubs
     # redirect '/'
   end
 
   post '/adding_members/:club_name' do
+    verify_user
     club = params['club_name']
     puts club
     underscore = "_"
@@ -625,10 +627,15 @@ class HoltonHubApp < Sinatra::Base
         GroupMember.create(student_id: student.id, group_id: @current_group.id)
       end
     end
-    redirect '/my_clubs/'+params['club_name'].to_s
+    if @current_group.group_type =="sport"
+      redirect '/my_sports/'+params['club_name'].to_s
+    else 
+      redirect '/my_clubs/'+params['club_name'].to_s
+    end
   end
 
   get '/my_clubs/:club_name' do
+    verify_user
     club = params['club_name']
     puts club
     underscore = "_"
@@ -652,12 +659,17 @@ class HoltonHubApp < Sinatra::Base
   end
 
   get '/my_sports/:sport_name' do
+    verify_user
     sport = params['sport_name']
     underscore = "_"
     sport.gsub!(underscore, " ")
     sport.downcase!
     @current_group = Group.find_by(name: sport)
     erb :sports_page
+  end
+
+  get '/welcome_page' do
+    erb :welcome_page
   end
 
   ##########################################

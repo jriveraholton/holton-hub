@@ -16,13 +16,13 @@
         <% @high_commitment.each do |club| %> 
             <div class="col-md-3 mb-3">
                 <div class="card border-primary">
-                    <h5 class="card-header" id="club-header"> <%=club.name %> 
+                    <h5 class="card-header" id="club-header"> <%=club.name.titleize %> 
                     </h5>
                     <div class="card-body" max-height="5rem" id="club-body">
                     <div class="overflow-y-auto">
                         <%= club.description %>
                     </div>
-                    <center><a href="/all_clubs/<%= club.name.sub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See more</a></center> 
+                    <center><a href="/my_clubs/<%=club.name.gsub!(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See more</a></center> 
                     </div>
                 </div>
             </div>
@@ -34,13 +34,13 @@
         <% @affinity_groups.each do |club| %> 
             <div class="col-md-3 mb-3">
                 <div class="card border-primary">
-                    <h5 class="card-header" id="club-header"> <%=club.name %> 
+                    <h5 class="card-header" id="club-header"> <%=club.name.titleize %> 
                     </h5>
                     <div class="card-body" max-height="5rem" id="club-body">
                     <div class="overflow-y-auto">
                         <%= club.description %>
                     </div>
-                    <center><a href="/all_clubs/<%= club.name.sub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See more</a></center> 
+                    <center><a href="/my_clubs/<%=club.name.gsub!(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See more</a></center> 
                     </div>
                 </div>
             </div>
@@ -52,13 +52,13 @@
         <% @interest.each do |club| %> 
             <div class="col-md-3 mb-3">
                 <div class="card border-primary">
-                    <h5 class="card-header" id="club-header"> <%=club.name %> 
+                    <h5 class="card-header" id="club-header"> <%=club.name.titleize %> 
                     </h5>
                     <div class="card-body" max-height="5rem" id="club-body">
                     <div class="overflow-y-auto">
                         <%= club.description %>
                     </div>
-                    <center><a href="/all_clubs/<%= club.name.sub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See more</a></center> 
+                    <center><a href="/my_clubs/<%=club.name.gsub!(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See more</a></center> 
                     </div>
                 </div>
             </div>
