@@ -146,13 +146,68 @@ class HoltonHubApp < Sinatra::Base
     erb :student
   end
 
+  ## MESSAGES and ANNOUNCEMENTS ##
   get '/messages' do
     verify_user
+    @groups = [] #list of message tag objects
+    if @active_user.is_admin
+      @groups = MessageTag.all
+    elsif Student.where(user_id: @active_user.id) != nil #if user is a student
+      stu = Student.find_by(user_id: @active_user.id)
+      if GroupLeader.where(student_id: stu.id) != nil #if user is a group leader        
+        GroupLeader.where(student_id: stu.id).each do |grp| #iterates thru groupleader objects
+          @groups << MessageTag.find(GroupMessagetag.find_by(group_id: grp.group_id).messagetag_id)
+        end
+      end
+    elsif Facultystaff.where(user_id: @active_user.id) != nil
+      fac = Facultystaff.find_by(user_id: @active_user.id)
+      if GroupAdvisor.where(facultystaff_id: fac.id) != nil #if user is a club advisor
+        GroupAdvisor.find_by(facultystaff_id: fac.id).each do |grp| #iterates thru groupleader objects
+          @groups << MessageTag.find(GroupMessagetag.find_by(group_id: grp.group_id).messagetag_id)
+        end
+      end
+    end
     erb :messages
   end
 
-  post '/messagesent' do
+  post '/send_message' do
+    # if params[:tags] != nil
+    subj = params[:subject]
+    cont = params[:content]
+    author = params[:author].to_i
+    msg = Message.create(subject: subj, content: cont, sent_at: Time.now(), author_id: author)
+    puts params[:tag].to_s + "HELLO"
+    params[:tag].each do |tag|
+      mt = MessageTag.find_by(recipient_tag: tag)
+      MessageMessageTag.create(message_id: msg.id, message_tag_id: mt.id)
+    end
+    redirect '/announcements'
+    # else
+    #   redirect '/error' #need to code in a way to not submit tagless messages
+    # end
   end 
+
+  get '/announcements' do
+    # verify_user
+    # #this would be a lot easier if we used associations: ask mr. rivera
+    # # all grade-level grouping has to be hard-coded: ask if this is necessary
+    # @all_msg = MessageTag.where(recipient_tag: "Upper School").includes(:message).order({message: :desc})
+    # @my_msg = []
+    # if Student.find_by(user_id: @active_user.id) != nil
+    #   GroupMember.where(student_id: Student.find_by(user_id: @active_user.id).id).each do |grpmemb|
+    #     @my_msg << GroupMessagetag.find_by(group_id: grpmemb.group_id).messagetag_id
+    #   end
+    #   GroupLeader.where(student_id: Student.find_by(user_id: @active_user.id).id).each do |grpld|
+    #     @my_msg << GroupMessagetag.find_by(group_id: grpld.group_id).messagetag_id
+    #   end
+    # elsif Facultystaff.find_by(user_id: @active_user.id) != nil
+    #   GroupAdvisor.where(facultystaff_id: Facultystaff.find_by(user_id: @active_user.id).id).each do |grpad|
+    #     @my_msg << GroupMessagetag.find_by(group_id: grpld.group_id).messagetag_id
+    #   end
+    # end
+    # erb :announcements
+  end
+  ##END MESSAGES AND ANNOUNCEMENTS ##
 
   get '/new_event' do
     verify_user
@@ -482,7 +537,6 @@ class HoltonHubApp < Sinatra::Base
     group = Group.create(name: params[:groupName], description: params[:groupDescription], group_type: params[:typeSelection], level_id: Integer(params[:groupTypeDropdown]))
     #assign students to be leaders of the recently created group
     if params[:student_leader] != nil
-      all_students = Student.all
       params[:student_leader].each do |leader_id|
         leader = GroupLeader.create(student_id: leader_id, group_id: group.id)
       end
@@ -491,6 +545,8 @@ class HoltonHubApp < Sinatra::Base
     if params[:sportsSeason] != nil
       GroupSeason.create(group_id: group.id, season_id: params[:sportsSeason])
     end
+    mt = MessageTag.create(recipient_tag: params[:groupName])
+    Group_MessageTag.create(group_id: group.id, messagetag_id: mt.id)
     redirect '/manage/manage_groups'
   end
 
@@ -536,6 +592,23 @@ class HoltonHubApp < Sinatra::Base
   post "/manage/trash_group" do
     group = Group.find(params[:id])
     if not group.active
+      if group.group_type =="club"
+        GroupAdvisor.destroy_by(group_id: group.id)
+        GroupLeader.destroy_by(group_id: group.id)
+        GroupMeeting.destroy_by(group_id: group.id)
+        GroupMember.destroy_by(group_id: group.id)
+        # THIS LINE EVENTUALLY NEEDS TO BE UNCOMMENTED
+        # WHEN WE CREATE THE GROUP MESSAGE TAG ASSOCIATION
+        # GroupMessageTag.destroy_by(group_id: group.id)
+      elsif group.group_type == "sport"
+        GroupAdvisor.destroy_by(group_id: group.id)
+        GroupLeader.destroy_by(group_id: group.id)
+        GroupMeeting.destroy_by(group_id: group.id)
+        GroupMember.destroy_by(group_id: group.id)
+        # GroupMessageTag.destroy_by(group_id: group.id)
+        GroupSeason.destroy_by(group_id: group.id)
+        Game.destroy_by(team_id: group.id)
+      end
       group.delete
       redirect '/manage/manage_groups'
     else
@@ -644,6 +717,17 @@ class HoltonHubApp < Sinatra::Base
     @current_group = Group.find_by(name: sport)
     if @current_group.active
       @record = Game.where(team_id: @current_group.id).order(date: :desc)
+      unordered_roster = GroupMember.where(group_id: @current_group.id).select(:student_id)
+      @wins = 0
+      @losses = 0
+      Game.where(team_id: @current_group.id).each do |game|
+        if game.result.downcase == 'win' or game.home_score > game.away_score
+          @wins += 1
+        elsif game.result.downcase == 'loss' or game.home_score < game.away_score
+          @losses += 1
+        end
+      end
+  
       erb :sports_page
     else
       erb :error
