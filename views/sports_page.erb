@@ -9,59 +9,72 @@
         <h1> <%= @current_group.name.titleize %></h1> 
         </div>
     </div>
+    <div class="row mb-3 justify-content-center">
+        <div class="col-md-8">
+        <img src="<%= '/sports/' + @current_group.name.gsub(' ', '_') + '.jpg' %>" alt="<%=@current_group.name.titleize%> photo" 
+        class="sportPhoto mx-auto d-block image-fluid"
+        onerror="this.onerror=null;this.src='/sports/placeholder.jpg';">
+        <div class="d-grid justify-content-center">
+        <a href="/all_sports/<%=@current_group.name.gsub(" ", "_")%>/add_image" class="btn btn-primary m-3 d-block">Replace Image</a>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-auto text-center">
+        <h1>Record</h1> <br>
+        <p><%= @wins %> - <%= @losses %> </p>
+        </div>
+    </div>
     <div class="row mb-3">
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link active" href="#home" data-bs-toggle="tab">Home</a>
+                <a class="nav-link active" data-bs-toggle="tab" href="#resultsid">Results</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#rosterid">Roster</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#resultsid">Results</a>
-            </li>
         </ul>
         <div class="tab-content">
-            <div id="home" class="tab-pane active justify-content-center" role="tab"> 
-                <%= puts File.exist?('~public/sports/' + @current_group.name.gsub(' ', '_') + '.jpg') %>
-                <%= puts '/sports/' + @current_group.name.gsub(' ', '_') + '.jpg' %>
-                <img src="<%= '/sports/' + @current_group.name.gsub(' ', '_') + '.jpg' %>" alt="<%=@current_group.name.titleize%> photo" 
-                    class="sportPhoto mx-auto d-block image-fluid"
-                    onerror="this.onerror=null;this.src='/sports/placeholder.jpg';">
-                <div class="d-grid justify-content-center">
-                <a href="/all_sports/<%=@current_group.name.gsub(" ", "_")%>/add_image" class="btn btn-primary m-3 d-block">Replace Image</a>
-                </div>
-            </div>
+           
             <div id="rosterid" class="tab-pane" role="tab"> 
-                <table class="table table-bordered table-striped">
+                <%if @leader %>
+                <a href="/all_sports/<%=@current_group.name.gsub(" ", "_")%>/add_member" class="btn btn-primary mt-3 mb-3 me-3">Add Player</a> 
+                <a href="/all_sports/<%=@current_group.name.gsub(" ", "_")%>/add_coach" class="btn btn-primary mt-3 mb-3">Add Coach</a>
+                <% end %>
+                <table class="table table-primary table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Member</th>
-                            <th scope="col">Role</th>
+                            <th scope="col">Coaches</th>
                         </tr>
                     </thead>
                         <tbody class="table-group-divider">
+                            <% @coaches.each do |coach| %>
+                                <%  %> 
                             <tr>
-                                <th scope="row">1</th>
-                                <td></td>
-                                <td></td>
+                                <td><%=coach.firstname + " " + stu.lastname%></td>
                             </tr>
+                            <% end %>
+                        </tbody>
+                </table>
+                <table class="table table-primary table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Players</th>
+                            <th scope="col">Year</th>
+                        </tr>
+                    </thead>
+                        <tbody class="table-group-divider">
+                            <% @roster.each do |stu| %>
+                                <%  %> 
                             <tr>
-                                <th scope="row">2</th>
-                                <td></td>
-                                <td></td>
+                                <td><%=stu.firstname + " " + stu.lastname%></td>
+                                <td><%=Student.find_by(user_id:stu.id).grade %> </td>
                             </tr>
-                            <tr>
-                                <th scope="row">3</th>
-                                <td></td>
-                                <td></td>
-                            </tr>
+                            <% end %>
                         </tbody>
                 </table>
             </div>
-            <div id="resultsid" class="tab-pane" role="tab">
-                <a href="/all_sports/<%=@current_group.name.gsub(" ", "_")%>/add_game" class="btn btn-primary m-3">Add Game</a>
+            <div id="resultsid" class="tab-pane active" role="tab">
+                <%if @leader %><a href="/all_sports/<%=@current_group.name.gsub(" ", "_")%>/add_game" class="btn btn-primary mt-3 mb-3">Add Game</a> <%end%>
                 <table class="table table-primary table-bordered table-striped">
                 <thead>
                     <tr>
@@ -70,6 +83,7 @@
                         <th scope="col">Time</th>
                         <th scope="col">Advantage</th>
                         <th scope="col">Score</th>
+                        <th scope="col">Result</th>
                         <th scope="col">Details</th>
                     </tr>
                 </thead>
@@ -79,8 +93,9 @@
                             <td><% if not game.status %> (<em>CANCELED</em>) <%end%><%= game.name %> (<a href="/all_sports/<%= @current_group.name.gsub(" ", "_")%>/edit?id=<%= game.id.to_s %>">edit</a>)</td>
                             <td><%= game.date.strftime("%m/%d/%Y") %></td>
                             <td><%= game.date.strftime("%I:%M %p") %></td>
-                            <td><%= game.advantage ? 'Home' : 'Away' %></td>
+                            <td><%= (not game.advantage.nil?) ? (game.advantage ? 'Home' : 'Away') : '' %></td>
                             <td><%= game.home_score.to_s + " - " + game.away_score.to_s%> </td>
+                            <td><%= game.result %></td>
                             <td><%= game.details %></td>
                             
                         </tr>
@@ -89,6 +104,7 @@
                     
                 </table>
             </div>
+            
         </div>
     </div>
 </div>

@@ -188,12 +188,16 @@ class HoltonHubApp < Sinatra::Base
   end 
 
   get '/announcements' do
-    # verify_user
-    # #this would be a lot easier if we used associations: ask mr. rivera
-    # # all grade-level grouping has to be hard-coded: ask if this is necessary
-    # @all_msg = MessageTag.where(recipient_tag: "Upper School").includes(:message).order({message: :desc})
+    verify_user
+    #this would be a lot easier if we used associations: ask mr. rivera
+    # all grade-level grouping has to be hard-coded: ask if this is necessary
+    # @all_msg = Message.where(recipient_tag: "Upper School").order({message: {sent_at: :desc}})
+    @all_msg = MessageTag.find_by(recipient_tag: "Upper School").messages.order(sent_at: :desc)
     # @my_msg = []
-    # if Student.find_by(user_id: @active_user.id) != nil
+    if Student.find_by(user_id: @active_user.id) != nil #if user is a student
+      stu = Student.find_by(user_id: @active_user.id)
+      Message.where(group: {id: GroupMember.where(student_id: stu.id)})
+    end
     #   GroupMember.where(student_id: Student.find_by(user_id: @active_user.id).id).each do |grpmemb|
     #     @my_msg << GroupMessagetag.find_by(group_id: grpmemb.group_id).messagetag_id
     #   end
@@ -205,7 +209,8 @@ class HoltonHubApp < Sinatra::Base
     #     @my_msg << GroupMessagetag.find_by(group_id: grpld.group_id).messagetag_id
     #   end
     # end
-    # erb :announcements
+    # Message.includes(:group).where(group: {id: GroupMember.where(student_id @active_user.id)})
+    erb :announcements
   end
   ##END MESSAGES AND ANNOUNCEMENTS ##
 
@@ -638,7 +643,7 @@ class HoltonHubApp < Sinatra::Base
         GroupMember.create(student_id: stu.id, group_id: group_id)
       end
     end
-    redirect '/all_clubs' #eventually redirect to the group you are adding members to
+    redirect '/manage/manage_groups' #eventually redirect to the group you are adding members to
   end
 
   get '/all_clubs/:club_name/add_member' do
@@ -660,14 +665,25 @@ class HoltonHubApp < Sinatra::Base
     # redirect '/'
   end
 
+  get '/all_sports/:sport/add_member' do
+    verify_user
+    sport = params[:sport]
+    
+    @current_group = Group.find_by(name: sport.gsub("_", " ").downcase)
+    puts @current_group.name
+    @student_list = User.where(id: Student.all.select(:user_id))
+    erb :add_to_clubs
+    # redirect '/'
+  end
+
   post '/adding_members/:club_name' do
     club = params['club_name']
-    puts club
+    # puts club
     underscore = "_"
     club.gsub!(underscore, " ")
     club.downcase!
     @current_group = Group.find_by(name: club)
-    puts "USERS: " + params[:user].to_s
+    # puts "USERS: " + params[:user].to_s
     selected_users = params[:user]
     selected_users.each do |st|
       split_name = st.split(", ")
@@ -680,7 +696,14 @@ class HoltonHubApp < Sinatra::Base
         GroupMember.create(student_id: student.id, group_id: @current_group.id)
       end
     end
-    redirect '/all_clubs/'+params['club_name'].to_s
+    if @current_group.group_type == "club"
+      redirect '/all_clubs/'+params['club_name'].to_s
+    elsif @current_group.group_type == "sport"
+      redirect '/all_sports/'+ params['club_name'].to_s
+    else
+      puts @current_group.group_type + 'error'
+      redirect '/error'
+    end
   end
 
   get '/all_clubs/:club_name' do
@@ -691,7 +714,7 @@ class HoltonHubApp < Sinatra::Base
     club.gsub!(underscore, " ")
     club.downcase!
     @current_group = Group.find_by(name: club)
-    if @current_group.active
+    if @current_group.active and @current_group.group_type == "club"
       @club_members = []
       @club_leaders = []
       members = GroupMember.where(group_id: @current_group.id)
@@ -715,19 +738,25 @@ class HoltonHubApp < Sinatra::Base
     sport = params['sport_name']
     sport.gsub!('_', " ")
     @current_group = Group.find_by(name: sport)
-    if @current_group.active
+    if @current_group.active and @current_group.group_type == "sport"
       @record = Game.where(team_id: @current_group.id).order(date: :desc)
       unordered_roster = GroupMember.where(group_id: @current_group.id).select(:student_id)
+      # puts Student.where(GroupMember.where(group_id: @current_group.id).select(:student_id)
+      @roster = User.where(id: (Student.where(id: GroupMember.where(group_id: @current_group.id).select(:student_id)).select(:user_id))).order(firstname: :asc)
+      @coaches = User.where(id: (Facultystaff.where(id: GroupAdvisor.where(group_id: @current_group.id).select(:facultystaff_id)).select(:user_id))).order(firstname: :asc)
+      @leader = @active_user.is_admin or GroupLeader.find_by(group_id: @current_group.id, student_id: Student.find_by(user_id: active_user.id).id).exist? or GroupAdvisor.find_by(group_id: @current_group.id, facultystaff_id: Facultystaff.find_by(user_id: active_user.id).id).exist?
       @wins = 0
       @losses = 0
       Game.where(team_id: @current_group.id).each do |game|
-        if game.result.downcase == 'win' or game.home_score > game.away_score
-          @wins += 1
-        elsif game.result.downcase == 'loss' or game.home_score < game.away_score
-          @losses += 1
+        puts game.home_score
+        if not(game.result.blank? and game.home_score.blank? and game.away_score.blank?)
+          if game.result.downcase == 'win' or game.home_score > game.away_score
+            @wins += 1
+          elsif game.result.downcase == 'loss' or game.home_score < game.away_score
+            @losses += 1
+          end
         end
       end
-  
       erb :sports_page
     else
       erb :error
