@@ -571,25 +571,34 @@ class HoltonHubApp < Sinatra::Base
   get '/all_clubs/:club_name/add_member' do
     verify_user
     club = params['club_name']
-    puts club
     underscore = "_"
     club.gsub!(underscore, " ")
     club.downcase!
     @current_group = Group.find_by(name: club)
-    @student_list = []
     all_students = Student.all
-    p "length" + all_students.length.to_s
+    @freshmen = []
+    @sophomores = []
+    @juniors = []
+    @seniors = []
     all_students.each do |st|
       user = User.find_by(id: st.user_id)
-      @student_list.push(user)
+      if st.grade == 9
+        @freshmen.push(user)
+      elsif st.grade == 10
+        @sophomores.push(user)
+      elsif st.grade == 11
+        @juniors.push(user)
+      else
+        @seniors.push(user)
+      end
     end
+
     erb :add_to_clubs
     # redirect '/'
   end
 
   post '/adding_members/:club_name' do
     club = params['club_name']
-    puts club
     underscore = "_"
     club.gsub!(underscore, " ")
     club.downcase!
@@ -604,9 +613,12 @@ class HoltonHubApp < Sinatra::Base
       # puts split_name[0]
       student = Student.find_by(user_id: user.id)
       if GroupMember.find_by(student_id: student.id, group_id: @current_group.id) == nil
-        GroupMember.create(student_id: student.id, group_id: @current_group.id)
+        if GroupLeader.find_by(student_id: student.id, group_id: @current_group.id) == nil
+          GroupMember.create(student_id: student.id, group_id: @current_group.id)
+        end
       end
     end
+    puts params[:user]
     redirect '/all_clubs/'+params['club_name'].to_s
   end
 
