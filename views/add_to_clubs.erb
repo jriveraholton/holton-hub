@@ -3,16 +3,18 @@
 		<h2>Students</h2>
 	</div>
 	<div class="row">
-		<form action="/adding_members/<%= @current_group.name.gsub!(" ", "_") %>" method="post">
+		<form action="/adding_members/<%= @current_group.name.gsub(" ", "_") %>" method="post">
 			<% @student_list.each do |st| %>
 				<div class="form-check">
-					<input class="form-check-input" type="checkbox" value="<%= st.lastname%>, <%= st.firstname%>" id="check<%= st.lastname %><%=st.firstname %>" name="user[]">
-					<label class="form-check-label" for="check<%= st.lastname %><%=st.firstname %>">
+				<input class="form-check-input" type="checkbox" value="<%= st.lastname%>, <%= st.firstname%>" id="<%= st.lastname + st.firstname%>" name="user[]"
+				<% if GroupMember.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>>
+					<label class="form-check-label" for="<%= st.lastname + st.firstname%>">
 						<%= st.lastname%>, <%= st.firstname%>
 					</label>
+				</input>
 				</div>
 			<% end %>
-			<button type="submit" class="btn btn-primary">Add to Club</button>
+			<button type="submit" class="btn btn-primary">Add</button>
 		</form>
 	</div>
 </div>

@@ -55,6 +55,7 @@ softball_game = Game.create(name: "vs. Holy Child", team_id: softball.id, date: 
 
 #group leaders/members
 GroupLeader.create(group_id: cheese.id, student_id: student5.id)
+GroupLeader.create(group_id: debate.id, student_id: student2.id)
 GroupMember.create(group_id: soccer.id, student_id: student5.id)
 GroupAdvisor.create(group_id: cheese.id, facultystaff_id: facstaff1.id)
 
@@ -79,3 +80,28 @@ GroupMessagetag.create(group_id: debate.id, messagetag_id: debate_tag.id)
 GroupMessagetag.create(group_id: soccer.id, messagetag_id: soccer_tag.id)
 GroupMessagetag.create(group_id: cheese.id, messagetag_id: cheese_tag.id)
 GroupMessagetag.create(group_id: softball.id, messagetag_id: soft_tag.id)
+
+
+#Group leaders
+GroupLeader.create(group_id: debate.id, student_id: 6)
+
+#group members
+GroupMember.create(student_id: 6, group_id: cheese.id)
+GroupMember.create(student_id: 6, group_id: softball.id)
+
+#group meetings
+GroupMeeting.create(location: "gym", event_date: DateTime.new(2025, 3, 12, 3, 30), group_id: softball.id)
+GroupMeeting.create(location: "field", event_date: DateTime.new(2025, 3, 20, 5, 00), group_id: softball.id)
+
+
+GroupMeeting.create(location: "cafeteria", event_date: DateTime.new(2025, 4, 30, 1, 00), group_id: cheese.id)
+GroupMeeting.create(location: "room 123", event_date: DateTime.new(2025, 2, 28, 10, 55), group_id: cheese.id)
+GroupMeeting.create(location: "cafe", event_date: DateTime.new(2025, 5, 1, 2, 45), group_id: cheese.id)
+
+GroupMeeting.create(location: "room 208", event_date: DateTime.new(2025, 4, 1, 10, 55), group_id: debate.id)
+GroupMeeting.create(location: "room 208", event_date: DateTime.new(2025, 1, 20, 3, 30), group_id: debate.id)
+GroupMeeting.create(location: "room 208", event_date: DateTime.new(2025, 3, 15, 1, 00), group_id: debate.id)
+GroupMeeting.create(location: "room 208", event_date: DateTime.new(2025, 1, 15, 2, 45), group_id: debate.id)
+
+GroupMeeting.create(location: "field", event_date: DateTime.new(2025, 3, 15, 1, 00), group_id: soccer.id)
+GroupMeeting.create(location: "field", event_date: DateTime.new(2025, 3, 20, 2, 45), group_id: soccer.id)

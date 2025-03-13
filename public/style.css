@@ -61,9 +61,9 @@ input.blue-user::file-selector-button {
 }
 
 h1 {
-	font-size: 20px;
-	font-family:Georgia, Times, serif;
-	margin-left:25px;
+    font-size: 20px;
+    font-family:Georgia, Times, serif;
+    /* margin-left:25px; */
 }
 
 
@@ -96,3 +96,26 @@ h1 {
 .card-header {
 	background: rgba(173, 216, 230, 0.4);
 }
+
+.groupimage {
+	width: 33%;
+	border: 5px black solid;
+}
+/* tr {
+	background-color: #fff;
+	color: navy;
+} */
+tr.strike {
+	text-decoration: line-through;
+}
+
+/* td {
+	background: #fff;
+} */
+
+.sportPhoto {
+	width: 80%;
+	/* height: 80vh; */
+	margin: 0 auto;
+	
+} 

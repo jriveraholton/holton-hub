@@ -71,6 +71,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_20_165836) do
     t.string "location", null: false
     t.datetime "event_date", null: false
     t.integer "group_id", null: false
+    t.text "description"
   end
 
   create_table "group_members", force: :cascade do |t|
