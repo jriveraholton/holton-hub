@@ -20,7 +20,7 @@
                 <!-- image should end up being a user-uploaded image-->
                 <!-- code needs to be updated once a method to edit sports pages is created -->
                 <div class="card-body" id="sport-body">
-                    <h5 class="card-title" id="sport-name"> <%=sport.name %> </h5>
+                    <h5 class="card-title" id="sport-name"> <%=sport.name.titleize %> </h5>
                     <hr>
                     <p class="card-text">
                         <div style="float: left; width: 50%;"><%= Season.find((GroupSeason.find_by(group_id: sport.id).season_id)).name %></div>
@@ -44,7 +44,7 @@
                 <!-- image should end up being a user-uploaded image-->
                 <!-- code needs to be updated once a method to edit sports pages is created -->
                 <div class="card-body" id="sport-body">
-                    <h5 class="card-title" id="sport-name"> <%=sport.name %> </h5>
+                    <h5 class="card-title" id="sport-name"> <%=sport.name.titleize %> </h5>
                     <hr>
                     <p class="card-text">
                         <div style="float: left; width: 50%;"><%= Season.find((GroupSeason.find_by(group_id: sport.id).season_id)).name %></div>
@@ -68,7 +68,7 @@
                 <!-- image should end up being a user-uploaded image-->
                 <!-- code needs to be updated once a method to edit sports pages is created -->
                 <div class="card-body" id="sport-body">
-                    <h5 class="card-title" id="sport-name"> <%=sport.name %> </h5>
+                    <h5 class="card-title" id="sport-name"> <%=sport.name.titleize %> </h5>
                     <hr>
                     <p class="card-text">
                         <div style="float: left; width: 50%;"><%= Season.find((GroupSeason.find_by(group_id: sport.id).season_id)).name %></div>

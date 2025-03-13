@@ -1,40 +1,41 @@
-<main>
-<div class="row justify-content-center" >
-<div class="col-lg-6">
-    <form action="/adding_members/<%= @current_group.name.gsub!(" ", "_") %>" method="post">
-        <div class="accordion" id="usersAccordion">
-            <% @all_students.each do |group, users| %>
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse<%= group %>" aria-expanded="false" aria-controls="flush-collapse<%= group %>">
-                            <h6>Grade <%= group %> <%="(#{users.length} Users)" %></h6>
-                        </button>
-                    </h2>
-                    <div id="flush-collapse<%= group %>" class="accordion-collapse collapse">
-                        <ul class="list-group" >
-                            <% users.each do |user| %>
-                                <li class="list-group-item">
-                                    <div class="row">
-                                        <div class="col" >
-                                        <label class="form-check-label" for="flexCheckDefault">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" value="<%= user.lastname%>, <%= user.firstname%>" id="flexCheckDefault" name="user[]">
-                                                    <label class="form-check-label" for="flexCheckDefault">
-                                                        <%= user.lastname%>, <%= user.firstname%>
+
+<div class="container">
+    <div class="row justify-content-center" >
+        <div class="col-lg-6">
+            <form action="/adding_members/<%= @current_group.name.gsub!(" ", "_") %>" method="post">
+                <div class="accordion" id="usersAccordion">
+                    <% @all_students.each do |group, users| %>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse<%= group %>" aria-expanded="false" aria-controls="flush-collapse<%= group %>">
+                                    <h6>Grade <%= group %> <%="(#{users.length} Users)" %></h6>
+                                </button>
+                            </h2>
+                            <div id="flush-collapse<%= group %>" class="accordion-collapse collapse">
+                                <ul class="list-group" >
+                                    <% users.each do |user| %>
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col" >
+                                                <label class="form-check-label" for="flexCheckDefault">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" value="<%= user.lastname%>, <%= user.firstname%>" id="flexCheckDefault" name="user[]">
+                                                            <label class="form-check-label" for="flexCheckDefault">
+                                                                <%= user.lastname%>, <%= user.firstname%>
+                                                            </label>
+                                                        </div>
                                                     </label>
                                                 </div>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </li>
-                            <% end %>
-                        </ul>						
-                    </div>
+                                            </div>
+                                        </li>
+                                    <% end %>
+                                </ul>						
+                            </div>
+                        </div>
+                    <% end %>
                 </div>
-            <% end %>
+                <button type="submit" class="btn btn-primary">Add to Club</button>
+            </form>
         </div>
-        <button type="submit" class="btn btn-primary">Add to Club</button>
-    </form>
+    </div>
 </div>
-</main>
-   

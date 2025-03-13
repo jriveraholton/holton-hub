@@ -1,0 +1,83 @@
+<div class="container">
+  <div class="row">
+      <h1>Club Meetings</h1>
+      <p>All future club meetings</p>
+  </div>
+  <div class="row">
+    <div class="col-lg-6">
+      <p>Sort through clubs</p>
+      <div id="myBtnContainer">
+        <button class="btn active" onclick="filterSelection('all')">All Clubs</button>
+        <button class="btn" onclick="filterSelection('mine')">My Clubs</button>
+      </div>
+
+    </div>
+
+  </div>
+  <br>
+  <br>
+
+
+  <div class="row">
+    <% @meetings.each do |meeting| %>
+      <% if @my_groups.include?(meeting.group_id) %>
+        <div class="filterDiv all mine col-md-4 col-lg-3 mb-3">
+      <% else %>
+        <div class="filterDiv all col-md-4 col-lg-3 mb-3">
+      <% end %>
+        <%if Time.now() < meeting.event_date %>
+          <div class="card border-primary">
+            <h5 class="card-header" id="group_name"> <%= @groups.find_by(id: meeting.group_id).name %> </h5>
+
+            <div class="card-body" id="club-body">
+              <% minute = meeting.event_date.min %>
+              <% if minute == 0 %>
+                  <%minute = "00" %>
+              <% end %>
+              <p>Date: <%= meeting.event_date.month %>/<%= meeting.event_date.day %>/<%= meeting.event_date.year %></p>
+              <p>Time: <%= meeting.event_date.hour %>:<%= minute %></p>
+              <p>Location: <%= meeting.location.capitalize! %> </p>
+              <!-- add description here --!>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+
+</div>
+
+
+
+<script>
+
+filterSelection("all")
+function filterSelection(c) {
+  var x, i;
+  console.log(c)
+  x = document.getElementsByClassName("filterDiv");
+  // Add the "show" class (display:block) to the filtered elements, and remove the "show" class from the elements that are not selected
+  for (i = 0; i < x.length; i++) {
+    if (x[i].className.indexOf(c) > -1){
+      x[i].style.display = "block";
+    } else{
+      x[i].style.display = "none";
+      console.log(x[i])
+      console.log("")
+    }
+  }
+}
+
+// Add active class to the current control button (highlight it)
+var btnContainer = document.getElementById("myBtnContainer");
+var btns = btnContainer.getElementsByClassName("btn");
+for (var i = 0; i < btns.length; i++) {
+  btns[i].addEventListener("click", function() {
+    var current = document.getElementsByClassName("active");
+    current[0].className = current[0].className.replace(" active", "");
+    this.className += " active";
+  });
+}
+
+</script>

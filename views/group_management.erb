@@ -1,17 +1,13 @@
 <div class="container">
     <div class="row justify-content-center text-center" >
-    <div class="col-lg-6 mb-3">
-        <a class="btn btn-primary btn-lg" href="/manage/manage_groups/add_group">Add Group</a>
+        <div class="col-lg-6 mb-3">
+            <a class="btn btn-primary btn-lg" href="/manage/manage_groups/add_group">Add Group</a>
         </div>
-    </div>
     </div>
     <div class="row justify-content-center text-center" >
-    <div class="col-lg-6 mb-3">
-        <div class="btn-group" role="group" aria-lable="User Management">
+        <div class="col-lg-6 mb-3">
             <a class="btn btn-primary" href="/manage/add_group_members">Batch Add Users</a>
-            <a class="btn btn-primary" href="/manage/">Add Single Member</a>
         </div>
-    </div>
     </div>
     <div class="row text-center">    
         <h1>Groups</h1>
@@ -31,7 +27,8 @@
                                 <li class="list-group-item">
                                     <div class="row">
                                         <div class="col" >
-                                            <%= club.name.titleize %> (<i><%= GroupLevel.find(club.level_id).name.titleize %></i>)
+                                            <a href="/all_clubs/<%= club.name.gsub(" ", "_")%>">
+                                            <%= club.name.titleize %></a> (<i><%= GroupLevel.find(club.level_id).name.titleize %></i>) 
                                         </div>
                                         <div class="col col-md-auto ms-auto text-end">
                                             <a href="/manage/edit_group?id=<%= club.id%>" class="btn btn-primary" role="button">Edit</a>
@@ -61,7 +58,8 @@
                                 <li class="list-group-item">
                                     <div class="row">
                                         <div class="col" >
-                                            <%= sport.name.titleize %> (<i><%= GroupLevel.find(sport.level_id).name.titleize %></i>)
+                                        <a href="/all_sports/<%= sport.name.gsub(" ", "_")%>">
+                                            <%= sport.name.titleize %></a> (<i><%= GroupLevel.find(sport.level_id).name.titleize %></i>)
                                         </div>
                                         <div class="col col-md-auto ms-auto text-end">
                                             <a href="/manage/edit_group?id=<%=sport.id%>" class="btn btn-primary" role="button">Edit</a>

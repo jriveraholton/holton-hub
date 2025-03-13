@@ -1,0 +1,39 @@
+<div class="container">
+    <h1>Add <%= @current_group.name.titleize %> Meeting </h1>
+
+    <form action="/push_club_meeting?id=<%= @current_group.id %>" method="post" enctype="application/x-www-form-urlencoded">
+        <div class="mb-3 row">
+            <div class="col-md-2">
+                <label for="datepicker" class="col-form-label">Date: </label>
+            </div>
+            <div class="col-md-3">
+                <input id="datepicker" name="date" class="form-control" type="datetime-local" min="<%= DateTime.now() %>" required>
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <div class="col-md-2">
+                <label for="location" class="col-form-label">Location: </label>
+            </div>
+            <div class="col-md-3">   
+                <input type="text" class="form-control" id="location" name="location" placeholder="Simms, D211, etc." required>
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <div class="col-md-2">
+                <label for="description" class="col-form-label">Description (optional)</label>
+            </div>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="description" name="description" placeholder="Assembly prep, math meet, etc.">
+            </div>
+        </div>
+        <div class="row m-3">
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary mb-3 me-3">Submit</button>
+            </div>
+            <div class="col-auto">
+                <a href="/all_clubs/<%= @current_group.name.sub(" ", "_")%>" class="btn btn-secondary mb-3">Cancel</a>
+            </div>
+        </div>
+    </form>
+    
+</div>
