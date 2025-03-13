@@ -5,13 +5,13 @@
 
   <form action="/create_group" method="post" enctype="multipart/form-data">
 
-    <select class="form-select" aria-label="Default select example" onfocusout="ifSport()" id="typeSelection" name="typeSelection" required>
+      <select class="form-select <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" aria-label="Default select example" onfocusout="ifSport()" id="typeSelection" name="typeSelection" required>
       <option selected disabled value>What type of group is this</option>
       <option value="club">Club</option>
       <option value="sport">Sport</option>
     </select> 
     <br>
-    <select class="form-select" aria-label="Default select example" id="groupTypeDropdown" name="groupTypeDropdown" required>
+    <select class="form-select <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" aria-label="Default select example" id="groupTypeDropdown" name="groupTypeDropdown" required>
       <option selected disabled value>What level of group is this</option>
       <% @group_types.each do |type| %>
         <option value=<%= type.id %> > <%= type.name.capitalize! %> </option>
@@ -20,20 +20,19 @@
 
     <br>
 
-    <select class="form-select" aria-label="Default select example" id="sportsSeason" name="sportsSeason">
+    <select class="form-select <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" aria-label="Default select example" id="sportsSeason" name="sportsSeason">
       <option selected disabled value>What season is this sport in</option>
       <% @sports_seasons.each do |season| %>
-        <option value=<%= season.id %>><%= season.name %></option>
+          <option value=<%= season.id %>><%= season.name %></option>
       <% end %>
     </select> 
 
     <br>
-    <input class="form-control" type="text" placeholder="Name of group" aria-label="default input example" id="groupName" name="groupName" required>
+    <input class="form-control <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" type="text" placeholder="Name of group" aria-label="default input example" id="groupName" name="groupName" required>
     <br>
 
-
     <div class="mb-3">
-      <textarea class="form-control" id="groupDescription" name="groupDescription" rows="3" placeholder="Description of group" required></textarea>
+		<textarea class="form-control <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" id="groupDescription" name="groupDescription" rows="3" placeholder="Description of group" required></textarea>
     </div>
 
     <br>
@@ -43,8 +42,8 @@
 
     <div class="row">
       <div class="col-lg-4">
-        <h4>Grade 10:</h4>
-        <input type="text" id="sophomore_input" onkeyup="myFunction('sophomore_table', 'sophomore_input')" placeholder="Search for names...">
+          <h4>Grade 10:</h4>
+          <input class="form-control search-field <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" type="text" id="sophomore_input" onkeyup="myFunction('sophomore_table', 'sophomore_input')" placeholder="Search for names...">
         <table id="sophomore_table" class="class_table">
           <% @sophomores.each do |sophomore| %>
             <tr>
@@ -57,14 +56,11 @@
             </tr>
           <% end %>
         </table>
-
-
-
       </div>
           
       <div class="col-lg-4">
-        <h4>Grade 11:</h4>
-        <input type="text" id="junior_input" onkeyup="myFunction('junior_table', 'junior_input')" placeholder="Search for names...">
+          <h4>Grade 11:</h4>
+          <input class="form-control search-field <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" type="text" id="junior_input" onkeyup="myFunction('junior_table', 'junior_input')" placeholder="Search for names...">
         <table id="junior_table" class="class_table">
           <% @juniors.each do |junior| %>
             <tr>
@@ -81,8 +77,8 @@
       </div>
             
       <div class="col-lg-4">    
-        <h4>Grade 12:</h4>
-        <input type="text" id="senior_input" onkeyup="myFunction('senior_table', 'senior_input')" placeholder="Search for names...">
+          <h4>Grade 12:</h4>
+          <input class="form-control search-field <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" type="text" id="senior_input" onkeyup="myFunction('senior_table', 'senior_input')" placeholder="Search for names...">
         <table id="senior_table" class="class_table">
           <% @seniors.each do |senior| %>
             <tr>
