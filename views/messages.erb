@@ -1,66 +1,38 @@
 
 <div class='container'>
-    <form method='post' action='/create'>
-        <div class='row' >
-            <div class="mb-3">
-                <label for="exampleFormControlTextarea1" class="form-label">Message</label>
-                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+  <form method='post' action='/send_message?author=<%=@active_user.id%>' enctype="application/x-www-form-urlencoded">
+    <div class='row mb-3 align-items-end'>
+      <div class="col-md-8">
+        <label for="subject" class="form-label">Subject</label>
+        <input type="text" class="form-control" id="subject" name="subject" required></input>
+      </div>
+      <div class="col-md-4">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+        Select
+        </button>
+        <div class="dropdown-menu">
+          <% @groups.each do |group| %>
+            <div class="form-check mb-2">
+              <input class="form-check-input me-1" type="checkbox" value="<%=group.recipient_tag%>" id="<%=group.recipient_tag%>" name="tag[]">
+              <label class="form-check-label" for="<%=group.recipient_tag%>"><%=group.recipient_tag.titleize%></label>
             </div>
-
-        <div class="btn-group" role="group">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Select</button>
-            <ul class="dropdown-menu">
-            <ul class="list-group">
-            <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox" value="" id="Classof2025">
-              <label class="form-check-label " for="Classof2025">Class of 2025</label>
-            </li>
-            <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox" value="" id="Classof2026">
-              <label class="form-check-label" for="Classof2026">Class of 2026</label>
-            </li>
-            <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox" value="" id="Classof2027">
-              <label class="form-check-label" for="Classof2027">Class of 2027</label>
-            </li>
-            <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox" value="" id="Classof2028">
-              <label class="form-check-label" for="Classof2028">Class of 2028</label>
-            </li>
-            <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox" value="" id="MathDepartment">
-              <label class="form-check-label" for="MathDepartment">Math Department</label>
-            </li>
-            <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox" value="" id="EnglishDepartment">
-              <label class="form-check-label" for="EnglishDepartment">English Department</label>
-            </li>
-            <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox" value="" id="HistoryDepartment">
-              <label class="form-check-label" for="HistoryDepartment">History Department</label>
-            </li>
-            <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox" value="" id="ScienceDepartment">
-              <label class="form-check-label" for="ScienceDepartment">Science Department</label>
-            </li>
-            <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox" value="" id="ComputerScienceDepartment">
-              <label class="form-check-label" for="ComputerScienceDepartment">Computer Science Department</label>
-            </li>
-            <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox" value="" id="WorldLanguageDepartment">
-              <label class="form-check-label" for="WorldLanguageDepartment">World Language Department</label>
-            </li>
-            <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox" value="" id="Administration">
-              <label class="form-check-label" for="Administration">Administration</label>
-            </li>
-          </ul>
-        </ul>
-          </div>
+          <% end %>
+          
         </div>
-            <br>
-            <button type='submit' class='btn btn-primary' href="/messagesent">Send</button>
-        </div>
-    </form>
+      </div>
+    </div> 
+    <div class='row mb-3'>
+      <div class="col">
+      <label for="content" class="form-label">Message</label>
+      <textarea type="text" class="form-control" id="content" name="content" rows="3" required></textarea>
+    
+      </div>
+    </div>
+    <div class='row mb-3'>
+      <div class="col-auto">
+      <button type='submit' class='btn btn-primary'>Send</button>
+      </div>
+    </div>
+  </form>
 </div>
+ 

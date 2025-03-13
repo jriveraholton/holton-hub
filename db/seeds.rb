@@ -4,17 +4,17 @@ blue = BwTeam.create(team_color: 'blue')
 
 #Users - Just a few for testing purposes
 user1 = User.create(firstname: "Jane", lastname:"Rollenhagen", email:"janey.rollenhagen.2025@holton-arms.edu", team_id: blue.id, is_admin: true)
-student1 = Student.create(grade: 12, user_id: user1.id)
+student1 = Student.create(class_of: 2025, user_id: user1.id)
 user2 = User.create(firstname: "Grace", lastname:"Ding", email:"grace.ding.2025@holton-arms.edu", team_id: blue.id, is_admin: true)
-student2 = Student.create(grade: 12, user_id: user2.id)
+student2 = Student.create(class_of: 2025, user_id: user2.id)
 user3 = User.create(firstname: "Kriti", lastname:"Hota", email:"kriti.hota.2026@holton-arms.edu", team_id: blue.id, is_admin: true)
-student3 = Student.create(grade: 11, user_id: user3.id)
+student3 = Student.create(class_of: 2026, user_id: user3.id)
 user4 = User.create(firstname: "Katherine", lastname:"Snider", email:"katherine.snider.2027@holton-arms.edu", team_id: white.id, is_admin: true)
-student4 = Student.create(grade: 10, user_id: user4.id)
+student4 = Student.create(class_of: 2027, user_id: user4.id)
 user5 = User.create(firstname: "Heidi", lastname:"Trambley", email:"heidi.trambley.2025@holton-arms.edu", team_id: white.id, is_admin: true)
-student5 = Student.create(grade: 12, user_id: user5.id)
+student5 = Student.create(class_of: 2025, user_id: user5.id)
 user6 = User.create(firstname: "Lindsay", lastname:"Kossoff", email:"lindsay.kossoff.2025@holton-arms.edu", team_id: blue.id, is_admin: true)
-student6 = Student.create(grade: 12, user_id: user6.id)
+student6 = Student.create(class_of: 2025, user_id: user6.id)
 user7 = User.create(firstname: "Joseph", lastname:"Rivera", email:"joseph.rivera@holton-arms.edu", team_id: white.id, is_admin: true)
 facstaff1 = Facultystaff.create(grade: 12, user_id: user7.id)
 user8 = User.create(firstname: "Tucker", lastname:"Sowers", email:"tucker.sowers@holton-arms.edu", team_id: white.id, is_admin: true)
@@ -55,6 +55,7 @@ softball_game = Game.create(name: "vs. Holy Child", team_id: softball.id, date: 
 
 #group leaders/members
 GroupLeader.create(group_id: cheese.id, student_id: student5.id)
+GroupLeader.create(group_id: debate.id, student_id: student2.id)
 GroupMember.create(group_id: soccer.id, student_id: student5.id)
 GroupAdvisor.create(group_id: cheese.id, facultystaff_id: facstaff1.id)
 

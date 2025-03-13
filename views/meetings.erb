@@ -27,17 +27,23 @@
       <% end %>
         <%if Time.now() < meeting.event_date %>
           <div class="card border-primary">
-            <h5 class="card-header" id="group_name"> <%= @groups.find_by(id: meeting.group_id).name %> </h5>
+            <h5 class="card-header" id="group_name"> <%= @groups.find_by(id: meeting.group_id).name.titleize %> </h5>
 
             <div class="card-body" id="club-body">
               <% minute = meeting.event_date.min %>
               <% if minute == 0 %>
                   <%minute = "00" %>
               <% end %>
-              <p>Date: <%= meeting.event_date.month %>/<%= meeting.event_date.day %>/<%= meeting.event_date.year %></p>
-              <p>Time: <%= meeting.event_date.hour %>:<%= minute %></p>
-              <p>Location: <%= meeting.location.capitalize! %> </p>
-              <!-- add description here --!>
+              <p>Date: <%= meeting.event_date.strftime('%m/%d/%Y') %> <br>
+              Time: <%= meeting.event_date.strftime('%I:%M %p')%> <br>
+              Location: <%= meeting.location.capitalize! %> <br>
+              <% if meeting.description != "" and meeting.description != nil %>
+              Description: <%= meeting.description %> 
+              <%end%></p>
+              <% if GroupLeader.find_by(group_id: meeting.group_id, student_id: @active_user.id) %>
+              <a href="/meetings/edit?id=<%= meeting.id%>" class="btn btn-primary">Edit</a>
+              <% end %>
+              
             </div>
           </div>
         <% end %>
