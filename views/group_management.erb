@@ -21,7 +21,7 @@
 			<div class="accordion" id="clubsAccordion">
                 <div class="accordion-item">
                     <h2 class="accordion-header">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-clubs" aria-expanded="false" aria-controls="flush-collapse-clubs">
+                        <button class="accordion-button <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-clubs" aria-expanded="false" aria-controls="flush-collapse-clubs">
                         Clubs
                         </button>
                     </h2>
@@ -51,7 +51,7 @@
             <div class="accordion" id="sportsAccordion">
                 <div class="accordion-item">
                     <h2 class="accordion-header">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-sports" aria-expanded="false" aria-controls="flush-collapse-sports">
+                        <button class="accordion-button <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-sports" aria-expanded="false" aria-controls="flush-collapse-sports">
                         Sports
                         </button>
                     </h2>
@@ -89,7 +89,7 @@
             <div class="accordion" id="archivedGroups">
                 <div class="accordion-item">
                     <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-archive" aria-expanded="false" aria-controls="flush-collapse-archive">
+                        <button class="accordion-button collapsed <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-archive" aria-expanded="false" aria-controls="flush-collapse-archive">
                         Archived Groups
                         </button>
                     </h2>

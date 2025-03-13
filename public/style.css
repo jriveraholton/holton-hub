@@ -28,15 +28,42 @@ body.white-user {
 	--bs-navbar-color:mediumblue;
 }
 
-.blue-user.navbar-toggler {
+.navbar-toggler.blue-user {
 	background-color:white;
 }
 
+.dropdown.blue-user .dropdown-item {
+	--bs-dropdown-link-hover-color:navy;
+}
+
+.form-control.blue-user {
+	color:aliceblue;
+}
+
+.form-control.blue-user::placeholder {
+	color:aliceblue;
+}
+
+input.blue-user::file-selector-button {
+	color:navy;
+}
+
+.input-group-text.blue-user {
+	color:navy;
+}
+
+.accordion-button.blue-user:is(.collapsed)::after {
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='rgba%28240,248,255%29' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M2 5L8 11L14 5'/%3e%3c/svg%3e");
+}
+
+.form-select.blue-user {
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba%28240,248,255%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
 
 h1 {
-    font-size: 20px;
-    font-family:Georgia, Times, serif;
-    margin-left:25px;
+	font-size: 20px;
+	font-family:Georgia, Times, serif;
+	margin-left:25px;
 }
 
 

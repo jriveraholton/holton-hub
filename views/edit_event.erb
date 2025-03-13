@@ -7,7 +7,7 @@
                 <label for="eventName" class="col-form-label">Event name</label>
             </div>
             <div class="col-md-10">   
-                <input type="text" class="form-control" id="eventName" name="eventName" value="<%= @event.name %>">
+                <input type="text" class="form-control <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" id="eventName" name="eventName" value="<%= @event.name %>">
             </div>
         </div>
         <div class="mb-3 row">
@@ -38,16 +38,16 @@
             </div>
             <div class="col-md-4">
             <div class="input-group">
-                <span class="input-group-text" id="blue_pts">Blue Team</span>
-                <input type="number" class="form-control" placeholder="e.g. 3"  min="0"
-                    aria-label="pts" aria-describedby="blue_pts" id="blue_pts" name="blue_pts" value="<%= @event.blue_points %>"> 
+                <span class="input-group-text <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" id="blue_pts">Blue Team</span>
+                <input type="number" class="form-control <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" placeholder="e.g. 3"  min="0"
+                       aria-label="pts" aria-describedby="blue_pts" id="blue_pts" name="blue_pts" value="<%= @event.blue_points %>"> 
             </div>
             </div>
             <div class="col-md-4">
             <div class="input-group">
-                <span class="input-group-text" id="blue_pts">White Team</span>
-                <input type="number" class="form-control" placeholder="e.g. 0"  min="0"
-                    aria-label="pts" aria-describedby="white_pts" id="white_pts" name="white_pts" value="<%= @event.white_points %>"> 
+                <span class="input-group-text <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" id="blue_pts">White Team</span>
+                <input type="number" class="form-control <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" placeholder="e.g. 0"  min="0"
+                       aria-label="pts" aria-describedby="white_pts" id="white_pts" name="white_pts" value="<%= @event.white_points %>"> 
             </div>
             </div>
         </div>

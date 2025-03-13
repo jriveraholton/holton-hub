@@ -9,7 +9,7 @@
     <div class="row">
         <form action="/add_group_members" method="post" enctype="multipart/form-data">
             <div class="mb-3 col-md-4">
-                <select id="group" name="group" class="form-select" aria-label="Group select">
+                <select id="group" name="group" class="form-select <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" aria-label="Group select">
                 <option selected disabled value>Select group to add members</option>
                 <% @all_sports.each do |sport|%>
                     <option value="<%= sport.id %>"><%=sport.name.titleize%></option>
@@ -22,7 +22,7 @@
             </div>
             <div class="mb-3">
                 <label for="members_list" class="form-label">Upload members list</label>
-                <input class="form-control" type="file" id="members_list" name="members_list" required>
+                <input class="form-control <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" type="file" id="members_list" name="members_list" required>
             </div>
             <div class="mb-3">
                 <button type="submit" class="btn btn-primary mb-3 me-3">Submit</button>

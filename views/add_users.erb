@@ -23,10 +23,10 @@
 		</p>
 		<form action="/create_users" method="post" enctype="multipart/form-data">
 			<div class="input-group">
-				<input type="file" class="form-control" id="accountsFile" name="accountsFile" aria-describedby="inputGroupFileAddon04" aria-label="Upload" required>
+				<input type="file" class="form-control <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" id="accountsFile" name="accountsFile" aria-describedby="inputGroupFileAddon04" aria-label="Upload" required>
 				<!-- <button class="btn btn-outline-secondary" type="submit" id="accountsFile">Submit</button> -->
 				
-				<input type="submit" value="Upload" class="btn" id="accountsFile">
+				<input type="submit" value="Upload" class="btn btn-primary" id="accountsFile">
 			</div>
 
 		</form>
