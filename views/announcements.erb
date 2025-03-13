@@ -5,8 +5,15 @@
     </div>
     <div class="row">
         <div class="col">
-        <% @all_msg.each do |linkedmsg| %>
-            <% msg = Message.find_by(id: linkedmsg.message_id) %>
+        <% @all_msg.each do |msg| %>
+            
+            <div class="alert alert-primary">
+                <h2><%= msg.subject %> </h2>
+                <p><%= msg.content %> </p>
+                <p><i>Sent at <%=msg.sent_at.strftime("%c")%></i></p>
+            </div>
+        <%end%>
+        <% @group_msg.each do |msg| %>
             <div class="alert alert-primary">
                 <h2><%= msg.subject %> </h2>
                 <p><%= msg.content %> </p>

@@ -119,7 +119,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_20_165836) do
   end
 
   create_table "students", force: :cascade do |t|
-    t.integer "grade", null: false
+    t.integer "class_of", null: false
     t.integer "user_id", null: false
   end
 
