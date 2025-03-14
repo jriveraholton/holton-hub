@@ -175,8 +175,14 @@ class HoltonHubApp < Sinatra::Base
     subj = params[:subject]
     cont = params[:content]
     author = params[:author].to_i
-    msg = Message.create(subject: subj, content: cont, sent_at: Time.now(), author_id: author)
-    puts params[:tag].to_s + "HELLO"
+  
+    time = Time.current
+    # puts Time.parse(time)
+    # puts Time.in_time_zone('America/New_York')
+    msg = Message.create(subject: subj, content: cont, sent_at: time, author_id: author)
+    # puts Time.now()
+    # puts Time.offset
+    # puts params[:tag].to_s + "HELLO"
     params[:tag].each do |tag|
       mt = MessageTag.find_by(recipient_tag: tag)
       MessageMessageTag.create(message_id: msg.id, message_tag_id: mt.id)
@@ -192,11 +198,15 @@ class HoltonHubApp < Sinatra::Base
     #this would be a lot easier if we used associations: ask mr. rivera
     # all grade-level grouping has to be hard-coded: ask if this is necessary
     # @all_msg = Message.where(recipient_tag: "Upper School").order({message: {sent_at: :desc}})
-    @all_msg = MessageTag.find_by(recipient_tag: "Upper School").messages.order(sent_at: :desc)
+    @all_msg = Message.where(id: MessageMessageTag.where(message_tag_id: MessageTag.find_by(recipient_tag: "Upper School").id).select(:message_id)).order(sent_at: :desc)
+    # MessageTag.find_by(recipient_tag: "Upper School").order(sent_at: :desc)
     # @my_msg = []
     if Student.find_by(user_id: @active_user.id) != nil #if user is a student
       stu = Student.find_by(user_id: @active_user.id)
-      Message.where(group: {id: GroupMember.where(student_id: stu.id)})
+
+      my_groups = Group.where(id: GroupMember.where(student_id: stu.id) + GroupLeader.where(student_id: stu.id))
+      puts my_groups
+      @group_msg = Message.where(id: MessageMessageTag.where(message_tag_id: MessageTag.where(id: GroupMessagetag.where(group_id: my_groups.select(:id)).select(:messagetag_id)).select(:id)).select(:message_id)).order(sent_at: :desc)
     end
     #   GroupMember.where(student_id: Student.find_by(user_id: @active_user.id).id).each do |grpmemb|
     #     @my_msg << GroupMessagetag.find_by(group_id: grpmemb.group_id).messagetag_id
@@ -300,7 +310,7 @@ class HoltonHubApp < Sinatra::Base
 
           #determine if the user is a student or a faculty/staff member and create the appropriate record
           if role == 'student'
-            stu = Student.create(user_id: new_user.id, grade: grade_level)
+            stu = Student.create(user_id: new_user.id, class_of: grade_level)
           else
             fac = Facultystaff.create(user_id: new_user.id, grade: grade_level)
           end
@@ -336,16 +346,21 @@ class HoltonHubApp < Sinatra::Base
   get '/manage/manage_users' do
     verify_user
     check_admin
-    @all_users = User.all
-    @all_by_groups = {9 => [], 10 => [], 11 => [], 12 => [], :facstaff => []}
-
+    all_users = User.all
+    @all_by_groups = {}
+    grades = Student.select(:class_of).distinct.sort
+    grades.each do |grade|
+      @all_by_groups[grade.class_of] = []
+    end
+    @all_by_groups[:facstaff] = []
+    puts @all_by_groups
     #figure out which users are students and put them together by grade level
     #and put all faculty and staff together
-    @all_users.each do |user|
+    all_users.each do |user|
       stu = Student.find_by(user_id: user.id)
       fac = Facultystaff.find_by(user_id: user.id)
       if stu != nil
-        @all_by_groups[stu.grade].push(user)
+        @all_by_groups[stu.class_of].push(user)
       elsif fac != nil
         @all_by_groups[:facstaff].push(user)
       end
@@ -517,16 +532,20 @@ class HoltonHubApp < Sinatra::Base
     @seniors = []
     all_students = Student.all
     all_users = User.all
+    grades = Student.select(:class_of).distinct.sort()
+    soph = grades[2].class_of
+    jun = grades[1].class_of
+    sen = grades[0].class_of
     all_students.each do |student|
-      if student.grade == 10
+      if student.class_of == soph
         @sophomores_hash = {:first => all_users.find_by(id: student.user_id).firstname, :last => all_users.find_by(id: student.user_id).lastname, :id => student.user_id}
         @sophomores.push(@sophomores_hash)
       end
-      if student.grade == 11
+      if student.class_of == jun
         @juniors_hash = {:first => all_users.find_by(id: student.user_id).firstname, :last => all_users.find_by(id: student.user_id).lastname, :id => student.user_id}
         @juniors.push(@juniors_hash)
       end
-      if student.grade == 12
+      if student.class_of == sen
         @seniors_hash = {:first => all_users.find_by(id: student.user_id).firstname, :last => all_users.find_by(id: student.user_id).lastname, :id => student.user_id}
         @seniors.push(@seniors_hash)
       end
@@ -649,18 +668,34 @@ class HoltonHubApp < Sinatra::Base
   get '/all_clubs/:club_name/add_member' do
     verify_user
     club = params['club_name']
-    puts club
     underscore = "_"
     club.gsub!(underscore, " ")
     club.downcase!
     @current_group = Group.find_by(name: club)
-    @student_list = []
     all_students = Student.all
-    p "length" + all_students.length.to_s
+    @freshmen = []
+    @sophomores = []
+    @juniors = []
+    @seniors = []
+
+    grades = Student.select(:class_of).distinct.sort()
+    soph = grades[2].class_of
+    jun = grades[1].class_of
+    sen = grades[0].class_of
+
     all_students.each do |st|
       user = User.find_by(id: st.user_id)
-      @student_list.push(user)
+      if st.class_of == sen
+        @seniors.push(user)
+      elsif st.class_of == jun
+        @juniors.push(user)
+      elsif st.class_of == soph
+        @sophomores.push(user)
+      else
+        @freshmen.push(user)
+      end
     end
+
     erb :add_to_clubs
     # redirect '/'
   end
@@ -678,7 +713,6 @@ class HoltonHubApp < Sinatra::Base
 
   post '/adding_members/:club_name' do
     club = params['club_name']
-    # puts club
     underscore = "_"
     club.gsub!(underscore, " ")
     club.downcase!
@@ -693,7 +727,9 @@ class HoltonHubApp < Sinatra::Base
       # puts split_name[0]
       student = Student.find_by(user_id: user.id)
       if GroupMember.find_by(student_id: student.id, group_id: @current_group.id) == nil
-        GroupMember.create(student_id: student.id, group_id: @current_group.id)
+        if GroupLeader.find_by(student_id: student.id, group_id: @current_group.id) == nil
+          GroupMember.create(student_id: student.id, group_id: @current_group.id)
+        end
       end
     end
     if @current_group.group_type == "club"
@@ -911,7 +947,6 @@ class HoltonHubApp < Sinatra::Base
 
     @groups = Group.all
     all_meetings = GroupMeeting.all
-
     my_group_list = GroupLeader.where(student_id: @active_user.id) + GroupMember.where(student_id: @active_user.id)
     @my_groups = []
     @meetings = []

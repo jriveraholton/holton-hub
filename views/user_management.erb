@@ -15,7 +15,7 @@
 						<h2 class="accordion-header">
 							<button class="accordion-button collapsed <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse<%= group %>" aria-expanded="false" aria-controls="flush-collapse<%= group %>">
 								<% if group.is_a? Integer %>
-									<h6>Grade <%= group %> <%="(#{users.length} Users)" %></h6>
+									<h6>Class of <%= group %> <%="(#{users.length} Users)" %></h6>
 								<% elsif group == :facstaff %>
 									<h6>Faculty & Staff <%="(#{users.length} Users)" %></h6>
 								<% end %>
