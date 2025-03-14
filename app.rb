@@ -677,16 +677,22 @@ class HoltonHubApp < Sinatra::Base
     @sophomores = []
     @juniors = []
     @seniors = []
+
+    grades = Student.select(:class_of).distinct.sort()
+    soph = grades[2].class_of
+    jun = grades[1].class_of
+    sen = grades[0].class_of
+
     all_students.each do |st|
       user = User.find_by(id: st.user_id)
-      if st.grade == 9
-        @freshmen.push(user)
-      elsif st.grade == 10
-        @sophomores.push(user)
-      elsif st.grade == 11
-        @juniors.push(user)
-      else
+      if st.class_of == sen
         @seniors.push(user)
+      elsif st.class_of == jun
+        @juniors.push(user)
+      elsif st.class_of == soph
+        @sophomores.push(user)
+      else
+        @freshmen.push(user)
       end
     end
 
@@ -941,7 +947,6 @@ class HoltonHubApp < Sinatra::Base
 
     @groups = Group.all
     all_meetings = GroupMeeting.all
-
     my_group_list = GroupLeader.where(student_id: @active_user.id) + GroupMember.where(student_id: @active_user.id)
     @my_groups = []
     @meetings = []
