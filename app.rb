@@ -147,7 +147,7 @@ class HoltonHubApp < Sinatra::Base
   end
 
   ## MESSAGES and ANNOUNCEMENTS ##
-  get '/messages' do
+  get '/send_message' do
     verify_user
     @groups = [] #list of message tag objects
     if @active_user.is_admin
@@ -167,10 +167,10 @@ class HoltonHubApp < Sinatra::Base
         end
       end
     end
-    erb :messages
+    erb :send_messages
   end
 
-  post '/send_message' do
+  post '/post_message' do
     # if params[:tags] != nil
     subj = params[:subject]
     cont = params[:content]
@@ -198,16 +198,19 @@ class HoltonHubApp < Sinatra::Base
     #this would be a lot easier if we used associations: ask mr. rivera
     # all grade-level grouping has to be hard-coded: ask if this is necessary
     # @all_msg = Message.where(recipient_tag: "Upper School").order({message: {sent_at: :desc}})
-    @all_msg = Message.where(id: MessageMessageTag.where(message_tag_id: MessageTag.find_by(recipient_tag: "Upper School").id).select(:message_id)).order(sent_at: :desc)
-    # MessageTag.find_by(recipient_tag: "Upper School").order(sent_at: :desc)
-    # @my_msg = []
     if Student.find_by(user_id: @active_user.id) != nil #if user is a student
       stu = Student.find_by(user_id: @active_user.id)
-
-      my_groups = Group.where(id: GroupMember.where(student_id: stu.id) + GroupLeader.where(student_id: stu.id))
-      puts my_groups
-      @group_msg = Message.where(id: MessageMessageTag.where(message_tag_id: MessageTag.where(id: GroupMessagetag.where(group_id: my_groups.select(:id)).select(:messagetag_id)).select(:id)).select(:message_id)).order(sent_at: :desc)
+      MessageTag.find_by(recipient_tag: "Class of " + stu.class_of.to_s)
+    elsif Facultystaff.find_by(user_id: @active_user.id) != nil
+      fac = Facultystaff.find_by(user_id: @active_user.id)
     end
+    @all_msg = Message.where(id: MessageMessageTag.where(message_tag_id: MessageTag.find_by(recipient_tag: "Upper School").id).select(:message_id)).order(sent_at: :desc)
+    
+
+    # MessageTag.find_by(recipient_tag: "Upper School").order(sent_at: :desc)
+    # @my_msg = []
+    
+    
     #   GroupMember.where(student_id: Student.find_by(user_id: @active_user.id).id).each do |grpmemb|
     #     @my_msg << GroupMessagetag.find_by(group_id: grpmemb.group_id).messagetag_id
     #   end
@@ -221,6 +224,24 @@ class HoltonHubApp < Sinatra::Base
     # end
     # Message.includes(:group).where(group: {id: GroupMember.where(student_id @active_user.id)})
     erb :announcements
+  end
+
+  get '/messages' do
+    if Student.find_by(user_id: @active_user.id) != nil #if user is a student
+      stu = Student.find_by(user_id: @active_user.id)
+
+      my_groups = Group.where(id: GroupMember.where(student_id: stu.id) + GroupLeader.where(student_id: stu.id))
+      # puts my_groups
+      @group_msg = Message.where(id: MessageMessageTag.where(message_tag_id: MessageTag.where(id: GroupMessagetag.where(group_id: my_groups.select(:id)).select(:messagetag_id)).select(:id)).select(:message_id)).order(sent_at: :desc)
+    elsif Facultystaff.find_by(user_id: @active_user.id) != nil
+      fac = Facultystaff.find_by(user_id: @active_user.id)
+
+      my_groups = Group.where(id: GroupAdvisor.where(facultystaff_id: fac.id))
+      # puts my_groups
+      @group_msg = Message.where(id: MessageMessageTag.where(message_tag_id: MessageTag.where(id: GroupMessagetag.where(group_id: my_groups.select(:id)).select(:messagetag_id)).select(:id)).select(:message_id)).order(sent_at: :desc)
+    
+    end
+
   end
   ##END MESSAGES AND ANNOUNCEMENTS ##
 
@@ -491,22 +512,23 @@ class HoltonHubApp < Sinatra::Base
 
   get '/all_sports' do
     verify_user
-    @all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc)
+    # all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc)
     #iterates thru and sorts all sports based on season
-    @fall_sports = []
-    @winter_sports = []
-    @spring_sports = []
-    #there should be a way to do this w/o hardcoding every season
-    @all_sports.each do |sport|
-
-      if GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Fall").id
-        @fall_sports << sport
-      elsif GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Winter").id
-        @winter_sports << sport
-      elsif GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Spring").id
-        @spring_sports << sport
-      end  
-    end
+    @fall_sports = Group.where(id: GroupSeason.where(season_id: Season.find_by(name: "Fall").id).select(:group_id)).order(level_id: :asc, name: :asc)
+    @winter_sports = Group.where(id: GroupSeason.where(season_id: Season.find_by(name: "Winter").id).select(:group_id)).order(level_id: :asc, name: :asc)
+    @spring_sports = Group.where(id: GroupSeason.where(season_id: Season.find_by(name: "Spring").id).select(:group_id)).order(level_id: :asc, name: :asc)
+    # @spring_sports = []
+    # #there should be a way to do this w/o hardcoding every season
+    # all_sports.each do |sport|
+      
+    #   # if GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Fall").id
+    #   #   @fall_sports << sport
+    #   if GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Winter").id
+    #     @winter_sports << sport
+    #   elsif GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Spring").id
+    #     @spring_sports << sport
+    #   end  
+    # end
     # @fall_sports1 = Group.where(GroupSeason.find_by(group_id: ))
     # @fall_sports = GroupSeason.where(season_id: Season.find_by(name: "Fall"))
     # @fall_sports = Group.where(GroupSeason.find_by(:group_id))
@@ -570,7 +592,7 @@ class HoltonHubApp < Sinatra::Base
       GroupSeason.create(group_id: group.id, season_id: params[:sportsSeason])
     end
     mt = MessageTag.create(recipient_tag: params[:groupName])
-    Group_MessageTag.create(group_id: group.id, messagetag_id: mt.id)
+    GroupMessagetag.create(group_id: group.id, messagetag_id: mt.id)
     redirect '/manage/manage_groups'
   end
 

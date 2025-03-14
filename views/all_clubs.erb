@@ -6,7 +6,10 @@
     <% if @active_user.is_admin %>
         <div class="row justify-content-md-center text-center mb-3">
             <div class="col">
-            <a href="/manage/manage_groups" class="btn btn-primary" role="button">Manage Groups</a>    
+                <div class="btn-group" role="group" aria-lable="Clubs Management">
+                <a href="/manage/manage_groups" class="btn btn-primary" role="button">Manage Clubs</a>    
+                <a class="btn btn-primary" href="/add_group">Add New Club</a>
+                </div>
             </div>
         </div>
     <% end %>
