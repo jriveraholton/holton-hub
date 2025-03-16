@@ -44,16 +44,16 @@ class HoltonHubApp < Sinatra::Base
   def verify_user
     #some token exists, but is it a real user?
     if session[:access_token] != nil
-	    @active_user = User.find_by(secret: session[:access_token])
+	  @active_user = User.find_by(secret: session[:access_token])
       #is no user recognized? Go to the sign_in page
       if(@active_user == nil)
         redirect '/sign_in'
       end
       @active_team_color = BwTeam.find(@active_user.team_id).team_color.downcase
-      #session[:team_color] = @active_team_color
+    #session[:team_color] = @active_team_color
     else
       #they've never signed in, so go to the sign in page
-	    redirect '/sign_in'
+	  redirect '/sign_in'
     end
   end
   def check_admin #use for pages w/ admin-only access
@@ -175,7 +175,7 @@ class HoltonHubApp < Sinatra::Base
     subj = params[:subject]
     cont = params[:content]
     author = params[:author].to_i
-  
+    
     time = Time.current
     # puts Time.parse(time)
     # puts Time.in_time_zone('America/New_York')
@@ -239,7 +239,7 @@ class HoltonHubApp < Sinatra::Base
       my_groups = Group.where(id: GroupAdvisor.where(facultystaff_id: fac.id))
       # puts my_groups
       @group_msg = Message.where(id: MessageMessageTag.where(message_tag_id: MessageTag.where(id: GroupMessagetag.where(group_id: my_groups.select(:id)).select(:messagetag_id)).select(:id)).select(:message_id)).order(sent_at: :desc)
-    
+      
     end
 
   end
@@ -350,14 +350,23 @@ class HoltonHubApp < Sinatra::Base
     role = params[:role]
     grade = params[:grade]
 
+
+    #determine class_of year based on selected grade and current date
+    current_month = Date.today.month
+    if current_month >= 1 and current_month <= 6
+      senior_year = Date.today.year
+    else
+      senior_year = Date.today.year + 1
+    end
+    class_of = senior_year + (12 - Integer(grade))
     
     #generates a default password in the format "gdingholtonarms"
     password = (fname.downcase[0] + lname.downcase + "holtonarms").to_s
 
     new_user = User.create(firstname: fname, lastname: lname, 
-                           email: email, secret: password, team_id: team_id, is_admin: is_admin)
+                           email: email, secret: password, team_id: team_id, is_admin: is_admin, active: true)
     if role == "Student" 
-      Student.create(user_id: new_user.id, grade: Integer(grade)) 
+      Student.create(user_id: new_user.id, class_of: Integer(class_of)) 
     else 
       Facultystaff.create(user_id: new_user.id, grade: Integer(grade))
     end
@@ -374,7 +383,7 @@ class HoltonHubApp < Sinatra::Base
       @all_by_groups[grade.class_of] = []
     end
     @all_by_groups[:facstaff] = []
-    puts @all_by_groups
+ 
     #figure out which users are students and put them together by grade level
     #and put all faculty and staff together
     all_users.each do |user|
@@ -402,7 +411,7 @@ class HoltonHubApp < Sinatra::Base
     user = User.find_by(firstname: fname, lastname: lname)
     user.active = active
     user.save
-
+    
     redirect '/manage/manage_users'
   end
 
@@ -415,7 +424,7 @@ class HoltonHubApp < Sinatra::Base
   ## END USER MANAGEMENT ##
 
   get '/faculty_page' do
-  # THIS IS NOT COMPLETE --- NEEDS TO CHECK IF USER IS FACULTY ??
+    # THIS IS NOT COMPLETE --- NEEDS TO CHECK IF USER IS FACULTY ??
     erb :faculty_page
   end
 
@@ -520,7 +529,7 @@ class HoltonHubApp < Sinatra::Base
     # @spring_sports = []
     # #there should be a way to do this w/o hardcoding every season
     # all_sports.each do |sport|
-      
+    
     #   # if GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Fall").id
     #   #   @fall_sports << sport
     #   if GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Winter").id
@@ -643,9 +652,9 @@ class HoltonHubApp < Sinatra::Base
         GroupLeader.destroy_by(group_id: group.id)
         GroupMeeting.destroy_by(group_id: group.id)
         GroupMember.destroy_by(group_id: group.id)
-        # THIS LINE EVENTUALLY NEEDS TO BE UNCOMMENTED
-        # WHEN WE CREATE THE GROUP MESSAGE TAG ASSOCIATION
-        # GroupMessageTag.destroy_by(group_id: group.id)
+      # THIS LINE EVENTUALLY NEEDS TO BE UNCOMMENTED
+      # WHEN WE CREATE THE GROUP MESSAGE TAG ASSOCIATION
+      # GroupMessageTag.destroy_by(group_id: group.id)
       elsif group.group_type == "sport"
         GroupAdvisor.destroy_by(group_id: group.id)
         GroupLeader.destroy_by(group_id: group.id)
@@ -676,7 +685,7 @@ class HoltonHubApp < Sinatra::Base
     group_id = params[:group].to_i
     file = params[:members_list][:tempfile].read
     students = file.split("\n")
-  
+    
     students.each do |email|
       use = User.find_by(email: email.delete("\r"))
       stu = Student.find_by(user_id: use.id)
@@ -887,7 +896,7 @@ class HoltonHubApp < Sinatra::Base
     result = params[:result]
     id = params[:id].to_i 
     game.update(status: status, name: name, date: date, advantage: home, 
-    home_score: h_score, away_score: a_score, details: details, result: result)
+                home_score: h_score, away_score: a_score, details: details, result: result)
     sport = Group.find(game.team_id)
     redirect "/all_sports/"+ sport.name.gsub(" ", "_").to_s
   end
@@ -954,7 +963,7 @@ class HoltonHubApp < Sinatra::Base
       file = params[:imageFile][:tempfile]
       puts "foundfile"
       File.open(File.join("./public/clubs", params[:club_name].to_s + File.extname(filename)), 'wb') do |f|
-      #File.open(File.join("/public/clubs/", filename), 'wb') do |f|
+        #File.open(File.join("/public/clubs/", filename), 'wb') do |f|
         f.write (file.read)
       end
     end
