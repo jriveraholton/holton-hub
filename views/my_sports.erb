@@ -4,20 +4,24 @@
     </div>
     <div class="row">
         <% @my_groups.each do |club| %>
-            <div class="col-md-4 col-lg-3 mb-3">
-                <div class="card border-primary">
-                    <h5 class="card-header" id="club-header"> 
-                        <%=club.name.titleize %> 
-                    </h5>
-                    <div class="card-body" max-height="5rem" id="club-body">
-                        <p style="text-align:center;">Level: <i><%= GroupLevel.find(club.level_id).name.titleize %></i></p>
-                        <div class="overflow-y-auto">
-                            <%= club.description %>
-                        </div>
-                        <center><a href="/all_clubs/<%= club.name.sub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See more</a></center> 
-                    </div>
+            <div class="col-md-3 mb-3">
+            <div class="card border-primary">
+            <img src="<%= '/sports/' + club.name.gsub(' ', '_') + '.jpg' %>" alt="<%=club.name.titleize%> photo" 
+            class="card-img"
+            onerror="this.onerror=null;this.src='/sports/placeholder.jpg';">
+                <div class="card-body" id="sport-body">
+                    <h5 class="card-title" id="sport-name"> <%=club.name.titleize %> </h5>
+                    <hr>
+                    <p class="card-text">
+                        <div style="float: left; width: 50%;"><%= Season.find((GroupSeason.find_by(group_id: club.id).season_id)).name %></div>
+                        <div style="float: right; width: 50%; text-align: right;"><i><%= GroupLevel.find(club.level_id).name.titleize %></i></div>
+                        <!-- finds season via group-season relation table-->
+                    </p>
+                
+                    <a href="/all_sports/<%= club.name.sub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See record</a>
                 </div>
-            </div> 
+            </div>
+        </div>
         <% end %>
     </div>
 </div>
