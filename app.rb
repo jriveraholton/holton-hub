@@ -635,13 +635,6 @@ class HoltonHubApp < Sinatra::Base
 
   get '/all_clubs/:club_name' do
     verify_user
-    club = params['club_name']
-    puts club
-    redirect '/all_clubs/'+params['club_name'].to_s
-  end
-
-  get '/all_clubs/:club_name' do
-    verify_user
     club = params[:club_name]
     underscore = "_"
     club.gsub!(underscore, " ")
