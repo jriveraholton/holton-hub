@@ -5,13 +5,59 @@
     </div>
     <div class="row">
         <div class="col">
-        <% @all_msg.each do |msg| %>
+        <% @priority.each do |msg| %>
             
-            <div class="alert alert-primary">
-                <h2><%= msg.subject %> </h2>
+            <div class="alert fade show <%= UserMessage.find_by(message_id: msg.id, user_id: @active_user.id).unread ? 'alert-danger' : 'alert-secondary'%>">
+                <div class="row align-items-center">
+                    <div class="col">
+                    <h2><i class="fa-regular fa-font-awesome me-3"></i> <%= msg.subject %> </h2>
+                    </div>
+                    <div class="col col-auto me-auto">
+                    <form method='post' action='/read_message?id=<%=@active_user.id%>&msg=<%=msg.id%>'>
+                    <button type="submit" class='btn btn-link' data-bs-toggle="tooltip" <%= UserMessage.find_by(message_id: msg.id, user_id: @active_user.id).unread ? 'data-bs-title="Mark as read" title="Mark as read"' : 'data-bs-title="Mark unread" title="Mark unread"' %>>
+                        <i class="<%= UserMessage.find_by(message_id: msg.id, user_id: @active_user.id).unread ? 'fa-regular' : 'fa-solid' %> fa-circle-check fa-xl"></i>
+                        </button>
+                        <!--<button type='submit' class='btn btn-primary'><i class="fa-solid fa-circle-check submit"></i></button>-->
+                    </form>
+                    </div>
+                    <div class="col col-auto me-auto">
+                        <form method='post' action='/delete_message?id=<%=@active_user.id%>&msg=<%=msg.id%>'>
+                            <button type='submit' class='btn-close' data-bs-dismiss="alert" aria-label="Close" title="Delete message"></button>
+                        </form>
+                    </div>
+                </div>
                 <p><i><%= MessageTag.find_by(id: MessageMessageTag.find_by(message_id: msg.id).message_tag_id).recipient_tag %></i></p>
                 <p><%= msg.content %> </p>
-                <p><i>Sent at <%=msg.sent_at.utc.strftime("%I:%M, %m/%d/%Y")%></i></p>
+                <p><i>Sent at <%=msg.sent_at.strftime("%I:%M, %m/%d/%Y")%></i></p>
+                
+            </div>
+        <%end%>
+        <hr>
+        <% @all_msg.each do |msg| %>
+            
+            <div class="alert fade show <%= UserMessage.find_by(message_id: msg.id, user_id: @active_user.id).unread ? 'alert-primary' : 'alert-secondary'%>">
+                <div class="row align-items-center">
+                    <div class="col">
+                    <h2><%= msg.subject %> </h2>
+                    </div>
+                    <div class="col col-auto me-auto">
+                    <form method='post' action='/read_message?id=<%=@active_user.id%>&msg=<%=msg.id%>'>
+                    <button type="submit" class='btn btn-link' data-bs-toggle="tooltip" <%= UserMessage.find_by(message_id: msg.id, user_id: @active_user.id).unread ? 'data-bs-title="Mark as read" title="Mark as read"' : 'data-bs-title="Mark unread" title="Mark unread"' %>>
+                        <i class="<%= UserMessage.find_by(message_id: msg.id, user_id: @active_user.id).unread ? 'fa-regular' : 'fa-solid' %> fa-circle-check fa-xl"></i>
+                        </button>
+                        <!--<button type='submit' class='btn btn-primary'><i class="fa-solid fa-circle-check submit"></i></button>-->
+                    </form>
+                    </div>
+                    <div class="col col-auto me-auto">
+                        <form method='post' action='/delete_message?id=<%=@active_user.id%>&msg=<%=msg.id%>'>
+                            <button type='submit' class='btn-close' data-bs-dismiss="alert" aria-label="Close" title="Delete message"></button>
+                        </form>
+                    </div>
+                </div>
+                <p><i><%= MessageTag.find_by(id: MessageMessageTag.find_by(message_id: msg.id).message_tag_id).recipient_tag %></i></p>
+                <p><%= msg.content %> </p>
+                <p><i>Sent at <%=msg.sent_at.strftime("%I:%M, %m/%d/%Y")%></i></p>
+                
             </div>
         <%end%>
         </div>

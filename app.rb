@@ -190,7 +190,8 @@ class HoltonHubApp < Sinatra::Base
           end
         end
       elsif tag.include? "Class of"
-        Student.where(class_of: tag[-4...-1].to_i).each do |stu|
+        Student.where(class_of: tag[-4..-1].to_i).each do |stu|
+          puts tag[-4..-1]
           if not UserMessage.where(user_id: stu.user_id, message_id: msg.id).exists?
             UserMessage.create(user_id: stu.user_id, message_id: msg.id)
           end
@@ -227,26 +228,32 @@ class HoltonHubApp < Sinatra::Base
     # @all_msg = Message.where(recipient_tag: "Upper School").order({message: {sent_at: :desc}})
 
 
-    if Student.find_by(user_id: @active_user.id) != nil #if user is a student
-      stu = Student.find_by(user_id: @active_user.id)
-      mt = MessageTag.find_by(recipient_tag: "Class of " + stu.class_of.to_s)
-    elsif Facultystaff.find_by(user_id: @active_user.id) != nil
-      fac = Facultystaff.find_by(user_id: @active_user.id)
-      grades = Student.select(:class_of).distinct.sort.to_a
-      if fac.grade == 12
-        gr = grades[0].class_of
-      elsif fac.grade == 11
-        gr = grades[1].class_of
-      elsif fac.grade == 10
-        gr = grades[2].class_of
-      else
-        gr = grades[3].class_of
-      end
-      mt = MessageTag.find_by(recipient_tag: "Class of "+ gr.to_s)
-    end
+    # if Student.find_by(user_id: @active_user.id) != nil #if user is a student
+    #   stu = Student.find_by(user_id: @active_user.id)
+    #   mt = MessageTag.find_by(recipient_tag: "Class of " + stu.class_of.to_s)
+    # elsif Facultystaff.find_by(user_id: @active_user.id) != nil
+    #   fac = Facultystaff.find_by(user_id: @active_user.id)
+    #   grades = Student.select(:class_of).distinct.sort.to_a
+    #   if fac.grade == 12
+    #     gr = grades[0].class_of
+    #   elsif fac.grade == 11
+    #     gr = grades[1].class_of
+    #   elsif fac.grade == 10
+    #     gr = grades[2].class_of
+    #   else
+    #     gr = grades[3].class_of
+    #   end
+    #   mt = MessageTag.find_by(recipient_tag: "Class of "+ gr.to_s)
+    # end
     # @all_msg = Message.where(id: MessageMessageTag.where(message_tag_id: [mt.id, MessageTag.find_by(recipient_tag: "Upper School").id]).select(:message_id)).order(sent_at: :desc)
-    
-    @all_msg = Message.where(id: UserMessage.where(user_id: @active_user.id).select(:message_id)).order(sent_at: :desc)
+    cls_tags = []
+    MessageTag.select(:recipient_tag).each do |tag|
+      if tag.recipient_tag.include? "Class of"
+        cls_tags << tag.recipient_tag
+      end
+    end
+    @priority = Message.where(id: UserMessage.where(user_id: @active_user.id).select(:message_id).order(:unread)).where(id: MessageMessageTag.where(message_tag_id: MessageTag.where(recipient_tag: "Upper School").or(MessageTag.where(recipient_tag: cls_tags)).select(:id)).select(:message_id))
+    @all_msg = Message.where(id: UserMessage.where(user_id: @active_user.id).select(:message_id).order(:unread)).where.not(id: @priority.select(:id))
 
     # MessageTag.find_by(recipient_tag: "Upper School").order(sent_at: :desc)
     # @my_msg = []
@@ -266,19 +273,29 @@ class HoltonHubApp < Sinatra::Base
     # Message.includes(:group).where(group: {id: GroupMember.where(student_id @active_user.id)})
     erb :announcements
   end
+  
+  post '/delete_message' do
+    UserMessage.find_by(message_id: params[:msg], user_id: params[:id]).delete
+    redirect '/announcements'
+  end
+  
+  post '/read_message' do
+    um = UserMessage.find_by(message_id: params[:msg], user_id: params[:id])
+    old_status = um.unread
+    um.update(unread: (not old_status))
+    redirect '/announcements'
+  end
 
   get '/messages' do
     if Student.find_by(user_id: @active_user.id) != nil #if user is a student
       stu = Student.find_by(user_id: @active_user.id)
 
       my_groups = Group.where(id: GroupMember.where(student_id: stu.id) + GroupLeader.where(student_id: stu.id))
-      # puts my_groups
       @group_msg = Message.where(id: MessageMessageTag.where(message_tag_id: MessageTag.where(id: GroupMessagetag.where(group_id: my_groups.select(:id)).select(:messagetag_id)).select(:id)).select(:message_id)).order(sent_at: :desc)
     elsif Facultystaff.find_by(user_id: @active_user.id) != nil
       fac = Facultystaff.find_by(user_id: @active_user.id)
 
       my_groups = Group.where(id: GroupAdvisor.where(facultystaff_id: fac.id))
-      # puts my_groups
       @group_msg = Message.where(id: MessageMessageTag.where(message_tag_id: MessageTag.where(id: GroupMessagetag.where(group_id: my_groups.select(:id)).select(:messagetag_id)).select(:id)).select(:message_id)).order(sent_at: :desc)
     
     end
@@ -294,8 +311,6 @@ class HoltonHubApp < Sinatra::Base
 
   get '/bw_events' do
     @events = BwEvent.all 
-    # @events.order(:event_date).reverse
-    # puts "sorted"
     @blue_points = 0
     @white_points = 0
     verify_user
@@ -325,7 +340,6 @@ class HoltonHubApp < Sinatra::Base
 
   post '/update_event' do
     event = BwEvent.find_by(id: params[:id])
-    puts "Event ID" + params[:id].to_s
     name = params[:eventName]
     date = params[:date].to_datetime #calendar on the frontend
     blue_pts = params[:blue_pts]
@@ -415,7 +429,6 @@ class HoltonHubApp < Sinatra::Base
       @all_by_groups[grade.class_of] = []
     end
     @all_by_groups[:facstaff] = []
-    puts @all_by_groups
     #figure out which users are students and put them together by grade level
     #and put all faculty and staff together
     @all_by_groups.keys.each do |grade|
@@ -528,7 +541,6 @@ class HoltonHubApp < Sinatra::Base
         end
       end
     end
-    puts "number of groups: " + @my_groups.length.to_s
     erb :my_clubs
   end
   
@@ -693,6 +705,7 @@ class HoltonHubApp < Sinatra::Base
   post "/manage/restore_group" do
     group = Group.find(params[:id])
     group.update(active: true)
+    
     puts group.name
     redirect '/manage/manage_groups'
   end 
@@ -789,7 +802,6 @@ class HoltonHubApp < Sinatra::Base
     sport = params[:sport]
     
     @current_group = Group.find_by(name: sport.gsub("_", " ").downcase)
-    puts @current_group.name
     @student_list = User.where(id: Student.all.select(:user_id))
     erb :add_to_clubs
     # redirect '/'
@@ -801,14 +813,10 @@ class HoltonHubApp < Sinatra::Base
     club.gsub!(underscore, " ")
     club.downcase!
     @current_group = Group.find_by(name: club)
-    # puts "USERS: " + params[:user].to_s
     selected_users = params[:user]
     selected_users.each do |st|
       split_name = st.split(", ")
       user = User.find_by(firstname: split_name[1], lastname: split_name[0])
-      # puts user.inspect
-      # puts split_name[1]
-      # puts split_name[0]
       student = Student.find_by(user_id: user.id)
       if GroupMember.find_by(student_id: student.id, group_id: @current_group.id) == nil
         if GroupLeader.find_by(student_id: student.id, group_id: @current_group.id) == nil
@@ -828,9 +836,8 @@ class HoltonHubApp < Sinatra::Base
 
   get '/all_clubs/:club_name' do
     verify_user
-    clubname = params[:club_name]
-    # underscore = "_"
-    club = clubname.gsub("_", " ").downcase
+    clubname = params['club_name']
+    club = params['club_name'].gsub("_", " ")
     puts clubname
     
     @current_group = Group.find_by(name: club)
@@ -978,7 +985,6 @@ class HoltonHubApp < Sinatra::Base
     id = params[:id]
     sport = Group.find(id)
     sport_name = sport.name.gsub(" ", "_")
-    puts File.dirname(__FILE__)
 
     photo = params[:imageUpload][:tempfile].read
     # path = Pathname.new('../public/' + sport_name + ".txt")
@@ -986,17 +992,6 @@ class HoltonHubApp < Sinatra::Base
     File.open(path, 'wb') do |f|
       f.write(photo)
     end
-    # if params[:imageFile]
-    #   filename = params[:imageFile][:filename] 
-    #   puts filename
-    #   file = params[:imageFile][:tempfile]
-    #   puts "foundfile"
-    #   File.open(File.join("./public/clubs", params[:club_name].to_s + File.extname(filename)), 'wb') do |f|
-    #   #File.open(File.join("/public/clubs/", filename), 'wb') do |f|
-    #     f.write (file.read)
-    #   end
-    # end
-    # photo.write_to_file '/public/' + sport_name + ".jpg"
     redirect '/all_sports/' + sport_name
   end
 
