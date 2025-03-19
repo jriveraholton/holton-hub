@@ -296,10 +296,6 @@ class HoltonHubApp < Sinatra::Base
     redirect '/manage/manage_users'
   end
 
-  get '/club_droppout' do
-    erb :club_droppout
-  end
-
   post '/push_club_meeting' do
     #still need to build frontend 
     location = params[:location]
@@ -321,7 +317,16 @@ class HoltonHubApp < Sinatra::Base
 
   get '/club_droppout' do
     verify_user
-    
+    gid = params["group_id"]
+    group = Group.find_by(id: gid)
+    student = Student.find_by(user_id: @active_user.id)
+    member = GroupMember.find_by(student_id: student.id, group_id: gid)
+    member.destroy
+    if group.group_type == "sport"
+      redirect '/my_sports'
+    else
+      redirect '/my_clubs'
+    end
   end
 
   get '/my_clubs' do
