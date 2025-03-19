@@ -57,6 +57,7 @@ softball_game = Game.create(name: "vs. Holy Child", team_id: softball.id, date: 
 GroupLeader.create(group_id: cheese.id, student_id: student5.id)
 GroupLeader.create(group_id: debate.id, student_id: student2.id)
 GroupMember.create(group_id: soccer.id, student_id: student5.id)
+GroupMember.create(group_id: softball.id, student_id: student5.id)
 GroupAdvisor.create(group_id: cheese.id, facultystaff_id: facstaff1.id)
 
 #group seasons

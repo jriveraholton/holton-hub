@@ -421,17 +421,19 @@ class HoltonHubApp < Sinatra::Base
     erb :create_single_user
   end
 
-  ## END USER MANAGEMENT ##
-
-  get '/faculty_page' do
-    # THIS IS NOT COMPLETE --- NEEDS TO CHECK IF USER IS FACULTY ??
-    erb :faculty_page
-  end
-
   get '/club_droppout' do
-    erb :club_droppout
+    verify_user
+    gid = params["group_id"]
+    group = Group.find_by(id: gid)
+    student = Student.find_by(user_id: @active_user.id)
+    member = GroupMember.find_by(student_id: student.id, group_id: gid)
+    member.destroy
+    if group.group_type == "sport"
+      redirect '/my_sports'
+    else
+      redirect '/my_clubs'
+    end
   end
-
 
   get '/today' do
     verify_user
@@ -451,7 +453,7 @@ class HoltonHubApp < Sinatra::Base
         grp = Group.find_by(id: ld.group_id, active: true)
         if grp != nil
           if grp.group_type == "club" 
-            @my_groups.push(grp)
+            @leader_my_groups.push(grp)
           end
         end
       end
@@ -460,7 +462,7 @@ class HoltonHubApp < Sinatra::Base
         grp = Group.find_by(id: mb.group_id, active: true)
         if grp != nil
           if grp.group_type == "club"
-            @my_groups.push(grp)
+            @member_my_groups.push(grp)
           end
         end
       end
@@ -471,7 +473,7 @@ class HoltonHubApp < Sinatra::Base
         grp = Group.find_by(id: ga.group_id, active: true)
         if grp != nil
           if grp.group_type == "club" 
-            @my_groups.push(grp)
+            @advisor_my_groups.push(grp)
           end
         end
       end
