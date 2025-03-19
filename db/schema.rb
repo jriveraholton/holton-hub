@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_20_165836) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_16_004252) do
   create_table "bw_event_divisions", force: :cascade do |t|
     t.integer "bw_event_id", null: false
     t.integer "division_id", null: false
@@ -121,6 +121,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_20_165836) do
   create_table "students", force: :cascade do |t|
     t.integer "class_of", null: false
     t.integer "user_id", null: false
+  end
+
+  create_table "user_messages", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "message_id", null: false
+    t.boolean "unread", default: true, null: false
   end
 
   create_table "users", force: :cascade do |t|
