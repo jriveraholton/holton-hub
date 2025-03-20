@@ -15,6 +15,7 @@
 				<button class="navbar-toggler <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
 					<span class="navbar-toggler-icon"></span>
 				</button>
+				<% if @active_user != nil %>
 				<div class="collapse navbar-collapse" id="navbarNav">
 					<ul class="navbar-nav me-auto">
 						<li class="nav-item dropdown">
@@ -57,7 +58,6 @@
 					</a>
 					</span>
 					<span class="navbar-text me-3">
-					<% puts UserMessage.where(user_id: @active_user.id, unread: true).count %>
 					<a href="/announcements" class="nav-link" <%= @active_user != nil and UserMessage.where(user_id: @active_user.id, unread: true).count > 0 ? 'style="color: #f00" title="Unread messages" ' : 'title="Read messages"' %>>
 					<i class="fa-regular fa-comment fa-2xl"></i>
 						<!--<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-chat-fill" viewBox="0 0 16 16">
@@ -66,6 +66,7 @@
 					</a>
 					</span>
 				</div>
+				<%end%>
 			</div>
 		</nav>
 		<%= yield %>
