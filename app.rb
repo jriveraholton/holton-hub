@@ -563,7 +563,8 @@ class HoltonHubApp < Sinatra::Base
         end
       end
     end
-    erb :groups/my_clubs
+    
+    erb :"groups/my_clubs"
   end
   
   get '/all_clubs' do
@@ -571,7 +572,7 @@ class HoltonHubApp < Sinatra::Base
     @high_commitment = Group.where(group_type: "club", active: true, level_id: GroupLevel.find_by(name: "high commitment").id).order(name: :asc)
     @interest = Group.where(group_type: "club", active: true, level_id: GroupLevel.find_by(name: "interest").id).order(name: :asc)
     @affinity_groups = Group.where(group_type: "club", active: true, level_id: GroupLevel.find_by(name: "affinity group").id).order(name: :asc)
-    erb :groups/all_clubs
+    erb :"groups/all_clubs"
   end
 
   get '/my_sports' do
@@ -605,7 +606,7 @@ class HoltonHubApp < Sinatra::Base
         end
       end
     end
-    erb :groups/my_sports
+    erb :"groups/my_sports"
   end
 
   get '/all_sports' do
@@ -632,7 +633,7 @@ class HoltonHubApp < Sinatra::Base
     # @fall_sports = Group.where(GroupSeason.find_by(:group_id))
     # fall_sports_ids.each do |id|
     #   @fall_sports << Group.find(id)
-    erb :groups/all_sports
+    erb :"groups/all_sports"
   end
 
   get '/add_group' do
@@ -672,7 +673,7 @@ class HoltonHubApp < Sinatra::Base
     end
     
     
-    erb :groups/add_group
+    erb :"groups/add_group"
   end
   
   
@@ -700,14 +701,14 @@ class HoltonHubApp < Sinatra::Base
     @all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc) 
     @all_clubs = Group.where(group_type: "club", active: true).order(level_id: :asc, name: :asc)
     @archived_groups = Group.where(active: false).order(group_type: :asc, level_id: :asc, name: :asc)
-    erb :groups/group_management
+    erb :"groups/group_management"
   end
 
   get "/manage/edit_group" do
     verify_user
     check_admin
     @group = Group.find(params[:id])
-    erb :groups/edit_group
+    erb :"groups/edit_group"
   end 
 
   post "/manage/update_group" do
@@ -768,7 +769,7 @@ class HoltonHubApp < Sinatra::Base
     @all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc) 
     @all_clubs = Group.where(group_type: "club", active: true).order(level_id: :asc, name: :asc)
     
-    erb :groups/add_batch_group_members
+    erb :"groups/add_batch_group_members"
   end
 
   post '/add_group_members' do
@@ -817,7 +818,7 @@ class HoltonHubApp < Sinatra::Base
       end
     end
 
-    erb :groups/add_group_member
+    erb :"groups/add_group_member"
     # redirect '/'
   end
 
@@ -827,7 +828,7 @@ class HoltonHubApp < Sinatra::Base
     
     @current_group = Group.find_by(name: sport.gsub("_", " ").downcase)
     @student_list = User.where(id: Student.all.select(:user_id))
-    erb :groups/add_group_member
+    erb :"groups/add_group_member"
     # redirect '/'
   end
 
@@ -878,7 +879,7 @@ class HoltonHubApp < Sinatra::Base
       leaders.each do |gl|
         @club_leaders << Student.find_by(id: gl.student_id)
       end
-      erb :groups/club_page
+      erb :"groups/club_page"
     else
       erb :error
     end
@@ -908,7 +909,7 @@ class HoltonHubApp < Sinatra::Base
           end
         end
       end
-      erb :groups/sports_page
+      erb :"groups/sports_page"
     else
       erb :error
     end
@@ -919,7 +920,7 @@ class HoltonHubApp < Sinatra::Base
     name = params[:name].gsub("_", " ")
     @current_group = Group.find_by(name: name)
     if GroupLeader.find_by(group_id: @current_group.id, student_id: @active_user.id) != nil
-      erb :groups/add_club_meeting
+      erb :"groups/add_club_meeting"
     else
       erb :error
     end
@@ -939,7 +940,7 @@ class HoltonHubApp < Sinatra::Base
     verify_user
     name = params[:name].gsub("_", " ")
     @current_group = Group.find_by(name: name)
-    erb :groups/add_game
+    erb :"groups/add_game"
   end
 
   post '/push_game_record' do
@@ -960,7 +961,7 @@ class HoltonHubApp < Sinatra::Base
     verify_user
     #need to add check admin functionality
     @game = Game.find_by(id: params[:id].to_i)
-    erb :groups/edit_game
+    erb :"groups/edit_game"
   end
 
   post '/edit_game' do
@@ -999,7 +1000,7 @@ class HoltonHubApp < Sinatra::Base
     sport.gsub!('_', " ")
     @current_group = Group.find_by(name: sport)
     if @current_group.active
-      erb :groups/add_sport_image
+      erb :"groups/add_sport_image"
     else
       erb :error
     end
@@ -1025,7 +1026,7 @@ class HoltonHubApp < Sinatra::Base
     @updatepath="/my_clubs/"+params[:club_name].to_s+"/update_club"
     @imagepath=params["club_name"]+".jpg"
     @groupedit=Group.find_by(name: groupname)
-    erb :groups/edit_club_page
+    erb :"groups/edit_club_page"
   end
 
   post '/all_clubs/:club_name/update_club' do 
@@ -1066,14 +1067,14 @@ class HoltonHubApp < Sinatra::Base
 
     @meetings = @meetings.sort_by {|meeting| meeting.event_date}
 
-    erb :groups/meetings
+    erb :"groups/meetings"
   end
 
   get '/meetings/edit' do
     verify_user
     @meeting = GroupMeeting.find_by(id: params[:id])
     if GroupLeader.find_by(group_id: @meeting.group_id, student_id: @active_user.id) != nil
-      erb :groups/edit_meeting
+      erb :"groups/edit_meeting"
     else
       erb :error
     end
