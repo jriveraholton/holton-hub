@@ -570,7 +570,7 @@ class HoltonHubApp < Sinatra::Base
 
   get '/all_clubs/:club_name/add_member' do
     verify_user
-    name = params[:name].sub("_", " ")
+    name = params[:club_name].sub("_", " ")
     @sport = Group.find_by(name: name)
     leaders = GroupLeader.where(group_id: @sport.id)
     is_leader = false
