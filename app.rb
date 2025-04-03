@@ -636,7 +636,7 @@ class HoltonHubApp < Sinatra::Base
     erb :"groups/all_sports"
   end
 
-  get '/add_group' do
+  get '/manage/manage_groups/add_group' do
     verify_user
     check_admin
     @group_types = []
@@ -789,6 +789,24 @@ class HoltonHubApp < Sinatra::Base
 
   get '/all_clubs/:club_name/add_member' do
     verify_user
+    name = params[:club_name].sub("_", " ")
+    @sport = Group.find_by(name: name)
+    leaders = GroupLeader.where(group_id: @sport.id)
+    is_leader = false
+    leaders.each do |leader|
+      if leader.id == @active_user.id 
+        is_leader = true
+      end
+    end
+    if is_leader or @active_user.is_admin
+      erb :edit_sport_page
+    else
+      erb :error
+    end
+  end
+
+  get '/add_to_clubs/:club_name' do
+    verify_user
     club = params['club_name']
     underscore = "_"
     club.gsub!(underscore, " ")
@@ -833,6 +851,7 @@ class HoltonHubApp < Sinatra::Base
   end
 
   post '/adding_members/:club_name' do
+    verify_user
     club = params['club_name']
     underscore = "_"
     club.gsub!(underscore, " ")
@@ -849,6 +868,7 @@ class HoltonHubApp < Sinatra::Base
         end
       end
     end
+
     if @current_group.group_type == "club"
       redirect '/all_clubs/'+params['club_name'].to_s
     elsif @current_group.group_type == "sport"
@@ -856,11 +876,13 @@ class HoltonHubApp < Sinatra::Base
     else
       puts @current_group.group_type + 'error'
       redirect '/error'
+
     end
   end
 
   get '/all_clubs/:club_name' do
     verify_user
+
     clubname = params['club_name']
     club = params['club_name'].gsub("_", " ")
     puts clubname
