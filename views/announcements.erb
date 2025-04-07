@@ -28,7 +28,8 @@
                 </div>
                 <p><i><%= MessageTag.find_by(id: MessageMessageTag.find_by(message_id: msg.id).message_tag_id).recipient_tag %></i></p>
                 <p><%= msg.content %> </p> 
-                <p><i>Sent at <%=msg.sent_at.strftime("%X %x")%></i></p>
+                <% puts "Sent at: " + msg.sent_at.to_s %>
+                <p><i>Sent at <%=msg.sent_at.strftime("%I:%M %p, %m/%d/%Y")%></i></p>
                 
             </div>
         <%end%>

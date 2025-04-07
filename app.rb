@@ -176,7 +176,11 @@ class HoltonHubApp < Sinatra::Base
     cont = params[:content]
     author = params[:author].to_i
     
-    time = Time.current
+    time = Time.now
+    puts time
+    time = DateTime.new(time.year, time.month, time.day, time.strftime("%H").to_i + (time.strftime("%z").to_i/100), time.min, time.sec, time.zone)
+    
+    puts time
     # puts Time.parse(time)
     # puts Time.in_time_zone('America/New_York')
     msg = Message.create(subject: subj, content: cont, sent_at: time, author_id: author)
