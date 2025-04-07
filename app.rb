@@ -151,19 +151,19 @@ class HoltonHubApp < Sinatra::Base
     verify_user
     @groups = [] #list of message tag objects
     if @active_user.is_admin
-      @groups = MessageTag.all
+      @groups = MessageTag.where(active: true)
     elsif Student.where(user_id: @active_user.id) != nil #if user is a student
       stu = Student.find_by(user_id: @active_user.id)
       if GroupLeader.where(student_id: stu.id) != nil #if user is a group leader        
         GroupLeader.where(student_id: stu.id).each do |grp| #iterates thru groupleader objects
-          @groups << MessageTag.find(GroupMessagetag.find_by(group_id: grp.group_id).messagetag_id)
+          @groups << MessageTag.find_by(id: GroupMessagetag.find_by(group_id: grp.group_id).messagetag_id, active: true)
         end
       end
     elsif Facultystaff.where(user_id: @active_user.id) != nil
       fac = Facultystaff.find_by(user_id: @active_user.id)
       if GroupAdvisor.where(facultystaff_id: fac.id) != nil #if user is a club advisor
         GroupAdvisor.find_by(facultystaff_id: fac.id).each do |grp| #iterates thru groupleader objects
-          @groups << MessageTag.find(GroupMessagetag.find_by(group_id: grp.group_id).messagetag_id)
+          @groups << MessageTag.find_by(id: GroupMessagetag.find_by(group_id: grp.group_id).messagetag_id, active: true)
         end
       end
     end
@@ -728,14 +728,17 @@ class HoltonHubApp < Sinatra::Base
   post "/manage/delete_group" do
     group = Group.find(params[:id])
     group.update(active: false)
+    msgtg = MessageTag.find_by(recipient_tag: group.name.titleize)
+    msgtg.update(active: false)
     redirect '/manage/manage_groups'
   end 
 
   post "/manage/restore_group" do
     group = Group.find(params[:id])
     group.update(active: true)
-    
-    puts group.name
+    msgtg = MessageTag.find_by(recipient_tag: group.name.titleize)
+    msgtg.update(active: true)
+    # puts group.name
     redirect '/manage/manage_groups'
   end 
 
@@ -750,6 +753,7 @@ class HoltonHubApp < Sinatra::Base
         # THIS LINE EVENTUALLY NEEDS TO BE UNCOMMENTED
         # WHEN WE CREATE THE GROUP MESSAGE TAG ASSOCIATION
         GroupMessagetag.destroy_by(group_id: group.id)
+        
       elsif group.group_type == "sport"
         GroupAdvisor.destroy_by(group_id: group.id)
         GroupLeader.destroy_by(group_id: group.id)
@@ -816,29 +820,31 @@ class HoltonHubApp < Sinatra::Base
     club.gsub!(underscore, " ")
     club.downcase!
     @current_group = Group.find_by(name: club)
-    all_students = Student.all
-    @freshmen = []
-    @sophomores = []
-    @juniors = []
-    @seniors = []
-
+  
     grades = Student.select(:class_of).distinct.sort()
+    
     soph = grades[2].class_of
     jun = grades[1].class_of
     sen = grades[0].class_of
 
-    all_students.each do |st|
-      user = User.find_by(id: st.user_id)
-      if st.class_of == sen
-        @seniors.push(user)
-      elsif st.class_of == jun
-        @juniors.push(user)
-      elsif st.class_of == soph
-        @sophomores.push(user)
-      else
-        @freshmen.push(user)
-      end
-    end
+    @seniors = User.where(id: Student.where(class_of: sen).select(:user_id)).order(:lastname)
+    @juniors = User.where(id: Student.where(class_of: jun).select(:user_id)).order(:lastname)
+    @sophomores = User.where(id: Student.where(class_of: soph).select(:user_id)).order(:lastname)
+    @freshmen = User.where(id: Student.where.not(class_of: [soph, jun, sen]).select(:user_id)).order(:lastname)
+    puts "ALL SENIORS"
+    puts @seniors
+    # all_students.each do |st|
+    #   user = User.find_by(id: st.user_id)
+    #   # if st.class_of == sen
+    #   #   @seniors.push(user)
+    #   if st.class_of == jun
+    #     @juniors.push(user)
+    #   elsif st.class_of == soph
+    #     @sophomores.push(user)
+    #   else
+    #     @freshmen.push(user)
+    #   end
+    # end
 
     erb :"groups/add_group_member"
     # redirect '/'

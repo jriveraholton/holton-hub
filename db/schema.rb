@@ -104,6 +104,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_16_004252) do
 
   create_table "message_tags", force: :cascade do |t|
     t.string "recipient_tag"
+    t.boolean "active", default: true, null: false
   end
 
   create_table "messages", force: :cascade do |t|
