@@ -176,7 +176,11 @@ class HoltonHubApp < Sinatra::Base
     cont = params[:content]
     author = params[:author].to_i
     
-    time = Time.current
+    time = Time.now
+    puts time
+    time = DateTime.new(time.year, time.month, time.day, time.strftime("%H").to_i + (time.strftime("%z").to_i/100), time.min, time.sec, time.zone)
+    
+    puts time
     # puts Time.parse(time)
     # puts Time.in_time_zone('America/New_York')
     msg = Message.create(subject: subj, content: cont, sent_at: time, author_id: author)
@@ -1042,30 +1046,87 @@ class HoltonHubApp < Sinatra::Base
     redirect '/all_sports/' + sport_name
   end
 
-  get '/all_clubs/:club_name/editclub' do
+  get '/all_clubs/:club_name/edit' do
     verify_user
-    groupname=params["club_name"].downcase.gsub("_"," ")
-    @updatepath="/my_clubs/"+params[:club_name].to_s+"/update_club"
-    @imagepath=params["club_name"]+".jpg"
-    @groupedit=Group.find_by(name: groupname)
+    groupname=params["club_name"].downcase
+    @updatepath="/update_club?name="+params[:club_name].to_s
+    @groupedit=Group.find_by(name: groupname.gsub("_"," "))
+    
+    @images = {}
+    n = 1
+    image_exists = File.file?(File.dirname(__FILE__) + '/public/clubs/'+ groupname + n.to_s + '.jpg')
+    
+    while image_exists
+      @images[n] = '/clubs/'+ groupname + n.to_s + '.jpg'
+      n += 1
+      image_exists = File.file?(File.dirname(__FILE__) + '/public/clubs/'+ groupname + n.to_s + '.jpg') #checks if file exists
+    end
     erb :"groups/edit_club_page"
   end
 
-  post '/all_clubs/:club_name/update_club' do 
-    if params[:imageFile]
-      filename = params[:imageFile][:filename] 
-      puts filename
-      file = params[:imageFile][:tempfile]
-      puts "foundfile"
-      File.open(File.join("./public/clubs", params[:club_name].to_s + File.extname(filename)), 'wb') do |f|
-        #File.open(File.join("/public/clubs/", filename), 'wb') do |f|
-        f.write (file.read)
+  post '/update_club' do 
+    groupname=params["name"].downcase.gsub("_"," ")
+    groupedit=Group.find_by(name: groupname)
+    #if they are totally SUBMITTED
+    if params[:commit] == "submit" 
+      groupedit.update(description: params["description"].strip) #commits descript 
+      if params[:imageFile] #adds a new image file if necessary
+        photo = params[:imageFile][:tempfile].read
+        image_exists = true
+        n = 0
+        while image_exists
+          n += 1
+          # puts File.file?(File.dirname(__FILE__) + '/public/clubs/'+params[:name] + n.to_s + '.jpg')
+          image_exists = File.file?(File.dirname(__FILE__) + '/public/clubs/'+params[:name] + n.to_s + '.jpg') #checks if file exists
+        end
+        
+        path = File.dirname(__FILE__) + '/public/clubs/'+params[:name] + n.to_s + '.jpg'
+        File.open(path, 'wb') do |f|
+          f.write(photo)
+        end
       end
+      redirect "/all_clubs/" + params["name"]
+    # for previewing images & adding multiple
+    elsif params[:commit] == "preview"
+      club_name = params[:name].gsub("_", " ")
+      club = Group.find_by(name: club_name)
+
+      if params[:imageFile]
+        photo = params[:imageFile][:tempfile].read
+        image_exists = true
+        n = 0
+        while image_exists #finds last image in line and appends a new one
+          n += 1
+          puts File.file?(File.dirname(__FILE__) + '/public/clubs/'+params[:name] + n.to_s + '.jpg')
+          image_exists = File.file?(File.dirname(__FILE__) + '/public/clubs/'+params[:name] + n.to_s + '.jpg') #checks if file exists
+        end
+        
+        path = File.dirname(__FILE__) + '/public/clubs/'+params[:name] + n.to_s + '.jpg'
+        File.open(path, 'wb') do |f|
+          f.write(photo)
+        end
+      end
+      redirect "/all_clubs/" + params["name"] + "/edit"
+    #for deleting photos
+    elsif params[:commit].include? "delete" #if the action is to delete
+      puts params[:commit]
+      n = params[:commit].sub("delete", "").to_i #first strip to which photo number we're deleting
+      #sets image exists to true for the image we're trying to delete
+      image_exists = File.file?(File.dirname(__FILE__) + '/public/clubs/'+ params[:name]+ (n+1).to_s + '.jpg')
+      while image_exists
+        current_img = File.open(File.dirname(__FILE__) + '/public/clubs/'+ params[:name]+ n.to_s + '.jpg')
+        replacement_img = File.open(File.dirname(__FILE__) + '/public/clubs/'+ params[:name]+ (n+1).to_s + '.jpg')
+        File.open(current_img, 'wb') do |f|
+          f.write(File.read(replacement_img))
+        end
+        n+=1 #looks for the next image in line to replace it with 
+        #stops once the next image does not exist
+        next_img = File.dirname(__FILE__) + '/public/clubs/'+ params[:name]+ (n+1).to_s + '.jpg'
+        image_exists = File.file?(next_img)
+      end
+      File.delete(File.dirname(__FILE__) + '/public/clubs/'+ params[:name]+ (n).to_s + '.jpg')
+      redirect "/all_clubs/" + params["name"] + "/edit"
     end
-    groupname=params["club_name"].downcase.gsub("_"," ")
-    @groupedit=Group.find_by(name: groupname)
-    @groupedit.update(description: params["description"].strip) 
-    redirect "/my_clubs/" + params[:club_name] + "/editclub"
   end 
 
   get '/meetings' do 

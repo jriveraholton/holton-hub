@@ -3,49 +3,55 @@
         <h1>Edit Your Club Page:</h1> 
     </div>
 
-    <div class="col-md-8">
-        <form action="<%= @updatepath %>" method="Post" enctype="multipart/form-data">
-            <div class="row-md-3">
-               <h2>
-                <%= @groupedit.name.titleize %>
-               </h2>
-            </div>
-                    <input type="file" class="form-control" id="imageFile" name="imageFile" aria-describedby="inputGroupFileAddon04" aria-label="Upload" accept=".jpg">
-                    <img src="/clubs/<%= @imagepath %>" alt="club picture" class="groupimage">
-            <div class="row">
-                    <h3>   </h3> 
-           <h8> ***please use .jpg files*** </h8>
-           <div class="row">
-                    <h3>   </h3> 
-        <h6>Club Description:</h2>
-            <div class="mb-3">
-                <textarea class="form-control" id="description" name="description" rows="3"><%=@groupedit.description%>
-                </textarea>
-            </div>
+    <div class="row mb-3">
+        <h2>
+        <%= @groupedit.name.titleize %>
+        </h2>
+    </div>
+    <form action="<%= @updatepath%>" method="Post" enctype="multipart/form-data">
+    <div class="row mb-3">
         <div class="col">
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <p>Please do not upload .heic files. Press preview to view image order and upload multiple images. </p>
+
+            <label for="imageFile">Upload an image: </label> <br>
+            <input type="file" id="imageFile" name="imageFile" accept="image/*"> 
+            <br>
+            
+        </div>
+    </div>
+    
+    <div class="row mb-3">
+        <% if not @images.empty?%>
+        <% @images.each do |n, img| %>
+        <div class="col col-auto text-end">
+            <div class="d-block position-relative">
+            <img src="<%= img %>" alt="club picture" class="groupimage" id="groupimage">
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-secondary">
+            <button type="submit" class="btn btn-close" name="commit" value="<%= "delete" + n.to_s%>"></button>
+            </span>
+            </div>
+        </div>
+        <% end %>
+        <% end %>
+    </div>
+    <div class="row mb-3">
+        <div class="col-auto">
+            <button type="submit" class="btn btn-outline-primary" name="commit" value="preview">Preview</button>
+        </div>
+    </div>
+    <div class="row mb-3"> <!-- need to go through and figure out how to do nested-ish forms -->
+    
+        <div class="col">
+            <h6>Club Description:</h2>
+            <textarea class="form-control" id="description" name="description" rows="3"><%=@groupedit.description%>
+            </textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary" name="commit" value="submit">Submit</button>
+        </div>
+    </form>
     </div>
 </div>
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     
-</div>
