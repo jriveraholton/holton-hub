@@ -1258,6 +1258,12 @@ class HoltonHubApp < Sinatra::Base
     meeting.delete
     redirect '/meetings'
   end
+
+  get '/sport_events' do
+    verify_user 
+    @allgames=Game.where("date>=?", Date.today)
+    erb :display_sport_events
+  end 
   ##########################################
 end
 

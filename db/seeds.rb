@@ -86,7 +86,6 @@ GroupMessagetag.create(group_id: soccer.id, messagetag_id: soccer_tag.id)
 GroupMessagetag.create(group_id: cheese.id, messagetag_id: cheese_tag.id)
 GroupMessagetag.create(group_id: softball.id, messagetag_id: soft_tag.id)
 
-
 #Group leaders
 GroupLeader.create(group_id: debate.id, student_id: 6)
 
@@ -110,3 +109,9 @@ GroupMeeting.create(location: "room 208", event_date: DateTime.new(2025, 1, 15, 
 
 GroupMeeting.create(location: "field", event_date: DateTime.new(2025, 3, 15, 1, 00), group_id: soccer.id)
 GroupMeeting.create(location: "field", event_date: DateTime.new(2025, 3, 20, 2, 45), group_id: soccer.id)
+
+Game.create(name:"soccermatch", team_id: soccer.id, date: DateTime.new(2025, 3, 14, 4, 15), advantage: true, home_score: 2, away_score: 0, result: "win")
+Game.create(name:"soccermatch2", team_id: soccer.id, date: DateTime.new(2025, 4, 17, 4, 15), details: "Opponent", status: true, advantage: false)
+Game.create(name:"soccermatch3", team_id: soccer.id, date: DateTime.new(2025, 4, 15, 4, 15), details: "Opponent", status: false, advantage: true)
+Game.create(name:"softballgame", team_id: softball.id, date: DateTime.new(2025, 5, 5, 4, 15), details: "Opponent", status: true,  advantage: true)
+
