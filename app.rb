@@ -1265,17 +1265,11 @@ class HoltonHubApp < Sinatra::Base
     redirect '/meetings'
   end
 
-  # get '/faculty_profile/:fac_name' do
-  #   verify_user
-  #   params["id"]
-  #   facname = params['fac_name']
-  #   fac = params['fac_name'].gsub("_", " ")
-  #   puts facname
-    
-  #   @current_fac = Facultystaff.find_by(name: fac)
-  #   # @current_fac = Facultystaff.find_by(user_id: @active_user.id)
-  #   erb :"groups/faculty_profile"
-  # end
+  get '/sport_events' do
+    verify_user 
+    @allgames=Game.where("date>=?", Date.today)
+    erb :display_sport_events
+  end 
 
   ##########################################
 end
