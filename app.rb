@@ -683,20 +683,26 @@ class HoltonHubApp < Sinatra::Base
   
   post "/create_group" do
     #create the group from form data and put into the schema
-    group = Group.create(active: true, name: params[:groupName].downcase, description: params[:groupDescription], group_type: params[:typeSelection], level_id: Integer(params[:groupTypeDropdown]))
-    #assign students to be leaders of the recently created group
-    if params[:student_leader] != nil
-      params[:student_leader].each do |leader_id|
-        leader = GroupLeader.create(student_id: leader_id, group_id: group.id)
+    name = params[:groupName].downcase
+    groupF = Group.find_by(name: name)
+    if groupF != nil
+      erb :duplicate_club
+    else
+      group = Group.create(active: true, name: params[:groupName].downcase, description: params[:groupDescription], group_type: params[:typeSelection], level_id: Integer(params[:groupTypeDropdown]))
+      #assign students to be leaders of the recently created group
+      if params[:student_leader] != nil
+        params[:student_leader].each do |leader_id|
+          leader = GroupLeader.create(student_id: leader_id, group_id: group.id)
+        end
       end
+      #if the group is a sport, give it a season
+      if params[:sportsSeason] != nil
+        GroupSeason.create(group_id: group.id, season_id: params[:sportsSeason])
+      end
+      mt = MessageTag.create(recipient_tag: params[:groupName])
+      GroupMessagetag.create(group_id: group.id, messagetag_id: mt.id)
+      redirect '/manage/manage_groups'
     end
-    #if the group is a sport, give it a season
-    if params[:sportsSeason] != nil
-      GroupSeason.create(group_id: group.id, season_id: params[:sportsSeason])
-    end
-    mt = MessageTag.create(recipient_tag: params[:groupName])
-    GroupMessagetag.create(group_id: group.id, messagetag_id: mt.id)
-    redirect '/manage/manage_groups'
   end
 
   get '/manage/manage_groups' do
@@ -1258,6 +1264,19 @@ class HoltonHubApp < Sinatra::Base
     meeting.delete
     redirect '/meetings'
   end
+
+  # get '/faculty_profile/:fac_name' do
+  #   verify_user
+  #   params["id"]
+  #   facname = params['fac_name']
+  #   fac = params['fac_name'].gsub("_", " ")
+  #   puts facname
+    
+  #   @current_fac = Facultystaff.find_by(name: fac)
+  #   # @current_fac = Facultystaff.find_by(user_id: @active_user.id)
+  #   erb :"groups/faculty_profile"
+  # end
+
   ##########################################
 end
 
