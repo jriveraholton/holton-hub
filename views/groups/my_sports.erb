@@ -1,0 +1,67 @@
+<div class="container" id="all_clubs">
+    <div class="row text-center">
+        <h1> My Sports Page</h1>  
+    </div>
+    <div class="row">
+        <% @leader_my_groups.each do |sport| %>
+            <div class="col-md-3 mb-3">
+            <div class="card border-primary">
+            <img src="<%= '/sports/' + sport.name.gsub(' ', '_') + '.jpg' %>" alt="<%=sport.name.titleize%> photo" 
+            class="card-img"
+            onerror="this.onerror=null;this.src='/sports/placeholder.jpg';">
+                <div class="card-body" id="sport-body">
+                    <h5 class="card-title" id="sport-name"> <%=sport.name.titleize %> </h5>
+                    <hr>
+                    <p class="card-text">
+                        <div style="float: left; width: 50%;"><%= Season.find((GroupSeason.find_by(group_id: sport.id).season_id)).name %></div>
+                        <div style="float: right; width: 50%; text-align: right;"><i><%= GroupLevel.find(sport.level_id).name.titleize %></i></div>
+                        <!-- finds season via group-season relation table-->
+                    </p>
+                
+                    <a href="/all_sports/<%= sport.name.gsub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See record</a>
+                </div>
+            </div>
+            </div>
+        <% end %>
+        <% @member_my_groups.each do |sport| %>
+            <div class="col-md-3 mb-3">
+            <div class="card border-primary">
+            <img src="<%= '/sports/' + sport.name.gsub(' ', '_') + '.jpg' %>" alt="<%=sport.name.titleize%> photo" 
+            class="card-img"
+            onerror="this.onerror=null;this.src='/sports/placeholder.jpg';">
+                <div class="card-body" id="sport-body">
+                    <h5 class="card-title" id="sport-name"> <%=sport.name.titleize %> </h5>
+                    <hr>
+                    <p class="card-text">
+                        <div style="float: left; width: 50%;"><%= Season.find((GroupSeason.find_by(group_id: sport.id).season_id)).name %></div>
+                        <div style="float: right; width: 50%; text-align: right;"><i><%= GroupLevel.find(sport.level_id).name.titleize %></i></div>
+                        <!-- finds season via group-season relation table-->
+                    </p>
+                
+                    <a href="/all_sports/<%= sport.name.gsub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See record</a>
+                </div>
+            </div>
+            </div>
+        <% end %>
+        <% @advisor_my_groups.each do |club| %>
+            <div class="col-md-3 mb-3">
+            <div class="card border-primary">
+            <img src="<%= '/sports/' + sport.name.gsub(' ', '_') + '.jpg' %>" alt="<%=sport.name.titleize%> photo" 
+            class="card-img"
+            onerror="this.onerror=null;this.src='/sports/placeholder.jpg';">
+                <div class="card-body" id="sport-body">
+                    <h5 class="card-title" id="sport-name"> <%=sport.name.titleize %> </h5>
+                    <hr>
+                    <p class="card-text">
+                        <div style="float: left; width: 50%;"><%= Season.find((GroupSeason.find_by(group_id: sport.id).season_id)).name %></div>
+                        <div style="float: right; width: 50%; text-align: right;"><i><%= GroupLevel.find(sport.level_id).name.titleize %></i></div>
+                        <!-- finds season via group-season relation table-->
+                    </p>
+                
+                    <a href="/all_sports/<%= sport.name.gsub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See record</a>
+                </div>
+            </div>
+            </div>
+        <% end %>
+    </div>
+</div>

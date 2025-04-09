@@ -6,7 +6,10 @@
     <% if @active_user.is_admin %>
         <div class="row justify-content-md-center text-center mb-3">
             <div class="col">
-            <a href="/manage/manage_groups" class="btn btn-primary" role="button">Manage Sports</a>    
+                <div class="btn-group" role="group" aria-lable="Sports Management">
+                <a href="/manage/manage_groups" class="btn btn-primary" role="button">Manage Sports</a>    
+                <a class="btn btn-primary" href="/add_group">Add New Sport</a>
+                </div>
             </div>
         </div>
     <% end %>
@@ -16,9 +19,9 @@
     <% @fall_sports.each do |sport| %>
         <div class="col-md-3 mb-3">
             <div class="card border-primary">
-                <img src="basketball.jpg" class="card-img" alt="..."> 
-                <!-- image should end up being a user-uploaded image-->
-                <!-- code needs to be updated once a method to edit sports pages is created -->
+            <img src="<%= '/sports/' + sport.name.gsub(' ', '_') + '.jpg' %>" alt="<%=sport.name.titleize%> photo" 
+            class="card-img"
+            onerror="this.onerror=null;this.src='/sports/placeholder.jpg';">
                 <div class="card-body" id="sport-body">
                     <h5 class="card-title" id="sport-name"> <%=sport.name.titleize %> </h5>
                     <hr>
@@ -28,7 +31,7 @@
                         <!-- finds season via group-season relation table-->
                     </p>
                 
-                    <a href="/all_sports/<%= sport.name.sub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See record</a>
+                    <a href="/all_sports/<%= sport.name.gsub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See record</a>
                 </div>
             </div>
         </div>
@@ -40,10 +43,10 @@
     <% @winter_sports.each do |sport| %>
         <div class="col-md-3 mb-3">
             <div class="card border-primary">
-                <img src="basketball.jpg" class="card-img" alt="..."> 
-                <!-- image should end up being a user-uploaded image-->
-                <!-- code needs to be updated once a method to edit sports pages is created -->
-                <div class="card-body" id="sport-body">
+            <img src="<%= '/sports/' + sport.name.gsub(' ', '_') + '.jpg' %>" alt="<%=sport.name.titleize%> photo" 
+            class="card-img"
+            onerror="this.onerror=null;this.src='/sports/placeholder.jpg';">
+            <div class="card-body" id="sport-body">
                     <h5 class="card-title" id="sport-name"> <%=sport.name.titleize %> </h5>
                     <hr>
                     <p class="card-text">
@@ -52,7 +55,7 @@
                         <!-- finds season via group-season relation table-->
                     </p>
                 
-                    <a href="/all_sports/<%= sport.name.sub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See record</a>
+                    <a href="/all_sports/<%= sport.name.gsub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See record</a>
                 </div>
             </div>
         </div>
@@ -64,9 +67,9 @@
         <% @spring_sports.each do |sport| %>
         <div class="col-md-3 mb-3">
             <div class="card border-primary">
-                <img src="basketball.jpg" class="card-img" alt="..."> 
-                <!-- image should end up being a user-uploaded image-->
-                <!-- code needs to be updated once a method to edit sports pages is created -->
+            <img src="<%= '/sports/' + sport.name.gsub(' ', '_') + '.jpg' %>" alt="<%=sport.name.titleize%> photo" 
+            class="card-img"
+            onerror="this.onerror=null;this.src='/sports/placeholder.jpg';">
                 <div class="card-body" id="sport-body">
                     <h5 class="card-title" id="sport-name"> <%=sport.name.titleize %> </h5>
                     <hr>
@@ -76,7 +79,7 @@
                         <!-- finds season via group-season relation table-->
                     </p>
                 
-                    <a href="/all_sports/<%= sport.name.sub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See record</a>
+                    <a href="/all_sports/<%= sport.name.gsub(" ", "_")%>" class="btn btn-primary card-link mt-3 justify-content-md-center" role="button">See record</a>
                 </div>
             </div>
         </div>

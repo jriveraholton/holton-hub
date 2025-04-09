@@ -67,7 +67,7 @@
                                 <%  %> 
                             <tr>
                                 <td><%=stu.firstname + " " + stu.lastname%></td>
-                                <td><%=Student.find_by(user_id:stu.id).grade %> </td>
+                                <td><%=Student.find_by(user_id:stu.id).class_of %> </td>
                             </tr>
                             <% end %>
                         </tbody>

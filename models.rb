@@ -62,3 +62,6 @@ end
 
 class GroupMessagetag < ActiveRecord::Base
 end
+
+class UserMessage < ActiveRecord::Base
+end

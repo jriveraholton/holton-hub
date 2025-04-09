@@ -98,8 +98,21 @@ h1 {
 }
 
 .groupimage {
-	width: 33%;
-	border: 5px black solid;
+	height: 30vh;
+	width: auto;
+	/* display: block; */
+}
+
+.trash_btn {
+	display: none;
+	/* transform: translateY(100%); */
+
+}
+.groupimage:hover + .trash_btn{
+	display: block;
+	/* transform: translateY(100%); */
+	margin-bottom: -10px;
+	
 }
 /* tr {
 	background-color: #fff;

@@ -44,16 +44,16 @@ class HoltonHubApp < Sinatra::Base
   def verify_user
     #some token exists, but is it a real user?
     if session[:access_token] != nil
-	    @active_user = User.find_by(secret: session[:access_token])
+	  @active_user = User.find_by(secret: session[:access_token])
       #is no user recognized? Go to the sign_in page
       if(@active_user == nil)
         redirect '/sign_in'
       end
       @active_team_color = BwTeam.find(@active_user.team_id).team_color.downcase
-      #session[:team_color] = @active_team_color
+    #session[:team_color] = @active_team_color
     else
       #they've never signed in, so go to the sign in page
-	    redirect '/sign_in'
+	  redirect '/sign_in'
     end
   end
   def check_admin #use for pages w/ admin-only access
@@ -147,46 +147,81 @@ class HoltonHubApp < Sinatra::Base
   end
 
   ## MESSAGES and ANNOUNCEMENTS ##
-  get '/messages' do
+  get '/send_message' do
     verify_user
     @groups = [] #list of message tag objects
     if @active_user.is_admin
-      @groups = MessageTag.all
+      @groups = MessageTag.where(active: true)
     elsif Student.where(user_id: @active_user.id) != nil #if user is a student
       stu = Student.find_by(user_id: @active_user.id)
       if GroupLeader.where(student_id: stu.id) != nil #if user is a group leader        
         GroupLeader.where(student_id: stu.id).each do |grp| #iterates thru groupleader objects
-          @groups << MessageTag.find(GroupMessagetag.find_by(group_id: grp.group_id).messagetag_id)
+          @groups << MessageTag.find_by(id: GroupMessagetag.find_by(group_id: grp.group_id).messagetag_id, active: true)
         end
       end
     elsif Facultystaff.where(user_id: @active_user.id) != nil
       fac = Facultystaff.find_by(user_id: @active_user.id)
       if GroupAdvisor.where(facultystaff_id: fac.id) != nil #if user is a club advisor
         GroupAdvisor.find_by(facultystaff_id: fac.id).each do |grp| #iterates thru groupleader objects
-          @groups << MessageTag.find(GroupMessagetag.find_by(group_id: grp.group_id).messagetag_id)
+          @groups << MessageTag.find_by(id: GroupMessagetag.find_by(group_id: grp.group_id).messagetag_id, active: true)
         end
       end
     end
-    erb :messages
+    erb :send_messages
   end
 
-  post '/send_message' do
+  post '/post_message' do
     # if params[:tags] != nil
     subj = params[:subject]
     cont = params[:content]
     author = params[:author].to_i
-  
-    time = Time.current
+    
+    time = Time.now
+    puts time
+    time = DateTime.new(time.year, time.month, time.day, time.strftime("%H").to_i + (time.strftime("%z").to_i/100), time.min, time.sec, time.zone)
+    
+    puts time
     # puts Time.parse(time)
     # puts Time.in_time_zone('America/New_York')
     msg = Message.create(subject: subj, content: cont, sent_at: time, author_id: author)
-    # puts Time.now()
-    # puts Time.offset
-    # puts params[:tag].to_s + "HELLO"
     params[:tag].each do |tag|
+      #associate it with each tag
       mt = MessageTag.find_by(recipient_tag: tag)
       MessageMessageTag.create(message_id: msg.id, message_tag_id: mt.id)
+      #associate it with each person
+      
+      if tag == "Upper School"
+        User.all.each do |use|
+          if not UserMessage.where(user_id: use.id, message_id: msg.id).exists?
+            UserMessage.create(user_id: use.id, message_id: msg.id)
+          end
+        end
+      elsif tag.include? "Class of"
+        Student.where(class_of: tag[-4..-1].to_i).each do |stu|
+          puts tag[-4..-1]
+          if not UserMessage.where(user_id: stu.user_id, message_id: msg.id).exists?
+            UserMessage.create(user_id: stu.user_id, message_id: msg.id)
+          end
+        end
+        #still need to do faculty staff
+      else
+        grp = Group.find_by(id: GroupMessagetag.find_by(messagetag_id: mt.id).group_id)
+        
+        memb = Student.where(id: GroupMember.where(group_id: grp.id)+ GroupLeader.where(group_id: grp.id))
+        memb.each do |stu|
+          if not UserMessage.where(user_id: stu.user_id, message_id: msg.id).exists?
+            UserMessage.create(user_id: stu.user_id, message_id: msg.id)
+          end
+        end
+        fac = Facultystaff.where(id: GroupAdvisor.where(group_id: grp.id).select(:facultystaff_id))
+        fac.each do |fs|
+          if not UserMessage.where(user_id: fs.user_id, message_id: msg.id).exists?
+            UserMessage.create(user_id: fs.user_id, message_id: msg.id)
+          end
+        end
+      end
     end
+    
     redirect '/announcements'
     # else
     #   redirect '/error' #need to code in a way to not submit tagless messages
@@ -198,16 +233,39 @@ class HoltonHubApp < Sinatra::Base
     #this would be a lot easier if we used associations: ask mr. rivera
     # all grade-level grouping has to be hard-coded: ask if this is necessary
     # @all_msg = Message.where(recipient_tag: "Upper School").order({message: {sent_at: :desc}})
-    @all_msg = Message.where(id: MessageMessageTag.where(message_tag_id: MessageTag.find_by(recipient_tag: "Upper School").id).select(:message_id)).order(sent_at: :desc)
+
+
+    # if Student.find_by(user_id: @active_user.id) != nil #if user is a student
+    #   stu = Student.find_by(user_id: @active_user.id)
+    #   mt = MessageTag.find_by(recipient_tag: "Class of " + stu.class_of.to_s)
+    # elsif Facultystaff.find_by(user_id: @active_user.id) != nil
+    #   fac = Facultystaff.find_by(user_id: @active_user.id)
+    #   grades = Student.select(:class_of).distinct.sort.to_a
+    #   if fac.grade == 12
+    #     gr = grades[0].class_of
+    #   elsif fac.grade == 11
+    #     gr = grades[1].class_of
+    #   elsif fac.grade == 10
+    #     gr = grades[2].class_of
+    #   else
+    #     gr = grades[3].class_of
+    #   end
+    #   mt = MessageTag.find_by(recipient_tag: "Class of "+ gr.to_s)
+    # end
+    # @all_msg = Message.where(id: MessageMessageTag.where(message_tag_id: [mt.id, MessageTag.find_by(recipient_tag: "Upper School").id]).select(:message_id)).order(sent_at: :desc)
+    cls_tags = []
+    MessageTag.select(:recipient_tag).each do |tag|
+      if tag.recipient_tag.include? "Class of"
+        cls_tags << tag.recipient_tag
+      end
+    end
+    @priority = Message.where(id: UserMessage.where(user_id: @active_user.id).select(:message_id).order(:unread)).where(id: MessageMessageTag.where(message_tag_id: MessageTag.where(recipient_tag: "Upper School").or(MessageTag.where(recipient_tag: cls_tags)).select(:id)).select(:message_id))
+    @all_msg = Message.where(id: UserMessage.where(user_id: @active_user.id).select(:message_id).order(:unread)).where.not(id: @priority.select(:id))
+
     # MessageTag.find_by(recipient_tag: "Upper School").order(sent_at: :desc)
     # @my_msg = []
-    if Student.find_by(user_id: @active_user.id) != nil #if user is a student
-      stu = Student.find_by(user_id: @active_user.id)
-
-      my_groups = Group.where(id: GroupMember.where(student_id: stu.id) + GroupLeader.where(student_id: stu.id))
-      puts my_groups
-      @group_msg = Message.where(id: MessageMessageTag.where(message_tag_id: MessageTag.where(id: GroupMessagetag.where(group_id: my_groups.select(:id)).select(:messagetag_id)).select(:id)).select(:message_id)).order(sent_at: :desc)
-    end
+    
+    
     #   GroupMember.where(student_id: Student.find_by(user_id: @active_user.id).id).each do |grpmemb|
     #     @my_msg << GroupMessagetag.find_by(group_id: grpmemb.group_id).messagetag_id
     #   end
@@ -222,6 +280,34 @@ class HoltonHubApp < Sinatra::Base
     # Message.includes(:group).where(group: {id: GroupMember.where(student_id @active_user.id)})
     erb :announcements
   end
+  
+  post '/delete_message' do
+    UserMessage.find_by(message_id: params[:msg], user_id: params[:id]).delete
+    redirect '/announcements'
+  end
+  
+  post '/read_message' do
+    um = UserMessage.find_by(message_id: params[:msg], user_id: params[:id])
+    old_status = um.unread
+    um.update(unread: (not old_status))
+    redirect '/announcements'
+  end
+
+  get '/messages' do
+    if Student.find_by(user_id: @active_user.id) != nil #if user is a student
+      stu = Student.find_by(user_id: @active_user.id)
+
+      my_groups = Group.where(id: GroupMember.where(student_id: stu.id) + GroupLeader.where(student_id: stu.id))
+      @group_msg = Message.where(id: MessageMessageTag.where(message_tag_id: MessageTag.where(id: GroupMessagetag.where(group_id: my_groups.select(:id)).select(:messagetag_id)).select(:id)).select(:message_id)).order(sent_at: :desc)
+    elsif Facultystaff.find_by(user_id: @active_user.id) != nil
+      fac = Facultystaff.find_by(user_id: @active_user.id)
+
+      my_groups = Group.where(id: GroupAdvisor.where(facultystaff_id: fac.id))
+      @group_msg = Message.where(id: MessageMessageTag.where(message_tag_id: MessageTag.where(id: GroupMessagetag.where(group_id: my_groups.select(:id)).select(:messagetag_id)).select(:id)).select(:message_id)).order(sent_at: :desc)
+      
+    end
+
+  end
   ##END MESSAGES AND ANNOUNCEMENTS ##
 
   get '/new_event' do
@@ -232,8 +318,6 @@ class HoltonHubApp < Sinatra::Base
 
   get '/bw_events' do
     @events = BwEvent.all 
-    # @events.order(:event_date).reverse
-    # puts "sorted"
     @blue_points = 0
     @white_points = 0
     verify_user
@@ -263,7 +347,6 @@ class HoltonHubApp < Sinatra::Base
 
   post '/update_event' do
     event = BwEvent.find_by(id: params[:id])
-    puts "Event ID" + params[:id].to_s
     name = params[:eventName]
     date = params[:date].to_datetime #calendar on the frontend
     blue_pts = params[:blue_pts]
@@ -329,14 +412,23 @@ class HoltonHubApp < Sinatra::Base
     role = params[:role]
     grade = params[:grade]
 
+
+    #determine class_of year based on selected grade and current date
+    current_month = Date.today.month
+    if current_month >= 1 and current_month <= 6
+      senior_year = Date.today.year
+    else
+      senior_year = Date.today.year + 1
+    end
+    class_of = senior_year + (12 - Integer(grade))
     
     #generates a default password in the format "gdingholtonarms"
     password = (fname.downcase[0] + lname.downcase + "holtonarms").to_s
 
     new_user = User.create(firstname: fname, lastname: lname, 
-                           email: email, secret: password, team_id: team_id, is_admin: is_admin)
+                           email: email, secret: password, team_id: team_id, is_admin: is_admin, active: true)
     if role == "Student" 
-      Student.create(user_id: new_user.id, grade: Integer(grade)) 
+      Student.create(user_id: new_user.id, class_of: Integer(class_of)) 
     else 
       Facultystaff.create(user_id: new_user.id, grade: Integer(grade))
     end
@@ -353,18 +445,25 @@ class HoltonHubApp < Sinatra::Base
       @all_by_groups[grade.class_of] = []
     end
     @all_by_groups[:facstaff] = []
-    puts @all_by_groups
     #figure out which users are students and put them together by grade level
     #and put all faculty and staff together
-    all_users.each do |user|
-      stu = Student.find_by(user_id: user.id)
-      fac = Facultystaff.find_by(user_id: user.id)
-      if stu != nil
-        @all_by_groups[stu.class_of].push(user)
-      elsif fac != nil
-        @all_by_groups[:facstaff].push(user)
+    @all_by_groups.keys.each do |grade|
+      if grade.is_a? Integer
+        @all_by_groups[grade] = User.where(id: Student.where(class_of: grade).select(:user_id)).order(lastname: :asc)
+      else
+        @all_by_groups[:facstaff] = User.where(id: Facultystaff.all.select(:user_id)).order(:lastname)
       end
     end
+    # User.where(id: Student.all.select(:user_id)).where(grade: )
+    # all_users.each do |user|
+    #   stu = Student.find_by(user_id: user.id)
+    #   fac = Facultystaff.find_by(user_id: user.id)
+    #   if stu != nil
+    #     @all_by_groups[stu.class_of].push(user)
+    #   elsif fac != nil
+    #     @all_by_groups[:facstaff].push(user)
+    #   end
+    # end
     erb :user_management
   end
 
@@ -381,16 +480,29 @@ class HoltonHubApp < Sinatra::Base
     user = User.find_by(firstname: fname, lastname: lname)
     user.active = active
     user.save
-
+    
     redirect '/manage/manage_users'
   end
 
   get '/manage/create_user' do
     verify_user
     check_admin
-    erb :create_single_user
+    erb :add_single_user
   end
 
+  get '/manage/edit_user' do
+    verify_user
+    check_admin
+    @use = User.find_by(id: params[:id])
+    erb :edit_user
+  end
+
+  post '/manage/update_user' do
+    user = User.find_by(id: params[:id])
+    team = BwTeam.find_by(team_color: params[:team])
+    user.update(firstname: params[:fname], lastname: params[:lname], team_id: team.id)
+    redirect '/manage/manage_users'
+  end
   ## END USER MANAGEMENT ##
 
   get '/faculty_page' do
@@ -399,9 +511,18 @@ class HoltonHubApp < Sinatra::Base
   end
 
   get '/club_droppout' do
-    erb :club_droppout
+    verify_user
+    gid = params["group_id"]
+    group = Group.find_by(id: gid)
+    student = Student.find_by(user_id: @active_user.id)
+    member = GroupMember.find_by(student_id: student.id, group_id: gid)
+    member.destroy
+    if group.group_type == "sport"
+      redirect '/my_sports'
+    else
+      redirect '/my_clubs'
+    end
   end
-
 
   get '/today' do
     verify_user
@@ -412,15 +533,16 @@ class HoltonHubApp < Sinatra::Base
   get '/my_clubs' do
     verify_user
     student = Student.find_by(user_id: @active_user.id)
-    @my_groups = []
-
+    @leader_my_groups = []
+    @member_my_groups = []
+    @advisor_my_groups = []
     if student != nil
       leader = GroupLeader.where(student_id: student.id)
       leader.each do |ld|
         grp = Group.find_by(id: ld.group_id, active: true)
         if grp != nil
           if grp.group_type == "club" 
-            @my_groups.push(grp)
+            @leader_my_groups.push(grp)
           end
         end
       end
@@ -429,10 +551,10 @@ class HoltonHubApp < Sinatra::Base
         grp = Group.find_by(id: mb.group_id, active: true)
         if grp != nil
           if grp.group_type == "club"
-            @my_groups.push(grp)
+            @member_my_groups.push(grp)
           end
         end
-      end 
+      end
     else
       fac = Facultystaff.find_by(user_id: @active_user.id)  
       group_adivsor = GroupAdvisor.where(facultystaff_id: fac.id)
@@ -440,13 +562,13 @@ class HoltonHubApp < Sinatra::Base
         grp = Group.find_by(id: ga.group_id, active: true)
         if grp != nil
           if grp.group_type == "club" 
-            @my_groups.push(grp)
+            @advisor_my_groups.push(grp)
           end
         end
       end
     end
-    puts "number of groups: " + @my_groups.length.to_s
-    erb :my_clubs
+    
+    erb :"groups/my_clubs"
   end
   
   get '/all_clubs' do
@@ -454,68 +576,71 @@ class HoltonHubApp < Sinatra::Base
     @high_commitment = Group.where(group_type: "club", active: true, level_id: GroupLevel.find_by(name: "high commitment").id).order(name: :asc)
     @interest = Group.where(group_type: "club", active: true, level_id: GroupLevel.find_by(name: "interest").id).order(name: :asc)
     @affinity_groups = Group.where(group_type: "club", active: true, level_id: GroupLevel.find_by(name: "affinity group").id).order(name: :asc)
-    erb :all_clubs
+    erb :"groups/all_clubs"
   end
 
   get '/my_sports' do
     verify_user
     student = Student.find_by(user_id: @active_user.id)
-    @my_groups = []
+    @leader_my_groups = []
+    @member_my_groups = []
+    @advisor_my_groups = []
     if student != nil
       leader = GroupLeader.where(student_id: student.id)
       leader.each do |ld|
         grp = Group.find_by(id: ld.group_id)
-        if grp.group_type == "sport" 
-          @my_groups.push(grp)
+        if grp.group_type == "sport"
+          @leader_my_groups.push(grp)
         end
       end
       member = GroupMember.where(student_id: student.id)
       member.each do |mb|
         grp = Group.find_by(id: mb.group_id)
         if grp.group_type == "sport"
-          @my_groups.push(grp)
+          @member_my_groups.push(grp)
         end
-      end 
+      end
     else
       fac = Facultystaff.find_by(user_id: @active_user.id)  
       group_adivsor = GroupAdvisor.where(facultystaff_id: fac.id)
       group_adivsor.each do |ga|
         grp = Group.find_by(id: ga.group_id)
-        if grp.group_type == "sport" 
-          @my_groups.push(grp)
+        if grp.group_type == "sport"
+          @advisor_my_groups.push(grp)
         end
       end
     end
-    erb :my_sports
+    erb :"groups/my_sports"
   end
 
   get '/all_sports' do
     verify_user
-    @all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc)
+    # all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc)
     #iterates thru and sorts all sports based on season
-    @fall_sports = []
-    @winter_sports = []
-    @spring_sports = []
-    #there should be a way to do this w/o hardcoding every season
-    @all_sports.each do |sport|
-
-      if GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Fall").id
-        @fall_sports << sport
-      elsif GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Winter").id
-        @winter_sports << sport
-      elsif GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Spring").id
-        @spring_sports << sport
-      end  
-    end
+    @fall_sports = Group.where(id: GroupSeason.where(season_id: Season.find_by(name: "Fall").id).select(:group_id)).order(level_id: :asc, name: :asc)
+    @winter_sports = Group.where(id: GroupSeason.where(season_id: Season.find_by(name: "Winter").id).select(:group_id)).order(level_id: :asc, name: :asc)
+    @spring_sports = Group.where(id: GroupSeason.where(season_id: Season.find_by(name: "Spring").id).select(:group_id)).order(level_id: :asc, name: :asc)
+    # @spring_sports = []
+    # #there should be a way to do this w/o hardcoding every season
+    # all_sports.each do |sport|
+    
+    #   # if GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Fall").id
+    #   #   @fall_sports << sport
+    #   if GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Winter").id
+    #     @winter_sports << sport
+    #   elsif GroupSeason.find_by(group_id: sport.id).season_id == Season.find_by(name: "Spring").id
+    #     @spring_sports << sport
+    #   end  
+    # end
     # @fall_sports1 = Group.where(GroupSeason.find_by(group_id: ))
     # @fall_sports = GroupSeason.where(season_id: Season.find_by(name: "Fall"))
     # @fall_sports = Group.where(GroupSeason.find_by(:group_id))
     # fall_sports_ids.each do |id|
     #   @fall_sports << Group.find(id)
-    erb :all_sports
+    erb :"groups/all_sports"
   end
 
-  get '/add_group' do
+  get '/manage/manage_groups/add_group' do
     verify_user
     check_admin
     @group_types = []
@@ -552,13 +677,13 @@ class HoltonHubApp < Sinatra::Base
     end
     
     
-    erb :add_group
+    erb :"groups/add_group"
   end
   
   
   post "/create_group" do
     #create the group from form data and put into the schema
-    group = Group.create(name: params[:groupName], description: params[:groupDescription], group_type: params[:typeSelection], level_id: Integer(params[:groupTypeDropdown]))
+    group = Group.create(active: true, name: params[:groupName].downcase, description: params[:groupDescription], group_type: params[:typeSelection], level_id: Integer(params[:groupTypeDropdown]))
     #assign students to be leaders of the recently created group
     if params[:student_leader] != nil
       params[:student_leader].each do |leader_id|
@@ -570,7 +695,7 @@ class HoltonHubApp < Sinatra::Base
       GroupSeason.create(group_id: group.id, season_id: params[:sportsSeason])
     end
     mt = MessageTag.create(recipient_tag: params[:groupName])
-    Group_MessageTag.create(group_id: group.id, messagetag_id: mt.id)
+    GroupMessagetag.create(group_id: group.id, messagetag_id: mt.id)
     redirect '/manage/manage_groups'
   end
 
@@ -580,14 +705,14 @@ class HoltonHubApp < Sinatra::Base
     @all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc) 
     @all_clubs = Group.where(group_type: "club", active: true).order(level_id: :asc, name: :asc)
     @archived_groups = Group.where(active: false).order(group_type: :asc, level_id: :asc, name: :asc)
-    erb :group_management
+    erb :"groups/group_management"
   end
 
   get "/manage/edit_group" do
     verify_user
     check_admin
     @group = Group.find(params[:id])
-    erb :edit_group
+    erb :"groups/edit_group"
   end 
 
   post "/manage/update_group" do
@@ -603,13 +728,17 @@ class HoltonHubApp < Sinatra::Base
   post "/manage/delete_group" do
     group = Group.find(params[:id])
     group.update(active: false)
+    msgtg = MessageTag.find_by(recipient_tag: group.name.titleize)
+    msgtg.update(active: false)
     redirect '/manage/manage_groups'
   end 
 
   post "/manage/restore_group" do
     group = Group.find(params[:id])
     group.update(active: true)
-    puts group.name
+    msgtg = MessageTag.find_by(recipient_tag: group.name.titleize)
+    msgtg.update(active: true)
+    # puts group.name
     redirect '/manage/manage_groups'
   end 
 
@@ -623,13 +752,14 @@ class HoltonHubApp < Sinatra::Base
         GroupMember.destroy_by(group_id: group.id)
         # THIS LINE EVENTUALLY NEEDS TO BE UNCOMMENTED
         # WHEN WE CREATE THE GROUP MESSAGE TAG ASSOCIATION
-        # GroupMessageTag.destroy_by(group_id: group.id)
+        GroupMessagetag.destroy_by(group_id: group.id)
+        
       elsif group.group_type == "sport"
         GroupAdvisor.destroy_by(group_id: group.id)
         GroupLeader.destroy_by(group_id: group.id)
         GroupMeeting.destroy_by(group_id: group.id)
         GroupMember.destroy_by(group_id: group.id)
-        # GroupMessageTag.destroy_by(group_id: group.id)
+        GroupMessagetag.destroy_by(group_id: group.id)
         GroupSeason.destroy_by(group_id: group.id)
         Game.destroy_by(team_id: group.id)
       end
@@ -647,14 +777,14 @@ class HoltonHubApp < Sinatra::Base
     @all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc) 
     @all_clubs = Group.where(group_type: "club", active: true).order(level_id: :asc, name: :asc)
     
-    erb :add_batch_group_members
+    erb :"groups/add_batch_group_members"
   end
 
   post '/add_group_members' do
     group_id = params[:group].to_i
     file = params[:members_list][:tempfile].read
     students = file.split("\n")
-  
+    
     students.each do |email|
       use = User.find_by(email: email.delete("\r"))
       stu = Student.find_by(user_id: use.id)
@@ -667,36 +797,56 @@ class HoltonHubApp < Sinatra::Base
 
   get '/all_clubs/:club_name/add_member' do
     verify_user
+    name = params[:club_name].sub("_", " ")
+    @sport = Group.find_by(name: name)
+    leaders = GroupLeader.where(group_id: @sport.id)
+    is_leader = false
+    leaders.each do |leader|
+      if leader.id == @active_user.id 
+        is_leader = true
+      end
+    end
+    if is_leader or @active_user.is_admin
+      erb :edit_sport_page
+    else
+      erb :error
+    end
+  end
+
+  get '/add_to_clubs/:club_name' do
+    verify_user
     club = params['club_name']
     underscore = "_"
     club.gsub!(underscore, " ")
     club.downcase!
     @current_group = Group.find_by(name: club)
-    all_students = Student.all
-    @freshmen = []
-    @sophomores = []
-    @juniors = []
-    @seniors = []
-
+  
     grades = Student.select(:class_of).distinct.sort()
+    
     soph = grades[2].class_of
     jun = grades[1].class_of
     sen = grades[0].class_of
 
-    all_students.each do |st|
-      user = User.find_by(id: st.user_id)
-      if st.class_of == sen
-        @seniors.push(user)
-      elsif st.class_of == jun
-        @juniors.push(user)
-      elsif st.class_of == soph
-        @sophomores.push(user)
-      else
-        @freshmen.push(user)
-      end
-    end
+    @seniors = User.where(id: Student.where(class_of: sen).select(:user_id)).order(:lastname)
+    @juniors = User.where(id: Student.where(class_of: jun).select(:user_id)).order(:lastname)
+    @sophomores = User.where(id: Student.where(class_of: soph).select(:user_id)).order(:lastname)
+    @freshmen = User.where(id: Student.where.not(class_of: [soph, jun, sen]).select(:user_id)).order(:lastname)
+    puts "ALL SENIORS"
+    puts @seniors
+    # all_students.each do |st|
+    #   user = User.find_by(id: st.user_id)
+    #   # if st.class_of == sen
+    #   #   @seniors.push(user)
+    #   if st.class_of == jun
+    #     @juniors.push(user)
+    #   elsif st.class_of == soph
+    #     @sophomores.push(user)
+    #   else
+    #     @freshmen.push(user)
+    #   end
+    # end
 
-    erb :add_to_clubs
+    erb :"groups/add_group_member"
     # redirect '/'
   end
 
@@ -705,26 +855,22 @@ class HoltonHubApp < Sinatra::Base
     sport = params[:sport]
     
     @current_group = Group.find_by(name: sport.gsub("_", " ").downcase)
-    puts @current_group.name
     @student_list = User.where(id: Student.all.select(:user_id))
-    erb :add_to_clubs
+    erb :"groups/add_group_member"
     # redirect '/'
   end
 
   post '/adding_members/:club_name' do
+    verify_user
     club = params['club_name']
     underscore = "_"
     club.gsub!(underscore, " ")
     club.downcase!
     @current_group = Group.find_by(name: club)
-    # puts "USERS: " + params[:user].to_s
     selected_users = params[:user]
     selected_users.each do |st|
       split_name = st.split(", ")
       user = User.find_by(firstname: split_name[1], lastname: split_name[0])
-      # puts user.inspect
-      # puts split_name[1]
-      # puts split_name[0]
       student = Student.find_by(user_id: user.id)
       if GroupMember.find_by(student_id: student.id, group_id: @current_group.id) == nil
         if GroupLeader.find_by(student_id: student.id, group_id: @current_group.id) == nil
@@ -732,6 +878,7 @@ class HoltonHubApp < Sinatra::Base
         end
       end
     end
+
     if @current_group.group_type == "club"
       redirect '/all_clubs/'+params['club_name'].to_s
     elsif @current_group.group_type == "sport"
@@ -739,6 +886,7 @@ class HoltonHubApp < Sinatra::Base
     else
       puts @current_group.group_type + 'error'
       redirect '/error'
+
     end
   end
 
@@ -748,6 +896,7 @@ class HoltonHubApp < Sinatra::Base
     underscore = "_"
     club.gsub!(underscore, " ")
     club.downcase!
+ 
     @current_group = Group.find_by(name: club)
     if @current_group.active == true and @current_group.group_type == "club"
       @club_members = []
@@ -772,7 +921,7 @@ class HoltonHubApp < Sinatra::Base
         end
         @meetings = @meetings.sort_by {|meeting| meeting.event_date}
       end
-      erb :club_page
+      erb :"groups/club_page"
     else
       erb :error
     end
@@ -868,7 +1017,7 @@ class HoltonHubApp < Sinatra::Base
           end
         end
       end
-      erb :sports_page
+      erb :"groups/sports_page"
     else
       erb :error
     end
@@ -879,7 +1028,7 @@ class HoltonHubApp < Sinatra::Base
     name = params[:name].gsub("_", " ")
     @current_group = Group.find_by(name: name)
     if GroupLeader.find_by(group_id: @current_group.id, student_id: @active_user.id) != nil
-      erb :add_club_meeting
+      erb :"groups/add_club_meeting"
     else
       erb :error
     end
@@ -899,7 +1048,7 @@ class HoltonHubApp < Sinatra::Base
     verify_user
     name = params[:name].gsub("_", " ")
     @current_group = Group.find_by(name: name)
-    erb :add_game
+    erb :"groups/add_game"
   end
 
   post '/push_game_record' do
@@ -920,7 +1069,7 @@ class HoltonHubApp < Sinatra::Base
     verify_user
     #need to add check admin functionality
     @game = Game.find_by(id: params[:id].to_i)
-    erb :edit_game
+    erb :"groups/edit_game"
   end
 
   post '/edit_game' do
@@ -940,7 +1089,7 @@ class HoltonHubApp < Sinatra::Base
     result = params[:result]
     id = params[:id].to_i 
     game.update(status: status, name: name, date: date, advantage: home, 
-    home_score: h_score, away_score: a_score, details: details, result: result)
+                home_score: h_score, away_score: a_score, details: details, result: result)
     sport = Group.find(game.team_id)
     redirect "/all_sports/"+ sport.name.gsub(" ", "_").to_s
   end
@@ -959,7 +1108,7 @@ class HoltonHubApp < Sinatra::Base
     sport.gsub!('_', " ")
     @current_group = Group.find_by(name: sport)
     if @current_group.active
-      erb :add_sport_image
+      erb :"groups/add_sport_image"
     else
       erb :error
     end
@@ -969,7 +1118,6 @@ class HoltonHubApp < Sinatra::Base
     id = params[:id]
     sport = Group.find(id)
     sport_name = sport.name.gsub(" ", "_")
-    puts File.dirname(__FILE__)
 
     photo = params[:imageUpload][:tempfile].read
     # path = Pathname.new('../public/' + sport_name + ".txt")
@@ -977,44 +1125,90 @@ class HoltonHubApp < Sinatra::Base
     File.open(path, 'wb') do |f|
       f.write(photo)
     end
-    # if params[:imageFile]
-    #   filename = params[:imageFile][:filename] 
-    #   puts filename
-    #   file = params[:imageFile][:tempfile]
-    #   puts "foundfile"
-    #   File.open(File.join("./public/clubs", params[:club_name].to_s + File.extname(filename)), 'wb') do |f|
-    #   #File.open(File.join("/public/clubs/", filename), 'wb') do |f|
-    #     f.write (file.read)
-    #   end
-    # end
-    # photo.write_to_file '/public/' + sport_name + ".jpg"
     redirect '/all_sports/' + sport_name
   end
 
-  get '/all_clubs/:club_name/editclub' do
+  get '/all_clubs/:club_name/edit' do
     verify_user
-    groupname=params["club_name"].downcase.gsub("_"," ")
-    @updatepath="/my_clubs/"+params[:club_name].to_s+"/update_club"
-    @imagepath=params["club_name"]+".jpg"
-    @groupedit=Group.find_by(name: groupname)
-    erb :edit_clubs
+    groupname=params["club_name"].downcase
+    @updatepath="/update_club?name="+params[:club_name].to_s
+    @groupedit=Group.find_by(name: groupname.gsub("_"," "))
+    
+    @images = {}
+    n = 1
+    image_exists = File.file?(File.dirname(__FILE__) + '/public/clubs/'+ groupname + n.to_s + '.jpg')
+    
+    while image_exists
+      @images[n] = '/clubs/'+ groupname + n.to_s + '.jpg'
+      n += 1
+      image_exists = File.file?(File.dirname(__FILE__) + '/public/clubs/'+ groupname + n.to_s + '.jpg') #checks if file exists
+    end
+    erb :"groups/edit_club_page"
   end
 
-  post '/all_clubs/:club_name/update_club' do 
-    if params[:imageFile]
-      filename = params[:imageFile][:filename] 
-      puts filename
-      file = params[:imageFile][:tempfile]
-      puts "foundfile"
-      File.open(File.join("./public/clubs", params[:club_name].to_s + File.extname(filename)), 'wb') do |f|
-      #File.open(File.join("/public/clubs/", filename), 'wb') do |f|
-        f.write (file.read)
+  post '/update_club' do 
+    groupname=params["name"].downcase.gsub("_"," ")
+    groupedit=Group.find_by(name: groupname)
+    #if they are totally SUBMITTED
+    if params[:commit] == "submit" 
+      groupedit.update(description: params["description"].strip) #commits descript 
+      if params[:imageFile] #adds a new image file if necessary
+        photo = params[:imageFile][:tempfile].read
+        image_exists = true
+        n = 0
+        while image_exists
+          n += 1
+          # puts File.file?(File.dirname(__FILE__) + '/public/clubs/'+params[:name] + n.to_s + '.jpg')
+          image_exists = File.file?(File.dirname(__FILE__) + '/public/clubs/'+params[:name] + n.to_s + '.jpg') #checks if file exists
+        end
+        
+        path = File.dirname(__FILE__) + '/public/clubs/'+params[:name] + n.to_s + '.jpg'
+        File.open(path, 'wb') do |f|
+          f.write(photo)
+        end
       end
+      redirect "/all_clubs/" + params["name"]
+    # for previewing images & adding multiple
+    elsif params[:commit] == "preview"
+      club_name = params[:name].gsub("_", " ")
+      club = Group.find_by(name: club_name)
+
+      if params[:imageFile]
+        photo = params[:imageFile][:tempfile].read
+        image_exists = true
+        n = 0
+        while image_exists #finds last image in line and appends a new one
+          n += 1
+          puts File.file?(File.dirname(__FILE__) + '/public/clubs/'+params[:name] + n.to_s + '.jpg')
+          image_exists = File.file?(File.dirname(__FILE__) + '/public/clubs/'+params[:name] + n.to_s + '.jpg') #checks if file exists
+        end
+        
+        path = File.dirname(__FILE__) + '/public/clubs/'+params[:name] + n.to_s + '.jpg'
+        File.open(path, 'wb') do |f|
+          f.write(photo)
+        end
+      end
+      redirect "/all_clubs/" + params["name"] + "/edit"
+    #for deleting photos
+    elsif params[:commit].include? "delete" #if the action is to delete
+      puts params[:commit]
+      n = params[:commit].sub("delete", "").to_i #first strip to which photo number we're deleting
+      #sets image exists to true for the image we're trying to delete
+      image_exists = File.file?(File.dirname(__FILE__) + '/public/clubs/'+ params[:name]+ (n+1).to_s + '.jpg')
+      while image_exists
+        current_img = File.open(File.dirname(__FILE__) + '/public/clubs/'+ params[:name]+ n.to_s + '.jpg')
+        replacement_img = File.open(File.dirname(__FILE__) + '/public/clubs/'+ params[:name]+ (n+1).to_s + '.jpg')
+        File.open(current_img, 'wb') do |f|
+          f.write(File.read(replacement_img))
+        end
+        n+=1 #looks for the next image in line to replace it with 
+        #stops once the next image does not exist
+        next_img = File.dirname(__FILE__) + '/public/clubs/'+ params[:name]+ (n+1).to_s + '.jpg'
+        image_exists = File.file?(next_img)
+      end
+      File.delete(File.dirname(__FILE__) + '/public/clubs/'+ params[:name]+ (n).to_s + '.jpg')
+      redirect "/all_clubs/" + params["name"] + "/edit"
     end
-    groupname=params["club_name"].downcase.gsub("_"," ")
-    @groupedit=Group.find_by(name: groupname)
-    @groupedit.update(description: params["description"].strip) 
-    redirect "/my_clubs/" + params[:club_name] + "/editclub"
   end 
 
   get '/meetings' do 
@@ -1038,14 +1232,14 @@ class HoltonHubApp < Sinatra::Base
 
     @meetings = @meetings.sort_by {|meeting| meeting.event_date}
 
-    erb :meetings
+    erb :"groups/meetings"
   end
 
   get '/meetings/edit' do
     verify_user
     @meeting = GroupMeeting.find_by(id: params[:id])
     if GroupLeader.find_by(group_id: @meeting.group_id, student_id: @active_user.id) != nil
-      erb :edit_meeting
+      erb :"groups/edit_meeting"
     else
       erb :error
     end
