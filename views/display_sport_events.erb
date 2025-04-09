@@ -1,0 +1,36 @@
+
+<div class="container">
+    <h1> Upcoming Sport Events:</h1>  
+    <div class="row">
+    <% @allgames.each do |game| %>
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <% @team=Group.find_by(id: game.team_id)%>
+                        <h5 class="sport-team"> <%= @team.name.titleize %> </h5>
+                    <p class="card-text"> <%=game.name %></p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Date: <%=game.date.strftime("%B %-d, %Y") %></li>
+                    <li class="list-group-item">Time: <%=game.date.strftime("%H:%M %P") %></li>
+                    <li class="list-group-item">Details: <%=game.details %></li>
+                    <li class="list-group-item">Status: 
+                        <% if game.status == true %>
+                            On time
+                        <% else %>
+                            Canceled
+                        <% end %>
+                    </li>
+                    <li class="list-group-item">Advantage:
+                        <% if game.advantage == true %>
+                            Home
+                        <% else %>
+                            Away
+                        <% end %>
+                    </li> 
+                </ul>
+            </div>
+        </div>
+    <% end %>
+    </div>
+</div>

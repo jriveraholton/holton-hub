@@ -687,6 +687,12 @@ class HoltonHubApp < Sinatra::Base
     @groupedit.update(description: params["description"].strip) 
     redirect "/my_clubs/" + params[:club_name] + "/editclub"
   end 
+
+  get '/sport_events' do
+    verify_user 
+    @allgames=Game.where("date>=?", Date.today)
+    erb :display_sport_events
+  end 
   ##########################################
 end
 

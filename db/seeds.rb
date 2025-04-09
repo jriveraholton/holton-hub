@@ -79,3 +79,8 @@ GroupMessagetag.create(group_id: debate.id, messagetag_id: debate_tag.id)
 GroupMessagetag.create(group_id: soccer.id, messagetag_id: soccer_tag.id)
 GroupMessagetag.create(group_id: cheese.id, messagetag_id: cheese_tag.id)
 GroupMessagetag.create(group_id: softball.id, messagetag_id: soft_tag.id)
+
+Game.create(name:"soccermatch", team_id: soccer.id, date: DateTime.new(2025, 3, 14, 4, 15), advantage: true, home_score: 2, away_score: 0, result: "win")
+Game.create(name:"soccermatch2", team_id: soccer.id, date: DateTime.new(2025, 4, 17, 4, 15), details: "Opponent", status: true, advantage: false)
+Game.create(name:"soccermatch3", team_id: soccer.id, date: DateTime.new(2025, 4, 15, 4, 15), details: "Opponent", status: false, advantage: true)
+Game.create(name:"softballgame", team_id: softball.id, date: DateTime.new(2025, 5, 5, 4, 15), details: "Opponent", status: true,  advantage: true)
