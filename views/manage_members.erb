@@ -1,0 +1,124 @@
+<!-- Notes to myself: -->
+<!-- On the other half of the page have a way to demote club leaders to just club members, and make a "are you sure" pop up-->
+<!--then if they need to be completely removed, they can be removed from that side-->
+
+<!-- make sure it does not crash if there are no members or leaders -->
+<!-- make a are you sure popup -->
+
+
+<!-- need to find out how to make two diff buttons go to two diff pages, current thing not working -->
+
+
+<div class="container">
+    <div class="row mb-3 align-items-end">
+        <div class="col-md-12">
+            <% link = "" %>
+            <%if @current_group.group_type == "club"%>
+                <% link = "/all_clubs/" + @current_group.name.gsub(" ", "_") %>
+            <%elsif @current_group.group_type == "sport"%>
+                <% link = "/all_sports/" + @current_group.name.gsub(" ", "_") %>
+            <%else%>
+                <% link = "/error" %>
+            <%end%>
+
+            <a href=<%=link%> class="btn btn-outline-secondary" role="button">Return to Group Page <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-return-left" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5"/>
+            </svg></a>
+
+            <h1 class="text-center"> Manage Current Group Members and Leaders</h1>
+            <hr> 
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Manage Members</h3>
+            <form id="member_form" method="post" action="/managing_members/<%=@current_group.name.gsub(' ', '_')%>">
+                <input type="text" id="member_input" onkeyup="myFunction('member_table', 'member_input')" placeholder="Search for names...">
+                <br>
+                <table id="member_table">
+                    <%if @members != nil %>
+                        <% @members.each do |member| %>
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="<%= member.lastname%>, <%= member.firstname%>" id="<%= member.lastname + member.firstname%>" name="user[]">
+                                        <label class="form-check-label" for="<%= member.lastname + member.firstname%>">
+                                            <%= member.lastname%>, <%= member.firstname%>
+                                        </label>
+                                        </input>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% end %>
+                    <%else%>
+                        <p>There are no current members in this club</p>
+                    <%end%>
+                </table>
+                <br>
+                <button name="task" value="promote" type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to promote these members?')">Make selected users into leaders</button>
+                <br>
+                <br>
+                <button name="task" value="remove" type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to remove these members?')">Remove selected users from group</button>
+                <br>
+            </form>
+        </div>
+
+        <div class="col-md-6">
+            <h3>Manage Leaders</h3>
+            <form id="leader_form" method="post" action="/managing_leaders/<%=@current_group.name.gsub(' ', '_')%>">
+                <input type="text" id="member_input" onkeyup="myFunction('member_table', 'member_input')" placeholder="Search for names...">
+                <br>
+                <table id="leader_table">
+                    <%if @leaders != nil %>
+                        <% @leaders.each do |leader| %>
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="<%= leader.lastname%>, <%= leader.firstname%>" id="<%= leader.lastname + leader.firstname%>" name="user[]">
+                                        <label class="form-check-label" for="<%= leader.lastname + leader.firstname%>">
+                                            <%= leader.lastname%>, <%= leader.firstname%>
+                                        </label>
+                                        </input>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% end %>
+                    <%else%>
+                        <p>There are no current leaders in this club</p>
+                    <%end%>
+                </table>
+                <br>
+                <button name="task" value="demote" type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to demote these leaders?')">Make selected users regular group members</button>
+                <br>
+                <br>
+                <button name="task" value="remove" type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to remove these leaders?')">Remove selected users from group</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+function myFunction(tableName, tableId) {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById(tableId);
+  filter = input.value.toUpperCase();
+  table = document.getElementById(tableName);
+  tr = table.getElementsByTagName("tr");
+
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+</script>

@@ -745,29 +745,104 @@ class HoltonHubApp < Sinatra::Base
   get '/all_clubs/:club_name' do
     verify_user
     club = params[:club_name]
-    
     underscore = "_"
     club.gsub!(underscore, " ")
     club.downcase!
     @current_group = Group.find_by(name: club)
-    if @current_group.active and @current_group.group_type == "club"
+    if @current_group.active == true and @current_group.group_type == "club"
       @club_members = []
       @club_leaders = []
       members = GroupMember.where(group_id: @current_group.id)
       leaders = GroupLeader.where(group_id: @current_group.id)
       members.each do |gm|
         student = Student.find_by(id: gm.student_id)
-        user = User.find_by(id: student.user_id)
-        @club_members << user
+        @club_members << User.find_by(id: student.user_id)
       end
       leaders.each do |gl|
-        @club_leaders << Student.find_by(id: gl.student_id)
+        student = Student.find_by(id: gl.student_id)
+        @club_leaders << User.find_by(id: student.user_id)
+      end
+
+      all_meetings = GroupMeeting.where(group_id: @current_group.id)
+      puts all_meetings
+      @meetings = []
+      all_meetings.each do |meeting|
+        if meeting.event_date > Time.now()
+          @meetings.push(meeting)
+        end
+        @meetings = @meetings.sort_by {|meeting| meeting.event_date}
       end
       erb :club_page
     else
       erb :error
     end
   end
+
+  get '/all_clubs/:club_name/manage_members' do
+    verify_user
+    club = params[:club_name].gsub!("_", " ")
+    @current_group = Group.find_by(name: club)
+
+    if GroupMember.where(group_id: @current_group.id) != nil
+      @members = User.where(id: (Student.where(id: GroupMember.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
+    end
+    if GroupLeader.where(group_id: @current_group.id) != nil
+      @leaders = User.where(id: (Student.where(id: GroupLeader.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
+    end
+
+    erb :manage_members
+  end
+
+  post '/managing_members/:group_name' do
+    group = params['group_name'].gsub!('_', " ")
+    group.downcase!
+    @current_group = Group.find_by(name: group)
+    selected_users = params[:user]
+    students = Student.all()
+
+    if selected_users != nil
+      selected_users.each do |st|
+        split_name = st.split(", ")
+        member = GroupMember.find_by(student_id: Student.find_by(user_id: User.find_by(firstname: split_name[1], lastname: split_name[0]).id).id, group_id: @current_group.id)
+        if member != nil
+          member.destroy
+        end
+
+        if params[:task] == "promote"
+          GroupLeader.create(student_id: Student.find_by(user_id: User.find_by(firstname: split_name[1], lastname: split_name[0]).id).id, group_id: @current_group.id)
+        end
+      end
+    end  
+
+    redirect '/all_clubs/' + params['group_name'].to_s.gsub(" ", "_") + '/manage_members'
+  end
+
+  post '/managing_leaders/:group_name' do
+    group = params['group_name'].gsub!('_', " ")
+    group.downcase!
+    @current_group = Group.find_by(name: group)
+    selected_users = params[:user]
+    students = Student.all()
+
+    if selected_users != nil
+      selected_users.each do |st|
+        split_name = st.split(", ")
+        leader = GroupLeader.find_by(student_id: Student.find_by(user_id: User.find_by(firstname: split_name[1], lastname: split_name[0]).id).id, group_id: @current_group.id)
+        if leader != nil
+          leader.destroy
+        end
+
+        if params[:task] == "demote"
+          puts params[:task]
+          GroupMember.create(student_id: Student.find_by(user_id: User.find_by(firstname: split_name[1], lastname: split_name[0]).id).id, group_id: @current_group.id)
+        end
+      end
+    end  
+
+    redirect '/all_clubs/' + params['group_name'].to_s.gsub(" ", "_") + '/manage_members'
+  end
+
+
 
   get '/all_sports/:sport_name' do
     verify_user
