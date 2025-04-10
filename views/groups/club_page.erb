@@ -8,8 +8,6 @@
             <hr> 
         </div>
     </div>
-
-
         <div class="row">
             <div class="col-md-6">
                 <h3>Description:</h3>
@@ -93,13 +91,13 @@
 
             <div class="col-md-6">
                 <h3>Manage Club:</h3>
-                <a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/add_member" class="btn btn-primary mx-auto" role="button">Add Members</a>    
+                <a href="/add_to_clubs/<%= @current_group.name.gsub(" ", "_") %>" class="btn btn-primary mx-auto" role="button">Add Members</a>    
                 <br>
                 <br>
                 <a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/manage_members" class="btn btn-primary mx-auto" role="button">Manage Members</a>
                 <br>
                 <br>
-                <a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/editclub" class="btn btn-primary mx-auto" role="button">Edit Club</a>
+                <a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/edit" class="btn btn-primary mx-auto" role="button">Edit Club</a>
                 <br>
                 <br>
                 <% if GroupLeader.find_by(group_id: @current_group.id, student_id: @active_user.id) %>
