@@ -114,10 +114,12 @@ h1 {
 	margin-bottom: -10px;
 	
 }
-/* tr {
-	background-color: #fff;
-	color: navy;
-} */
+
+.club-img {
+	height: 50vh;
+	width: auto;
+	margin: 0 auto;
+}
 tr.strike {
 	text-decoration: line-through;
 }

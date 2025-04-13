@@ -49,8 +49,8 @@
             <tr>
               <td>
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value=<%= String(sophomore[:id]) %> id=<%= String(sophomore[:id]) %> name="student_leader[]">
-                  <label class="form-check-label" for=<%= String(sophomore[:id]) %>><%= String(sophomore[:first] + " " + sophomore[:last]) %></label>
+                  <input class="form-check-input" type="checkbox" value=<%= sophomore.id %> id=<%= sophomore.id %> name="student_leader[]">
+                  <label class="form-check-label" for=<%= sophomore.id %>><%= sophomore.firstname + " " + sophomore.lastname %></label>
                 </div>
               </td>
             </tr>
@@ -66,8 +66,8 @@
             <tr>
               <td>
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value=<%= String(junior[:id]) %> id=<%= String(junior[:id]) %> name="student_leader[]">
-                  <label class="form-check-label" for=<%= String(junior[:id]) %>><%= String(junior[:first] + " " + junior[:last]) %></label>
+                  <input class="form-check-input" type="checkbox" value=<%= junior.id %> id=<%= junior.id %> name="student_leader[]">
+                  <label class="form-check-label" for=<%= junior.id %>><%= junior.firstname + " " + junior.lastname %></label>
                 </div>
               </td>
             </tr>
@@ -84,8 +84,8 @@
             <tr>
               <td>
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value=<%= String(senior[:id]) %> id=<%= String(senior[:id]) %> name="student_leader[]">
-                  <label class="form-check-label" for=<%= String(senior[:id]) %>><%= String(senior[:first] + " " + senior[:last]) %></label>
+                  <input class="form-check-input" type="checkbox" value=<%= senior.id %> id=<%= senior.id %> name="student_leader[]">
+                  <label class="form-check-label" for=<%= senior.id %>><%= senior.firstname + " " + senior.lastname %></label>
                 </div>
               </td>
             </tr>

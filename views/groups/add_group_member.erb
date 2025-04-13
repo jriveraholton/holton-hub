@@ -14,7 +14,7 @@
               			<td>
 							<div class="form-check">
 								<input class="form-check-input" type="checkbox" value="<%= st.lastname%>, <%= st.firstname%>" id="<%= st.lastname + st.firstname%>" name="user[]"
-								<% if GroupLeader.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>>
+								<% if GroupMember.find_by(student_id: st.id, group_id: @current_group.id) != nil or GroupLeader.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>>
 									<label class="form-check-label" for="<%= st.lastname + st.firstname%>">
 										<%= st.lastname%>, <%= st.firstname%>
 									</label>
@@ -38,8 +38,7 @@
               			<td>
 							<div class="form-check">
 								<input class="form-check-input" type="checkbox" value="<%= st.lastname%>, <%= st.firstname%>" id="<%= st.lastname + st.firstname%>" name="user[]"
-								<% if GroupMember.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>
-								<% if GroupLeader.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>>
+								<% if GroupMember.find_by(student_id: st.id, group_id: @current_group.id) != nil or GroupLeader.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>>
 									<label class="form-check-label" for="<%= st.lastname + st.firstname%>">
 										<%= st.lastname%>, <%= st.firstname%>
 									</label>
@@ -62,8 +61,7 @@
               			<td>
 							<div class="form-check">
 								<input class="form-check-input" type="checkbox" value="<%= st.lastname%>, <%= st.firstname%>" id="<%= st.lastname + st.firstname%>" name="user[]"
-								<% if GroupMember.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>
-								<% if GroupLeader.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>>
+								<% if GroupMember.find_by(student_id: st.id, group_id: @current_group.id) != nil or GroupLeader.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>>
 									<label class="form-check-label" for="<%= st.lastname + st.firstname%>">
 										<%= st.lastname%>, <%= st.firstname%>
 									</label>
@@ -85,8 +83,7 @@
               			<td>
 							<div class="form-check">
 								<input class="form-check-input" type="checkbox" value="<%= st.lastname%>, <%= st.firstname%>" id="<%= st.lastname + st.firstname%>" name="user[]"
-								<% if GroupMember.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>
-								<% if GroupLeader.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>>
+								<% if GroupMember.find_by(student_id: st.id, group_id: @current_group.id) != nil or GroupLeader.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>>
 									<label class="form-check-label" for="<%= st.lastname + st.firstname%>">
 										<%= st.lastname%>, <%= st.firstname%>
 									</label>
@@ -99,7 +96,7 @@
 		</div>
 		
 	</div>
-	<button type="submit" class="btn btn-primary">Add to Club</button>
+	<button type="submit" class="btn btn-primary">Add to Group</button>
 	</form>
 </div>
 

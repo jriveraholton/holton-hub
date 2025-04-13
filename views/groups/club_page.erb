@@ -10,7 +10,7 @@
     </div>
 
 
-        <div class="row">
+        <div class="row mb-3">
             <div class="col-md-6">
                 <h3>Description:</h3>
                 <p><%= @current_group.description %> </p>
@@ -22,20 +22,17 @@
                     <% end %>
                 </p>
             </div>
-            
+            <% if not @images.empty? %>
             <div class="col-md-6">
                 <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
-                        <div class="carousel-item active">
-                        <img src="..." class="d-block w-100" alt="...">
-                        </div>
-                        <div class="carousel-item">
-                        <img src="..." class="d-block w-100" alt="...">
-                        </div>
-                        <div class="carousel-item">
-                        <img src="..." class="d-block w-100" alt="...">
-                        </div>
+                        <% @images.each do |n, img| %>
+                            <div class="carousel-item <%= n == 1 ? 'active' : ''%>">
+                            <img src="<%= img %>" class="d-block club-img " alt="...">
+                            </div>
+                        <% end %>
                     </div>
+                    <% if @images.count > 1 %>
                     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Previous</span>
@@ -44,14 +41,16 @@
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Next</span>
                     </button>
+                    <% end %>
                 </div>
             </div>
+            <% end %>
         </div>
 
-        <div class="row">
+        <div class="row mb-3">
             <h3>Club Meetings:</h3>
         </div>
-        <div class="row">
+        <div class="row mb-3">
             <% if @meetings != nil %>
                 <% @meetings.each do |meeting| %>
                     <div class="col-md-4 col-lg-3 mb-3">
@@ -83,8 +82,8 @@
     <br>
     <hr>
     <% if GroupLeader.find_by(group_id: @current_group.id, student_id: @active_user.id) != nil or @active_user.is_admin%>
-        <div class="row">
-            <div class="col-md-6">
+        <div class="row mb-3">
+            <div class="col-md-6 mb-3">
                 <h3>Club Members:</h3>
                 <% @club_members.each do |st| %>
                     <%= st.lastname + ", " + st.firstname %> <br>
@@ -99,9 +98,10 @@
                 <a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/manage_members" class="btn btn-primary mx-auto" role="button">Manage Members</a>
                 <br>
                 <br>
-                <a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/editclub" class="btn btn-primary mx-auto" role="button">Edit Club</a>
+                <a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/edit" class="btn btn-primary mx-auto" role="button">Edit Club Page</a>
                 <br>
                 <br>
+                
                 <% if GroupLeader.find_by(group_id: @current_group.id, student_id: @active_user.id) %>
                     <a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/add_meeting" class="btn btn-primary mx-auto" role="button">Add Meeting</a>    
                 <% end%>
