@@ -1,55 +1,27 @@
 <div id="planner" class="carousel slide">
 <div class="container">
-<table class="table align-middle table-hover table-bordered border-primary">
-  <thead>
-    <tr>
-      <th scope="col">Time</th>
-      <th scope="col">1/9/25: Blue Thursday</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">8:00-8:15</th>
-      <td>Assembly</td>
-    </tr>
-    <tr>
-      <th scope="row">8:15-9:05</th>
-      <td>U1</td>
-    </tr>
-    <tr>
-      <th scope="row">9:10-10:00</th>
-      <td>U2</td>
-    </tr>
-    <tr>
-        <th scope="row">10:05-10:55</th>
-        <td>U4</td>
-    </tr>
-    <tr>
-        <th scope="row">10:55-11:15</th>
-        <td>Break</td>
-    </tr>
-    <tr>
-        <th scope="row">11:15-12:05</th>
-        <td>U5</td>
-    </tr>
-    <tr>
-        <th scope="row">12:10-1:00</th>
-        <td>U7</td>
-    </tr>
-    <tr>
-        <th scope="row">1:00-1:50</th>
-        <td>Lunch</td>
-    </tr>
-    <tr>
-        <th scope="row">1:50-2:40</th>
-        <td>Afternoon Assembly</td>
-    </tr>
-    <tr>
-        <th scope="row">2:45-3:30</th>
-        <td>U9</td>
-    </tr>
-  </tbody>
-</table>
+<%@all_days.each do |schedule|%>
+  <table class="table align-middle table-hover table-bordered border-primary">
+    <thead>
+      <tr>
+        <th scope="col">Time</th>
+        <th scope="col">Day <%=schedule["day"]%> - <%=schedule["week_color"].titleize%> <%=schedule["day_of_week"].titleize%></th>
+      </tr>
+    </thead>
+    <tbody> 
+      <%schedule["blocks"].each do |block| %> 
+        <tr>
+        <td>
+          <%=block.start.strftime("%k:%M")%> - 
+          <%time = block.start + block.duration*60%> 
+          <%=time.strftime("%k:%M")%> 
+        </td>
+        <td><%=block.description%></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<%end%>
 
 <div class="modal fade" id="exampleModalToggle" aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
@@ -163,10 +135,10 @@
 </div>
 </div>
 </div>
-<% if @fac_member == true  %> 
+<% if @active_user.is_admin == true  %> 
   <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Edit Schedule</button>
-  <a href="https://holtonhub.org/edit_schedule">
-  <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Upload Schedule</button>
+  <a href="/edit_schedule">
+    <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Upload Schedule</button>
   </a>
 <% end %> 
 

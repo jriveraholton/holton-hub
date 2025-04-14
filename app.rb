@@ -344,6 +344,23 @@ class HoltonHubApp < Sinatra::Base
     else
       @fac_member = false 
     end
+    @all_days = [] 
+    for i in 1..10 
+      ds = DailySchedule.find_by(day: i) 
+      if ds != nil 
+        schedule = {"blocks" => []}
+        schedule["day"] = i
+        schedule["day_of_week"] = ds.day_of_the_week 
+        schedule["week_color"] = ds.week_type
+        schedule["date"] = ds.date_of 
+        blocks = DailyScheduleScheduleBlock.where(dailyschedule_id: ds.id)
+        blocks.each do |b|
+          period = ScheduleBlock.find_by(id: b.block_id) 
+          schedule["blocks"] << period 
+        end
+        @all_days << schedule 
+      end 
+    end
     erb :day_schedule
   end
 
@@ -395,21 +412,20 @@ class HoltonHubApp < Sinatra::Base
     lines.each do |line| 
       data = line.split(",")
       if data[3] == "US"
-        description = data[1]
-        day1_time = data[11,12] #blue 
-        day2_time = data[13,14] #blue 
-        day3_time = data[15.16] #blue 
-        day4_time = data[17,18] #blue 
-        day5_time = data[19,20] #blue 
-        day6_time = data[21,22] #white 
-        day7_time = data[23,24] #white 
-        day8_time = data[25,26] #white 
-        day9_time = data[27,28] #white 
-        day10_time = data[29,30] #white  
+       p description = data[1] 
+       day_time = data[11..30]
+       day_time.each_slice(2) do |start, finish|
+        if start != "" 
+          p start = start.to_time
+          p finish = finish.to_time 
+          duration = (finish - start)/60
+          p "time difference: " + duration.to_s 
+        end
+       end
       end
     end
     redirect '/today'
-  end
+  end 
   
   get '/all_clubs' do
     verify_user
