@@ -32,8 +32,22 @@ body.white-user {
 	background-color:white;
 }
 
+.table.blue-user {
+	--bs-table-color:aliceblue;
+	--bs-emphasis-color:aliceblue;
+}
+
 .dropdown.blue-user .dropdown-item {
 	--bs-dropdown-link-hover-color:navy;
+}
+
+.sched.carousel-control-prev {
+	margin-left: -10%;
+}
+
+
+.sched.carousel-control-next {
+	margin-right:-10%;
 }
 
 .form-control.blue-user {

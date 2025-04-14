@@ -18,7 +18,7 @@
 				<% if @active_user != nil %>
 				<div class="collapse navbar-collapse" id="navbarNav">
 					<ul class="navbar-nav me-auto">
-						<li class="nav-item dropdown">
+						<li class="nav-item dropdown <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>">
 							<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" href="#">Schedule</a>
 							<ul class="dropdown-menu">
 								<li><a class="dropdown-item" href="/today">Daily Schedule</a></li>
@@ -71,11 +71,13 @@
 		</nav>
 		<%= yield %>
 		<footer>
-			<h1>
-				<br>
-				HOLTON HUB<hr>
-			</h1>
 			<div class="container-fluid text-center">
+				<div>
+					<h1>
+						<br>
+						HOLTON HUB<hr>
+					</h1>
+				</div>
 				<div class="row justify-content-md-center">
 					<div class="col-lg-3">
 						Contact<br><br>
