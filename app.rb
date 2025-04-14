@@ -804,16 +804,6 @@ class HoltonHubApp < Sinatra::Base
     club.downcase!
     @current_group = Group.find_by(name: club)
   
-    # grades = Student.select(:class_of).distinct.order(:class_of)
-    
-    # soph = grades[2].class_of
-    # jun = grades[1].class_of
-    # sen = grades[0].class_of
-
-    # @seniors = User.where(id: Student.where(class_of: sen).select(:user_id)).order(:lastname)
-    # @juniors = User.where(id: Student.where(class_of: jun).select(:user_id)).order(:lastname)
-    # @sophomores = User.where(id: Student.where(class_of: soph).select(:user_id)).order(:lastname)
-    # @freshmen = User.where(id: Student.where.not(class_of: [soph, jun, sen]).select(:user_id)).order(:lastname)
     is_leader = false
     if Student.find_by(user_id: @active_user.id) != nil and GroupLeader.find_by(group_id: @current_group.id, student_id: Student.find_by(user_id: @active_user.id)) != nil
       is_leader = true
@@ -840,28 +830,31 @@ class HoltonHubApp < Sinatra::Base
   get '/all_sports/:sport/add_member' do
     verify_user
     sport = params[:sport]
-    
-    @current_group = Group.find_by(name: sport.gsub("_", " ").downcase)
-    grades = Student.select(:class_of).distinct.sort()
-    
-    soph = grades[2].class_of
-    jun = grades[1].class_of
-    sen = grades[0].class_of
-
-    @seniors = User.where(id: Student.where(class_of: sen).select(:user_id)).order(:lastname)
-    @juniors = User.where(id: Student.where(class_of: jun).select(:user_id)).order(:lastname)
-    @sophomores = User.where(id: Student.where(class_of: soph).select(:user_id)).order(:lastname)
-    @freshmen = User.where(id: Student.where.not(class_of: [soph, jun, sen]).select(:user_id)).order(:lastname)
+    underscore = "_"
+    sport.gsub!(underscore, " ")
+    sport.downcase!
+    @current_group = Group.find_by(name: sport)
+  
     is_leader = false
     if Student.find_by(user_id: @active_user.id) != nil and GroupLeader.find_by(group_id: @current_group.id, student_id: Student.find_by(user_id: @active_user.id)) != nil
       is_leader = true
     end
     if is_leader or @active_user.is_admin
+      @all_students = {}
+      Student.select(:class_of).distinct.order(:class_of).each do |grade|
+        grade = grade.class_of
+        puts "hello"
+        @all_students[grade] = User.where(id: Student.where(class_of: grade).select(:user_id)).order(:lastname) 
+        @all_students[grade].each do |person|
+          puts person.firstname
+        end
+      end
+      # puts @all_students
+      
       erb :"groups/add_group_member"
     else
       erb :error
     end
-    # redirect '/'
   end
 
   post '/adding_members/:club_name' do
