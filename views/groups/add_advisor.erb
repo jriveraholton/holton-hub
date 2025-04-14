@@ -1,0 +1,50 @@
+<div class="container">
+    <div class="row mb-3 align-items-end">
+    <div class="col-auto">
+        <a href="/all_<%= @grp.group_type %>s/<%= @grp.name.gsub(' ', '_')%>" class="btn btn-outline-secondary" role="button"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-return-left" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5"/>
+        </svg></a>
+    </div>
+    <div class="col">
+        <h1>Add <%= @grp.name.titleize %> <%= @grp.group_type == "club" ? 'advisor' : 'coach' %></h1>
+    </div>
+    </div>
+
+    <form action="/delete_advisor?id=<%= @grp.id %>" method="post" enctype="application/x-www-form-urlencoded">
+    <div class="row mb-3">
+        <div class="col-auto">
+        <h2>Current Advisors: </h2>
+        <% if @adv %>
+            <ul style="list-style-type: none;">
+            <% @adv.each do |advisor| %>
+                <li><button class="btn btn-close" style="display: inline;" type="submit" name="commit" value="<%= advisor.id %>"></button> <%= User.find(advisor.user_id).firstname + ' ' + User.find(advisor.user_id).lastname %><br></li>
+            <% end %>
+            </ul>
+        <% else %> 
+        <p>n/a </p>
+        <% end %>
+        </div>
+    </div>
+    </form>
+    <form action="/add_advisor?id=<%= @grp.id %>" method="post" enctype="application/x-www-form-urlencoded">
+    <div class="row mb-3">
+        <div class="col-md-2">
+            <label for="advisors" class="form-label">Add advisor: </label>
+        </div>
+        <div class="col-md-4">
+            <select id="advisors" name="advisors" class="form-select" aria-label="Faculty select">
+                <option selected disabled value>Select</option>
+                <% User.where(id: Facultystaff.all.select(:user_id)).order(:lastname).each do |fac| %>
+                <option value="<%=fac.id %>"><%=fac.lastname + ", " + fac.firstname%></option>
+                <% end %>
+            </select>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-auto">
+            <button type="submit" class="btn btn-outline-success" name="commit" value="repeat">Add Another</button>
+            <button type="submit" class="btn btn-primary" name="commit" value="submit">Submit</button>
+        </div>
+    </div>
+    </form>
+</div>

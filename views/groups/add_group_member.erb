@@ -1,129 +1,42 @@
 <div class="container">
-	<div class="row" >
-		<h2>Students</h2>
-	</div>
-	<form action="/adding_members/<%= @current_group.name.gsub!(" ", "_") %>" method="post">
-	<div class="row">
-		<div class="col-lg-3">
-			<h4>Grade 9:</h4>
-			<input type="text" id="freshmen_input" onkeyup="myFunction('freshmen_table', 'freshmen_input')" placeholder="Search for names...">
-			<table id="freshmen_table">
-				<% if @freshmen %>
-				<% @freshmen.each do |st| %>
-					<tr>
-              			<td>
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox" value="<%= st.lastname%>, <%= st.firstname%>" id="<%= st.lastname + st.firstname%>" name="user[]"
-								<% if GroupLeader.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>>
-									<label class="form-check-label" for="<%= st.lastname + st.firstname%>">
-										<%= st.lastname%>, <%= st.firstname%>
-									</label>
-								</input>
-							</div>
-						</td>
-					</tr>
-				<% end %>
-				<% end %>
-			</table>
-		</div>
-
-
-		<div class="col-lg-3">
-			<h4>Grade 10:</h4>
-			<input type="text" id="sophomore_input" onkeyup="myFunction('sophomore_table', 'sophomore_input')" placeholder="Search for names...">
-			<table id="sophomore_table">
-				<% if @sophomores %>
-				<% @sophomores.each do |st| %>
-					<tr>
-              			<td>
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox" value="<%= st.lastname%>, <%= st.firstname%>" id="<%= st.lastname + st.firstname%>" name="user[]"
-								<% if GroupMember.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>
-								<% if GroupLeader.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>>
-									<label class="form-check-label" for="<%= st.lastname + st.firstname%>">
-										<%= st.lastname%>, <%= st.firstname%>
-									</label>
-								</input>
-							</div>
-						</td>
-					</tr>
-				<% end %>
-				<% end %>
-			</table>
-		</div>
-
-		<div class="col-lg-3">
-			<h4>Grade 11:</h4>
-			<input type="text" id="junior_input" onkeyup="myFunction('junior_table', 'junior_input')" placeholder="Search for names...">
-			<table id="junior_table">
-				<% if @juniors %>
-				<% @juniors.each do |st| %>
-					<tr>
-              			<td>
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox" value="<%= st.lastname%>, <%= st.firstname%>" id="<%= st.lastname + st.firstname%>" name="user[]"
-								<% if GroupMember.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>
-								<% if GroupLeader.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>>
-									<label class="form-check-label" for="<%= st.lastname + st.firstname%>">
-										<%= st.lastname%>, <%= st.firstname%>
-									</label>
-								</input>
-							</div>
-						</td>
-            		</tr>
-				<% end %>
-				<% end %>
-			</table>
-		</div>
-
-		<div class="col-lg-3">
-			<h4>Grade 12:</h4>
-			<input type="text" id="senior_input" onkeyup="myFunction('senior_table', 'senior_input')" placeholder="Search for names...">
-			<table id="senior_table">
-				<% @seniors.each do |st| %>
-					<tr>
-              			<td>
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox" value="<%= st.lastname%>, <%= st.firstname%>" id="<%= st.lastname + st.firstname%>" name="user[]"
-								<% if GroupMember.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>
-								<% if GroupLeader.find_by(student_id: st.id, group_id: @current_group.id) != nil%> checked <%end%>>
-									<label class="form-check-label" for="<%= st.lastname + st.firstname%>">
-										<%= st.lastname%>, <%= st.firstname%>
-									</label>
-								</input>
-							</div>
-						</td>
-            		</tr>
-				<% end %>
-			</table>
-		</div>
-		
-	</div>
-	<button type="submit" class="btn btn-primary">Add to Club</button>
-	</form>
+    
+    <div class="row justify-content-center" >
+        <div class="col-lg-6">
+            <form action="/adding_members/<%= @current_group.name.gsub!(" ", "_") %>" method="post">
+                <div class="accordion" id="usersAccordion">
+                    <% @all_students.each do |group, users| %>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse<%= group %>" aria-expanded="false" aria-controls="flush-collapse<%= group %>">
+                                    <h6>Grade <%= group %> <%="(#{users.length} Users)" %></h6>
+                                </button>
+                            </h2>
+                            <div id="flush-collapse<%= group %>" class="accordion-collapse collapse">
+                                <ul class="list-group" >
+                                    <% users.each do |user| %>
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col" >
+                                                <label class="form-check-label" for="flexCheckDefault">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" value="<%= user.lastname%>, <%= user.firstname%>" id="<%= user.id%>" name="user[]"
+															<% if GroupMember.find_by(student_id: Student.find_by(user_id: user.id).id, group_id: @current_group.id) != nil or GroupLeader.find_by(student_id: Student.find_by(user_id: user.id).id, group_id: @current_group.id) != nil%> checked <%end%>>
+                                                            <label class="form-check-label" for="<%= user.id %>">
+                                                                <%= user.lastname%>, <%= user.firstname%>
+                                                            </label>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    <% end %>
+                                </ul>						
+                            </div>
+                        </div>
+                    <% end %>
+                </div>
+                <button type="submit" class="btn btn-primary">Add to Club</button>
+            </form>
+        </div>
+    </div>
 </div>
-
-
-
-<script>
-function myFunction(tableName, tableId) {
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById(tableId);
-  filter = input.value.toUpperCase();
-  table = document.getElementById(tableName);
-  tr = table.getElementsByTagName("tr");
-
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[0];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-  }
-}
-
-</script>
