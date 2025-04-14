@@ -657,7 +657,8 @@ class HoltonHubApp < Sinatra::Base
     @seniors = []
     all_students = Student.all
     all_users = User.all
-    grades = Student.select(:class_of).distinct.sort()
+    grades = Student.select(:class_of).distinct.order(:class_of)
+    
     soph = grades[2].class_of
     jun = grades[1].class_of
     sen = grades[0].class_of
@@ -813,7 +814,7 @@ class HoltonHubApp < Sinatra::Base
       end
     end
     if is_leader or @active_user.is_admin
-      erb :edit_sport_page
+      erb :add_to_clubs
     else
       erb :error
     end
@@ -827,7 +828,7 @@ class HoltonHubApp < Sinatra::Base
     club.downcase!
     @current_group = Group.find_by(name: club)
   
-    grades = Student.select(:class_of).distinct.sort()
+    grades = Student.select(:class_of).distinct.order(:class_of)
     
     soph = grades[2].class_of
     jun = grades[1].class_of
