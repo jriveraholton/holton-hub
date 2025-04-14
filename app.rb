@@ -945,7 +945,22 @@ class HoltonHubApp < Sinatra::Base
       @leaders = User.where(id: (Student.where(id: GroupLeader.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
     end
 
-    erb :manage_members
+    erb :'groups/manage_members'
+  end
+
+  get '/all_sports/:sport/manage_members' do
+    verify_user
+    grp = params[:sport].gsub!("_", " ")
+    @current_group = Group.find_by(name: grp)
+
+    if GroupMember.where(group_id: @current_group.id) != nil
+      @members = User.where(id: (Student.where(id: GroupMember.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
+    end
+    if GroupLeader.where(group_id: @current_group.id) != nil
+      @leaders = User.where(id: (Student.where(id: GroupLeader.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
+    end
+
+    erb :'groups/manage_members'
   end
 
   post '/managing_members/:group_name' do
@@ -1010,6 +1025,7 @@ class HoltonHubApp < Sinatra::Base
       # puts Student.where(GroupMember.where(group_id: @current_group.id).select(:student_id)
       @roster = User.where(id: (Student.where(id: GroupMember.where(group_id: @current_group.id).select(:student_id)).select(:user_id))).order(firstname: :asc)
       @coaches = User.where(id: (Facultystaff.where(id: GroupAdvisor.where(group_id: @current_group.id).select(:facultystaff_id)).select(:user_id))).order(firstname: :asc)
+      @captains = User.where(id: (Student.where(id: GroupLeader.where(group_id: @current_group.id).select(:student_id)).select(:user_id))).order(firstname: :asc)
       @leader = @active_user.is_admin or GroupLeader.find_by(group_id: @current_group.id, student_id: Student.find_by(user_id: active_user.id).id).exist? or GroupAdvisor.find_by(group_id: @current_group.id, facultystaff_id: Facultystaff.find_by(user_id: active_user.id).id).exist?
       @wins = 0
       @losses = 0
