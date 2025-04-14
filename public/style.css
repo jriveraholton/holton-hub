@@ -135,6 +135,10 @@ tr.strike {
 	
 } 
 
+.del_advisor:hover + .advisor {
+	text-decoration: line-through;
+	font-style: italic;
+}
 .search-field {
 	width:80%;
 }

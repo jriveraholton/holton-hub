@@ -891,7 +891,9 @@ class HoltonHubApp < Sinatra::Base
       @club_members = User.where(id: Student.where(id: GroupMember.where(group_id: @current_group.id).select(:student_id)).select(:user_id)).order(:class_of, :lastname)
       @club_leaders = User.where(id: Student.where(id: GroupLeader.where(group_id: @current_group.id).select(:student_id)).select(:user_id)).order(class_of: :asc, lastname: :desc)
       leaders = GroupLeader.where(group_id: @current_group.id)
- 
+      if GroupAdvisor.where(group_id: @current_group.id) != nil
+        @adv = User.where(id: Facultystaff.where(id: GroupAdvisor.where(group_id: @current_group.id).select(:facultystaff_id)).select(:user_id))
+      end
       all_meetings = GroupMeeting.where(group_id: @current_group.id)
       puts all_meetings
       @meetings = []
@@ -1015,6 +1017,85 @@ class HoltonHubApp < Sinatra::Base
     else
       erb :error
     end
+  end
+
+  get '/all_clubs/:name/add_advisor' do
+    verify_user
+    grp_name = params[:name].gsub("_", " ")
+    @grp = Group.find_by(name: grp_name)
+    # is_leader = Student.find_by(user_id: @active_user.id) != nil and GroupLeader.find_by(group_id: @grp.id, student_id: Student.find_by(user_id: @active_user.id).id) != nil
+    is_leader = false
+    if Student.find_by(user_id: @active_user.id) != nil and GroupLeader.find_by(group_id: @grp.id, student_id: Student.find_by(user_id: @active_user.id).id) != nil
+      is_leader = true
+    end
+    is_advisor = false
+    if Facultystaff.find_by(user_id: @active_user.id) != nil and GroupAdvisor.find_by(group_id: @grp.id, facultystaff_id: Facultystaff.find_by(user_id: @active_user.id).id) != nil
+      is_advisor = true
+    end 
+    if @active_user.is_admin or is_leader or is_advisor
+      @adv = Facultystaff.where(id: GroupAdvisor.where(group_id: @grp.id).order(:id).select(:facultystaff_id))
+      erb :"groups/add_advisor"
+    else
+      erb :error
+    end
+  end
+
+  get '/all_sports/:name/add_coach' do
+    verify_user
+    grp_name = params[:name].gsub("_", " ")
+    @grp = Group.find_by(name: grp_name)
+    is_leader = Student.find_by(user_id: @active_user.id) != nil and GroupLeader.find_by(group_id: @grp.id, student_id: Student.find_by(user_id: @active_user.id).id)
+    is_advisor = Facultystaff.find_by(user_id: @active_user.id) != nil and GroupAdvisor.find_by(group_id: @grp.id, facultystaff_id: Facultystaff.find_by(user_id: @active_user.id).id)
+    if @active_user.is_admin or is_leader or is_advisor
+      @adv = Facultystaff.where(id: GroupAdvisor.where(group_id: @grp.id).order(:id).select(:facultystaff_id))
+      erb :"groups/add_advisor"
+    else
+      erb :error
+    end
+  end
+
+  post '/add_advisor' do
+    grp = Group.find_by(id: params[:id])
+    # adv = User.find_by(id: params[:advisors].to_i)
+    
+    if params[:commit] == "repeat"
+      if params[:advisors]
+        fac = Facultystaff.find_by(user_id: params[:advisors].to_i)
+        if GroupAdvisor.find_by(group_id: grp.id, facultystaff_id: fac.id) == nil
+          GroupAdvisor.create(group_id: grp.id, facultystaff_id: fac.id)
+        end
+      end
+      if grp.group_type == "club"
+        adv = "advisor"
+      else
+        adv = "coach"
+      end
+      redirect '/all_' + grp.group_type + 's/' + grp.name.gsub(" ", "_") + '/add_' + adv
+    elsif params[:commit] == "submit"
+      if params[:advisors]
+        fac = Facultystaff.find_by(user_id: params[:advisors].to_i)
+        if GroupAdvisor.find_by(group_id: grp.id, facultystaff_id: fac.id) == nil
+          GroupAdvisor.create(group_id: grp.id, facultystaff_id: fac.id)
+        end
+      end
+      redirect '/all_' + grp.group_type + 's/' + grp.name.gsub(" ", "_")
+    elsif params[:commit].include? "delete" #if the action is to delete
+      n = params[:commit].sub("delete", "").to_i
+      GroupAdvisor.find_by(facultystaff_id: n, group_id: grp.id).destroy
+      redirect '/all_' + grp.group_type + 's/' + grp.name.gsub(" ", "_") + '/add_advisor'
+    end
+  end
+
+  post '/delete_advisor' do
+    grp = Group.find_by(id: params[:id])
+    n = params[:commit].to_i
+    GroupAdvisor.find_by(facultystaff_id: n, group_id: grp.id).destroy
+    if grp.group_type == "club"
+      adv = "advisor"
+    else
+      adv = "coach"
+    end
+    redirect '/all_' + grp.group_type + 's/' + grp.name.gsub(" ", "_") + '/add_' + adv
   end
 
   get '/all_clubs/:name/add_meeting' do

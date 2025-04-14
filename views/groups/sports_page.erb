@@ -38,7 +38,7 @@
             <div id="rosterid" class="tab-pane" role="tab"> 
                 <%if @leader %>
                 <a href="/all_sports/<%=@current_group.name.gsub(" ", "_")%>/add_member" class="btn btn-primary mt-3 mb-3 me-3">Add Player</a> 
-                <a href="/all_sports/<%=@current_group.name.gsub(" ", "_")%>/add_coach" class="btn btn-primary mt-3 mb-3">Add Coach</a>
+                <a href="/all_sports/<%=@current_group.name.gsub(" ", "_")%>/add_coach" class="btn btn-primary mt-3 mb-3">Edit Coaches</a>
                 <% end %>
                 <table class="table table-primary table-bordered table-striped">
                     <thead>
@@ -46,14 +46,14 @@
                             <th scope="col">Coaches</th>
                         </tr>
                     </thead>
-                        <tbody class="table-group-divider">
-                            <% @coaches.each do |coach| %>
-                                <%  %> 
-                            <tr>
-                                <td><%=coach.firstname + " " + stu.lastname%></td>
-                            </tr>
-                            <% end %>
-                        </tbody>
+                    <tbody class="table-group-divider">
+                        <% @coaches.each do |coach| %>
+                            <%  %> 
+                        <tr>
+                            <td><%=coach.firstname + " " + coach.lastname%></td>
+                        </tr>
+                        <% end %>
+                    </tbody>
                 </table>
                 <table class="table table-primary table-bordered table-striped">
                     <thead>
