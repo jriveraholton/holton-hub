@@ -2,6 +2,7 @@ require 'sinatra'
 require 'sinatra/activerecord'
 require 'oauth2'
 require 'rack'
+require 'active_support'
 
 require './models.rb'
 require './s_config.rb'
@@ -177,10 +178,13 @@ class HoltonHubApp < Sinatra::Base
     author = params[:author].to_i
     
     time = Time.now
-    puts time
-    time = DateTime.new(time.year, time.month, time.day, time.strftime("%H").to_i + (time.strftime("%z").to_i/100), time.min, time.sec, time.zone)
+    ctime = time
+    puts "TIMEINZONE: " + time.in_time_zone("Eastern Time (US & Canada)").to_s
     
-    puts time
+    time = DateTime.new(time.year, time.month, time.day, time.strftime("%H").to_i + (time.strftime("%z").to_i/100), time.min, time.sec, time.zone)
+    Time.zone = "Eastern Time (US & Canada)"
+    puts "TIME WITH ZONE INFO:" +  Time.zone.now.to_s
+    
     # puts Time.parse(time)
     # puts Time.in_time_zone('America/New_York')
     msg = Message.create(subject: subj, content: cont, sent_at: time, author_id: author)
