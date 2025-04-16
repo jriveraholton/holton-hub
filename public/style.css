@@ -45,17 +45,17 @@ body.white-user {
 	margin-left: -10%;
 }
 
-
 .sched.carousel-control-next {
 	margin-right:-10%;
 }
 
 .form-control.blue-user {
-	color:aliceblue;
+	color:black;
+	background-color:white;
 }
 
 .form-control.blue-user::placeholder {
-	color:aliceblue;
+	color:grey;
 }
 
 input.blue-user::file-selector-button {
@@ -80,6 +80,17 @@ h1 {
     /* margin-left:25px; */
 }
 
+.carousel-control-prev-icon.white-user {
+	background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%231c1c84'%3e%3cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3e%3c/svg%3e");
+}
+
+.carousel-control-next-icon.white-user {
+	background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%231c1c84'%3e%3cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+.carousel-indicators.white-user [data-bs-target] {
+	background-color:#1c1c84;
+}
 
 #g_logo {
 	height: 20px;
@@ -138,15 +149,9 @@ tr.strike {
 	text-decoration: line-through;
 }
 
-/* td {
-	background: #fff;
-} */
-
 .sportPhoto {
 	width: 80%;
-	/* height: 80vh; */
-	margin: 0 auto;
-	
+	margin: 0 auto;	
 } 
 
 .del_advisor:hover + .advisor {
