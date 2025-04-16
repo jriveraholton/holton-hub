@@ -178,15 +178,10 @@ class HoltonHubApp < Sinatra::Base
     author = params[:author].to_i
     
     time = Time.now
-    ctime = time
     puts "TIMEINZONE: " + time.in_time_zone("Eastern Time (US & Canada)").to_s
+    time = time.in_time_zone("Eastern Time (US & Canada)")
     
     time = DateTime.new(time.year, time.month, time.day, time.strftime("%H").to_i + (time.strftime("%z").to_i/100), time.min, time.sec, time.zone)
-    Time.zone = "Eastern Time (US & Canada)"
-    puts "TIME WITH ZONE INFO:" +  Time.zone.now.to_s
-    
-    # puts Time.parse(time)
-    # puts Time.in_time_zone('America/New_York')
     msg = Message.create(subject: subj, content: cont, sent_at: time, author_id: author)
     params[:tag].each do |tag|
       #associate it with each tag
