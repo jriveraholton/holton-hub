@@ -7,7 +7,7 @@
                 <label for="blue_pts" class="form-label">Name</label>
             </div>
             <div class="col-md-4">
-            <div class="input-group">
+            <div class="input-group mb-3">
                 <span class="input-group-text <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" id="fname">First name</span>
                 <input type="text" class="form-control <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" value="<%=@use.firstname%>"
                        aria-label="fname" aria-describedby="fname" id="fname" name="fname" placeholder="e.g. Holly"> 
@@ -31,6 +31,15 @@
                     <option value="blue" <%= @use.team_id == BwTeam.find_by(team_color: 'blue').id ? 'selected' : '' %>>Blue</option>
                 </select>
             </div>
+			<div class="col-md-4" >
+				<% if @use.id == @active_user.id %>
+					<input type="checkbox" class="form-check-input" id="admincheck" name="is_admin" <% if @use.is_admin %>checked<% end %> disabled>
+					<input type="hidden" id="admincheck" name="is_admin" value=<% if @use.is_admin %>true<% else %>false<% end %>>
+				<% else %>
+					<input type="checkbox" class="form-check-input" id="admincheck" name="is_admin" <% if @use.is_admin %>checked<% end %>>
+				<% end %>
+				<label class="form-check-label" for="admincheck">Admin?</label>
+			</div>
         </div>
         <div class="d-grid gap-2 d-md-block">
                 <button type="submit" class="btn btn-primary mb-3 me-3">Submit</button>

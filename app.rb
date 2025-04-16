@@ -499,7 +499,8 @@ class HoltonHubApp < Sinatra::Base
   post '/manage/update_user' do
     user = User.find_by(id: params[:id])
     team = BwTeam.find_by(team_color: params[:team])
-    user.update(firstname: params[:fname], lastname: params[:lname], team_id: team.id)
+    is_admin = params[:is_admin] != nil ? true : false
+    user.update(firstname: params[:fname], lastname: params[:lname], team_id: team.id, is_admin: is_admin)
     redirect '/manage/manage_users'
   end
   ## END USER MANAGEMENT ##
