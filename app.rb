@@ -376,7 +376,9 @@ class HoltonHubApp < Sinatra::Base
         grade_level = Integer(data[4])
         role = data[5].downcase.strip
         
-        if User.find_by(email: email) == nil #user does not yet exist        
+        searchingfor = User.find_by(firstname: fname, lastname: lname, email: email.downcase)
+
+        if searchingfor == nil #user does not yet exist        
           team_id = BwTeam.find_by(team_color: data[3].downcase.strip).id
           # assigns an admin role to administrators
           if data.length > 6 and data[6].downcase.strip == "admin"
@@ -388,8 +390,7 @@ class HoltonHubApp < Sinatra::Base
           #generates a default password in the format "gracedingholtonarms"
           password = (fname.downcase + lname.downcase + "holtonarms").to_s
 
-          new_user = User.create(firstname: fname, lastname: lname, 
-                                 email: email, secret: password, team_id: team_id, is_admin: is_admin)
+          new_user = User.create(firstname: fname, lastname: lname, email: email.downcase, secret: password, team_id: team_id, is_admin: is_admin)
 
           #determine if the user is a student or a faculty/staff member and create the appropriate record
           if role == 'student'
