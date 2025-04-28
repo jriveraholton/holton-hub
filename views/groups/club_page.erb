@@ -73,7 +73,7 @@
                                 <% end %>
                                 <p>Date: <%= meeting.event_date.strftime('%m/%d/%Y') %> <br>
                                     Time: <%= meeting.event_date.strftime('%I:%M %p')%> <br>
-                                    Location: <%= meeting.location.capitalize! %> <br>
+                                    Location: <%= meeting.location %> <br>
                                     <% if meeting.description != "" and meeting.description != nil %>
                                         Description: <%= meeting.description %> 
                                     <%end%>

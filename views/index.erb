@@ -1,3 +1,23 @@
+<div class="container">
+	<%if not @global_meetings.empty? %>
+		<% @global_meetings.each do |glmtg| %>
+		<div class="alert alert-warning alert-dismissible fade show" role="alert">
+			<strong><%=Group.find_by(id: glmtg.group_id).name.titleize%></strong> meets today at <strong><%=glmtg.event_date.strftime("%l:%M %P")%></strong> in <%=glmtg.location%>.
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		
+		<% end %>
+	<% end %>
+	<%if not @global_games.empty? %>
+		<% @global_games.each do |glmtg| %>
+		<div class="alert alert-warning alert-dismissible fade show" role="alert">
+			<strong><%=Group.find_by(id: glmtg.team_id).name.titleize%></strong> has a<%= glmtg.advantage ? ' Home' : 'n Away' %> game today at <strong><%=glmtg.date.strftime("%l:%M %P")%></strong>.
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		
+		<% end %>
+	<% end %>
+</div>
 <div class="container-fluid">
 	<div class="row" >
 		<div class="col" >

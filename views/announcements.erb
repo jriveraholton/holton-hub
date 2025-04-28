@@ -27,16 +27,15 @@
                     </div>
                 </div>
                 <p><i><%= MessageTag.find_by(id: MessageMessageTag.find_by(message_id: msg.id).message_tag_id).recipient_tag %></i></p>
-                <p><%= msg.content %> </p> 
-                <% puts "Sent at: " + msg.sent_at.to_s %>
-                <p><i>Sent at <%=msg.sent_at.strftime("%I:%M %p, %m/%d/%Y")%></i></p>
+                <p><%= msg.content.gsub(/\n/, '<br/>') %> </p> 
+                <p style="font-size: .8em"><i>Sent at <%=msg.sent_at.strftime("%l:%M%P, %m/%d/%Y")%></i></p>
                 
             </div>
         <%end%>
         <hr>
         <% @all_msg.each do |msg| %>
             
-            <div class="alert fade show <%= UserMessage.find_by(message_id: msg.id, user_id: @active_user.id).unread ? 'alert-primary' : 'alert-secondary'%>">
+            <div class="alert fade show <%= ('alert-secondary' if not UserMessage.find_by(message_id: msg.id, user_id: @active_user.id).unread) || ('alert-success' if msg.subject.include? "New" and msg.subject.include? "Meeting") || 'alert-primary'%>">
                 <div class="row align-items-center">
                     <div class="col">
                     <h2><%= msg.subject %> </h2>
@@ -56,8 +55,8 @@
                     </div>
                 </div>
                 <p><i><%= MessageTag.find_by(id: MessageMessageTag.find_by(message_id: msg.id).message_tag_id).recipient_tag %></i></p>
-                <p><%= msg.content %> </p>
-                <p><i>Sent at <%=msg.sent_at.strftime("%l:%M%P, %m/%d/%Y")%></i></p>
+                <p><%= msg.content.gsub(/\n/, '<br/>') %> </p>
+                <p style="font-size: .8em"><i>Sent at <%=msg.sent_at.strftime("%l:%M%P, %m/%d/%Y")%></i></p>
             </div>
         <%end%>
         </div>
