@@ -14,13 +14,15 @@
         <img src="<%= '/sports/' + @current_group.name.gsub(' ', '_') + '.jpg' %>" alt="<%=@current_group.name.titleize%> photo" 
         class="sportPhoto mx-auto d-block image-fluid"
         onerror="this.onerror=null;this.src='/sports/placeholder.jpg';">
+        <% if @leader %>
         <div class="d-grid justify-content-center">
         <a href="/all_sports/<%=@current_group.name.gsub(" ", "_")%>/add_image" class="btn btn-primary m-3 d-block">Replace Image</a>
         </div>
+        <% end %>
     </div>
-    <div class="row justify-content-center">
+    <div class="row mt-3 justify-content-center">
         <div class="col-auto text-center">
-        <h1>Record</h1> <br>
+        <h1>Record</h1>
         <p><%= @wins %> - <%= @losses %> </p>
         </div>
     </div>
@@ -97,7 +99,7 @@
                     <tbody class="table-group-divider">
                     <% @record.each do |game| %>
                         <tr <% if not game.status %> class="strike" <% end %>>
-                            <td><% if not game.status %> (<em>CANCELED</em>) <%end%><%= game.name %> (<a href="/all_sports/<%= @current_group.name.gsub(" ", "_")%>/edit?id=<%= game.id.to_s %>">edit</a>)</td>
+                            <td><% if not game.status %> (<em>CANCELED</em>) <%end%><%= game.name %> <% if @leader %>(<a href="/all_sports/<%= @current_group.name.gsub(" ", "_")%>/edit?id=<%= game.id.to_s %>">edit</a>)<% end%></td>
                             <td><%= game.date.strftime("%m/%d/%Y") %></td>
                             <td><%= game.date.strftime("%I:%M %p") %></td>
                             <td><%= (not game.advantage.nil?) ? (game.advantage ? 'Home' : 'Away') : '' %></td>
