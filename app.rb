@@ -694,7 +694,7 @@ class HoltonHubApp < Sinatra::Base
   
   post "/create_group" do
     #create the group from form data and put into the schema
-    name = params[:groupName].downcase
+    name = params[:groupName].downcase.strip
     groupF = Group.find_by(name: name)
     if groupF != nil
       erb :duplicate_club
@@ -919,7 +919,7 @@ class HoltonHubApp < Sinatra::Base
     club.downcase!
  
     @current_group = Group.find_by(name: club)
-    if @current_group.active == true and @current_group.group_type == "club"
+    if @current_group != nil and @current_group.active and @current_group.group_type == "club"
       @club_members = []
       @club_leaders = []
       @club_members = User.where(id: Student.where(id: GroupMember.where(group_id: @current_group.id).select(:student_id)).select(:user_id)).order(:class_of, :lastname)
@@ -1176,7 +1176,7 @@ class HoltonHubApp < Sinatra::Base
     # sends a message to all applicable members
     subj = "New " + grp.name.titleize + " Meeting: " + date.strftime("%B %-d")
     content = @active_user.firstname + " " + @active_user.lastname + " added a " + 
-              grp.name.titleize + " meeting at " + date.strftime("%l:%M %P on %A, %B %-d") + " \n\r Description: " + desc + " in " + location
+              grp.name.titleize + " meeting at " + date.strftime("%l:%M %P on %A, %B %-d") + " in " + location + " \n\r Description: " + desc
     
     time = Time.now
     time = DateTime.new(time.year, time.month, time.day, time.strftime("%H").to_i + (time.strftime("%z").to_i/100), time.min, time.sec, time.zone)
