@@ -57,12 +57,29 @@ class HoltonHubApp < Sinatra::Base
 	  redirect '/sign_in'
     end
   end
+
   def check_admin #use for pages w/ admin-only access
     if not @active_user.is_admin
       redirect '/error'
     end
   end
 
+  def find_meetings
+    if Student.where(user_id: @active_user.id) != nil 
+      stu = Student.find_by(user_id: @active_user.id)
+      my_groups = Group.where(group_type: "club", id: GroupMember.where(student_id: stu.id) + GroupLeader.where(student_id: stu.id))
+      my_sports = Group.where(group_type: "sport", id: GroupMember.where(student_id: stu.id) + GroupLeader.where(student_id: stu.id))
+      
+    elsif Facultystaff.where(user_id: @active_user.id) != nil
+      fac = Facultystaff.find_by(user_id: @active_user.id)
+      my_groups = Group.where(group_type: "club", id: GroupAdvisor.where(facultystaff_id: fac.id))
+      my_groups = Group.where(group_type: "sport", id: GroupAdvisor.where(facultystaff_id: fac.id))
+      # my_groups = Group.where(id: GroupAdvisor.where(student_id: Student.find_by(user_id: @active_user.id).id).select(:group_id)).select(:id)
+      # my_groups = Group.where(group_type: "sport", id: GroupAdvisor.where(student_id: Student.find_by(user_id: @active_user.id).id).select(:group_id)).select(:id)
+    end
+    @global_meetings = GroupMeeting.where(event_date: (Time.now.midnight)..(Time.now.midnight + 1.day))
+    @global_games = Game.where(date: (Time.now.midnight)..(Time.now.midnight + 1.day), status: true)
+  end
   #pull the google info based on the logged in user
   def access_token
     return OAuth2::AccessToken.new(client, session[:access_token], :refresh_token => session[:refresh_token])
@@ -98,9 +115,11 @@ class HoltonHubApp < Sinatra::Base
   #home route
   get '/' do
     verify_user #make sure user is logged in, or force them to the login in page
+    find_meetings
     if @active_user != nil
       puts "LOGGED IN: " + @active_user.email
       puts "TEAM COLOR: " + @active_team_color.to_s
+      
     end
     erb :index
   end
@@ -206,12 +225,13 @@ class HoltonHubApp < Sinatra::Base
       else
         grp = Group.find_by(id: GroupMessagetag.find_by(messagetag_id: mt.id).group_id)
         
-        memb = Student.where(id: GroupMember.where(group_id: grp.id)+ GroupLeader.where(group_id: grp.id))
+        memb = Student.where(id: GroupMember.where(group_id: grp.id).select(:student_id)) + Student.where(id: GroupLeader.where(group_id: grp.id).select(:student_id))
         memb.each do |stu|
           if not UserMessage.where(user_id: stu.user_id, message_id: msg.id).exists?
             UserMessage.create(user_id: stu.user_id, message_id: msg.id)
           end
         end
+        
         fac = Facultystaff.where(id: GroupAdvisor.where(group_id: grp.id).select(:facultystaff_id))
         fac.each do |fs|
           if not UserMessage.where(user_id: fs.user_id, message_id: msg.id).exists?
@@ -316,6 +336,7 @@ class HoltonHubApp < Sinatra::Base
   end
 
   get '/bw_events' do
+    verify_user
     @events = BwEvent.all 
     @blue_points = 0
     @white_points = 0
@@ -469,6 +490,7 @@ class HoltonHubApp < Sinatra::Base
 
   get '/manage/add_users' do
     verify_user
+    check_admin
     erb :add_users
   end
 
@@ -769,6 +791,7 @@ class HoltonHubApp < Sinatra::Base
   get '/manage/add_group_members' do
     verify_user
     check_admin
+    
     @all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc) 
     @all_clubs = Group.where(group_type: "club", active: true).order(level_id: :asc, name: :asc)
     
@@ -1021,13 +1044,18 @@ class HoltonHubApp < Sinatra::Base
     sport.gsub!('_', " ")
     @current_group = Group.find_by(name: sport)
     if @current_group.active and @current_group.group_type == "sport"
-      @record = Game.where(team_id: @current_group.id).order(date: :desc)
+      @record = Game.where(team_id: @current_group.id).order(date: :asc)
       unordered_roster = GroupMember.where(group_id: @current_group.id).select(:student_id)
       # puts Student.where(GroupMember.where(group_id: @current_group.id).select(:student_id)
       @roster = User.where(id: (Student.where(id: GroupMember.where(group_id: @current_group.id).select(:student_id)).select(:user_id))).order(firstname: :asc)
       @coaches = User.where(id: (Facultystaff.where(id: GroupAdvisor.where(group_id: @current_group.id).select(:facultystaff_id)).select(:user_id))).order(firstname: :asc)
       @captains = User.where(id: (Student.where(id: GroupLeader.where(group_id: @current_group.id).select(:student_id)).select(:user_id))).order(firstname: :asc)
-      @leader = @active_user.is_admin or GroupLeader.find_by(group_id: @current_group.id, student_id: Student.find_by(user_id: active_user.id).id).exist? or GroupAdvisor.find_by(group_id: @current_group.id, facultystaff_id: Facultystaff.find_by(user_id: active_user.id).id).exist?
+      is_leader = Student.find_by(user_id: @active_user.id) != nil && GroupLeader.find_by(group_id: @current_group.id, student_id: Student.find_by(user_id: @active_user.id).id) != nil
+      puts GroupLeader.find_by(group_id: @current_group.id, student_id: Student.find_by(user_id: @active_user.id).id) != nil  
+      is_advisor = Facultystaff.find_by(user_id: @active_user.id) != nil && GroupAdvisor.find_by(group_id: @current_group.id, facultystaff_id: Facultystaff.find_by(user_id: @active_user.id).id) != nil
+      puts is_leader
+      puts is_advisor
+      @leader = @active_user.is_admin or is_leader or is_advisor
       @wins = 0
       @losses = 0
       Game.where(team_id: @current_group.id).each do |game|
@@ -1137,13 +1165,41 @@ class HoltonHubApp < Sinatra::Base
   end
 
   post '/push_club_meeting' do
+    verify_user
     #still need to build frontend 
     location = params[:location]
-    date = params[:date]
+    date = params[:date].to_datetime
     id = params[:id].to_i #need to specifically pass as ID
     desc = params[:description]
     meeting = GroupMeeting.create(location: location, event_date: date, group_id: id.to_i, description: desc)
+    grp = Group.find_by(id: id)
+    # sends a message to all applicable members
+    subj = "New " + grp.name.titleize + " Meeting: " + date.strftime("%B %-d")
+    content = @active_user.firstname + " " + @active_user.lastname + " added a " + 
+              grp.name.titleize + " meeting at " + date.strftime("%l:%M %P on %A, %B %-d") + " \n\r Description: " + desc + " in " + location
+    
+    time = Time.now
+    time = DateTime.new(time.year, time.month, time.day, time.strftime("%H").to_i + (time.strftime("%z").to_i/100), time.min, time.sec, time.zone)
+    msg = Message.create(subject: subj, sent_at: time, content: content, author_id: @active_user.id)
+    msgtg = MessageTag.find_by(id: GroupMessagetag.find_by(group_id: grp.id).messagetag_id)
+    MessageMessageTag.create(message_id: msg.id, message_tag_id: msgtg.id)
+    
+    memb = Student.where(id: GroupMember.where(group_id: grp.id).select(:student_id)) + Student.where(id: GroupLeader.where(group_id: grp.id).select(:student_id))
+    memb.each do |stu|
+      if not UserMessage.where(user_id: stu.user_id, message_id: msg.id).exists?
+        UserMessage.create(user_id: stu.user_id, message_id: msg.id)
+      end
+    end
+    
+    fac = Facultystaff.where(id: GroupAdvisor.where(group_id: grp.id).select(:facultystaff_id))
+    fac.each do |fs|
+      if not UserMessage.where(user_id: fs.user_id, message_id: msg.id).exists?
+        UserMessage.create(user_id: fs.user_id, message_id: msg.id)
+      end
+    end
+    
     redirect "/meetings"
+    # redirect '/post_message?subject=' + subj + '&content=' + content + '&author= ' + @active_user.id.to_s + '&tag=' + msgtg
   end
 
   get '/all_sports/:name/add_game' do
@@ -1169,18 +1225,20 @@ class HoltonHubApp < Sinatra::Base
   
   get '/all_sports/:name/edit' do #edit game records
     verify_user
-    #need to add check admin functionality
-    @game = Game.find_by(id: params[:id].to_i)
-    erb :"groups/edit_game"
+    grp = Group.find_by(name: params[:name].downcase.gsub("_", " "))
+    is_leader = Student.find_by(user_id: @active_user.id) != nil and GroupLeader.find_by(group_id: grp.id, student_id: Student.find_by(user_id: @active_user.id).id)
+    is_advisor = Facultystaff.find_by(user_id: @active_user.id) != nil and GroupAdvisor.find_by(group_id: grp.id, facultystaff_id: Facultystaff.find_by(user_id: @active_user.id).id)
+    if is_leader or is_advisor or @active_user.is_admin
+      @game = Game.find_by(id: params[:id].to_i)
+      erb :"groups/edit_game"
+    else
+      erb :error
+    end
   end
 
   post '/edit_game' do
+    verify_user
     game = Game.find_by(id: params[:id].to_i)
-    if params[:cancel] == 'on'
-      status = false
-    else
-      status = true
-    end
     name = params[:name]
     id = params[:id]
     date = params[:date].to_datetime
@@ -1189,16 +1247,74 @@ class HoltonHubApp < Sinatra::Base
     a_score = params[:ascore]
     details = params[:details]
     result = params[:result]
+    sport = Group.find(game.team_id)
     id = params[:id].to_i 
+    
+    if params[:cancel] == 'on'
+      status = false
+      subj = sport.name.titleize + " Game Canceled: " + date.strftime("%B %-d")
+      content = @active_user.firstname + " " + @active_user.lastname + " canceled the " + 
+                sport.name.titleize + " game at " + date.strftime("%l:%M %P on %A, %B %-d") 
+      
+      time = Time.now
+      time = DateTime.new(time.year, time.month, time.day, time.strftime("%H").to_i + (time.strftime("%z").to_i/100), time.min, time.sec, time.zone)
+      msg = Message.create(subject: subj, sent_at: time, content: content, author_id: @active_user.id)
+      msgtg = MessageTag.find_by(id: GroupMessagetag.find_by(group_id: sport.id).messagetag_id)
+      MessageMessageTag.create(message_id: msg.id, message_tag_id: msgtg.id)
+      
+      memb = Student.where(id: GroupMember.where(group_id: sport.id).select(:student_id)) + Student.where(id: GroupLeader.where(group_id: sport.id).select(:student_id))
+      memb.each do |stu|
+        if not UserMessage.where(user_id: stu.user_id, message_id: msg.id).exists?
+          UserMessage.create(user_id: stu.user_id, message_id: msg.id)
+        end
+      end
+      
+      fac = Facultystaff.where(id: GroupAdvisor.where(group_id: sport.id).select(:facultystaff_id))
+      fac.each do |fs|
+        if not UserMessage.where(user_id: fs.user_id, message_id: msg.id).exists?
+          UserMessage.create(user_id: fs.user_id, message_id: msg.id)
+        end
+      end
+    else
+      status = true
+    end
+    
     game.update(status: status, name: name, date: date, advantage: home, 
                 home_score: h_score, away_score: a_score, details: details, result: result)
-    sport = Group.find(game.team_id)
+
     redirect "/all_sports/"+ sport.name.gsub(" ", "_").to_s
   end
 
   post '/delete_game' do
+    verify_user
     game = Game.find_by(id: params[:id])
     sport = Group.find(game.team_id)
+    
+    date = game.date
+    subj = sport.name.titleize + " Game Canceled: " + date.strftime("%B %-d")
+    content = @active_user.firstname + " " + @active_user.lastname + " canceled the " + 
+              sport.name.titleize + " game at " + date.strftime("%l:%M %P on %A, %B %-d") 
+    
+    time = Time.now
+    time = DateTime.new(time.year, time.month, time.day, time.strftime("%H").to_i + (time.strftime("%z").to_i/100), time.min, time.sec, time.zone)
+    msg = Message.create(subject: subj, sent_at: time, content: content, author_id: @active_user.id)
+    msgtg = MessageTag.find_by(id: GroupMessagetag.find_by(group_id: sport.id).messagetag_id)
+    MessageMessageTag.create(message_id: msg.id, message_tag_id: msgtg.id)
+    
+    memb = Student.where(id: GroupMember.where(group_id: sport.id).select(:student_id)) + Student.where(id: GroupLeader.where(group_id: sport.id).select(:student_id))
+    memb.each do |stu|
+      if not UserMessage.where(user_id: stu.user_id, message_id: msg.id).exists?
+        UserMessage.create(user_id: stu.user_id, message_id: msg.id)
+      end
+    end
+    
+    fac = Facultystaff.where(id: GroupAdvisor.where(group_id: sport.id).select(:facultystaff_id))
+    fac.each do |fs|
+      if not UserMessage.where(user_id: fs.user_id, message_id: msg.id).exists?
+        UserMessage.create(user_id: fs.user_id, message_id: msg.id)
+      end
+    end
+
     game.delete
     redirect "/all_sports/"+ sport.name.gsub(" ", "_").to_s
   end
@@ -1317,17 +1433,11 @@ class HoltonHubApp < Sinatra::Base
     verify_user
 
     @groups = Group.all
-    all_meetings = GroupMeeting.all
     my_group_list = GroupLeader.where(student_id: @active_user.id) + GroupMember.where(student_id: @active_user.id)
     @my_groups = []
-    @meetings = []
+    @meetings = GroupMeeting.where('event_date >= ?', Time.now.midnight).order(:event_date)
 
-    all_meetings.each do |meeting|
-      if  meeting.event_date > Time.now()
-        @meetings.push(meeting)
-      end
-    end
-
+    # @my_groups = Group.where(id: GroupLeader.where(student_id: @active_user.id).select(:group_id) + GroupMember.where(student_id: @active_user.id).select(:group_id))
     my_group_list.each do |group|
       @my_groups.push(@groups.find_by(id: group.group_id).id)
     end
@@ -1348,24 +1458,55 @@ class HoltonHubApp < Sinatra::Base
   end
 
   post '/update_meeting' do
+    verify_user
     meeting = GroupMeeting.find_by(id: params[:id])
+    
     location = params[:location]
     date = params[:date].to_datetime #calendar on the frontend
     desc = params[:desc]
     meeting.update(location: location, event_date: date, description: desc) # this one - should be an edit 
+    
+    
     redirect '/meetings'
   end
 
   post '/delete_meeting' do
+    verify_user
     meeting = GroupMeeting.find_by(id: params[:id])
-    meeting.delete
+    date = meeting.event_date
+    grp = Group.find_by(id: meeting.group_id)
+    subj = grp.name.titleize + " Meeting Canceled: " + date.strftime("%B %-d")
+    content = @active_user.firstname + " " + @active_user.lastname + " canceled the " + 
+              grp.name.titleize + " meeting at " + date.strftime("%l:%M %P on %A, %B %-d") 
+    
+    time = Time.now
+    time = DateTime.new(time.year, time.month, time.day, time.strftime("%H").to_i + (time.strftime("%z").to_i/100), time.min, time.sec, time.zone)
+    msg = Message.create(subject: subj, sent_at: time, content: content, author_id: @active_user.id)
+    msgtg = MessageTag.find_by(id: GroupMessagetag.find_by(group_id: grp.id).messagetag_id)
+    MessageMessageTag.create(message_id: msg.id, message_tag_id: msgtg.id)
+    
+    memb = Student.where(id: GroupMember.where(group_id: grp.id).select(:student_id)) + Student.where(id: GroupLeader.where(group_id: grp.id).select(:student_id))
+    memb.each do |stu|
+      if not UserMessage.where(user_id: stu.user_id, message_id: msg.id).exists?
+        UserMessage.create(user_id: stu.user_id, message_id: msg.id)
+      end
+    end
+    
+    fac = Facultystaff.where(id: GroupAdvisor.where(group_id: grp.id).select(:facultystaff_id))
+    fac.each do |fs|
+      if not UserMessage.where(user_id: fs.user_id, message_id: msg.id).exists?
+        UserMessage.create(user_id: fs.user_id, message_id: msg.id)
+      end
+    end
+    meeting.destroy
     redirect '/meetings'
   end
 
-  get '/sport_events' do
+  get '/games' do
     verify_user 
-    @allgames=Game.where("date>=?", Date.today)
-    erb :display_sport_events
+    
+    @allgames=Game.where("date>=?", Date.today).order(:date)
+    erb :'groups/games'
   end 
 
   ##########################################
