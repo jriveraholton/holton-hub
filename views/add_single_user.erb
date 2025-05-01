@@ -34,16 +34,16 @@
         </div>
         <div class="row">
             <div class="col-md-4 mb-3">
-                <select class="form-select" aria-label="Default select example" name="role" required>
+                <select class="form-select" aria-label="Default select example" onfocusout="ifStudent()" onfocusout="ifFaculty()" id="typeSelection" name="role" required>
 					<option selected disabled value>Role</option>
 					<option value="Student">Student</option>
-					<option value="Faculty/Staff">Faculty/Staff</option>
+					<option value="Faculty">Faculty/Staff</option>
                 </select>
             </div>
         </div>
 		<div class="row">
 			<div class="col-md-4 mb-3">
-				<select class="form-select" aria-label="Default select example" name="grade" required>
+				<select class="form-select" aria-label="Default select example" id=Faculty name="grade" required>
 					<option selected disabled value">Grade</option>
 					<option value="9">9</option>
 					<option value="10">10</option>
@@ -52,6 +52,17 @@
 				</select>
 			</div>
 		</div>
+        <div class="row">
+			<div class="col-md-4 mb-3">
+				<select class="form-select" aria-label="Default select example" id=Student name="grade" required>
+					<option selected disabled value">Graduation Year</option>
+					<option value="2028">2028</option>
+					<option value="2027">2027</option>
+					<option value="2026">2026</option>
+					<option value="2025">2025</option>
+				</select>
+			</div>
+        </div>
 		<div class="row">
 			<div class="col-md-4 mb-3">
 				<input type="checkbox" class="form-check-input" id="admincheck" name="is_admin">
@@ -65,3 +76,27 @@
 		</div>
     </form>
 </div> 
+
+
+<script>
+function ifStudent() {
+    var x = document.getElementById("typeSelection");
+    var val = x.value;
+    if (val === "Student") {
+        Student.style.display = "block";
+    } else{
+        Faculty.style.display = "none";
+    }
+}
+
+function ifFaculty() {
+    var x = document.getElementById("typeSelection");
+    var val = x.value;
+    if (val === "Faculty") {
+        Faculty.style.display = "block";
+    } else{
+        Student.style.display = "none";
+    }
+}
+
+</script>
