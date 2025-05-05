@@ -1,0 +1,72 @@
+<!-- text boxes: description -->
+<!-- time element: start -->
+<!-- number: duration -->
+
+<div class='container'>
+    <h1 class="text-center">
+    Day <%=@schedule["day"]%> - <%=@schedule["week_color"].titleize%> <%=@schedule["day_of_week"].titleize%>
+    </h1>
+    <form action='/update_blocks' method="post" id="block_form"> 
+    <% block_num=1 %>
+    <% @schedule["blocks"].each do |block|%>
+    <div class="card mb-2" style="width: 22rem;">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <label for="description" class="col-form-label">Description </label>
+                </div>
+                <div class="col-auto" >
+                <input name="description<%=block_num%>" class="form-control" value= "<%=block.description%>">
+                </div>
+                </div>
+            <div class="col-auto">
+                <label for="time" class="col-form-label">Start Time: </label>
+                <input name="time<%=block_num%>" type="time" value= "<%=block.start.strftime("%H:%M")%>">
+            </div>
+            <div class="col-auto">
+                <label for="duration" class="col-form-label">Duration (mins): </label>
+                <input name="duration<%=block_num%>" type="number" min="0" value= "<%=block.duration%>">
+            </div>
+        </div>
+    </div>
+    <% block_num = block_num+1%>
+    <% end %>
+    <input name="block_count" id="block_count" type="hidden" value="<%=block_num%>">
+    <input type='submit' class="btn btn-primary mb-2">
+    <input name='id' type='hidden' value='<%=@schedule['id']%>'>
+    </form>
+    <button class='btn btn-secondary' onclick="add_block()">Add Block</button>
+</div>
+<script>
+        function add_block(){
+            console.log("function ran")
+            block_count = document.getElementById("block_count")
+            count = parseInt(block_count.value) + 1
+            block_count.value = count.toString()
+            form = document.getElementById("block_form");
+            template = document.createElement("div");
+            template.classList.add("card")
+            template.classList.add("mb-2")
+            template.style = "width: 22rem;"
+            template.innerHTML = `
+                <div class="card-body">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-auto">
+                            <label for="description" class="col-form-label">Description </label>
+                        </div>
+                        <div class="col-auto" >
+                        <input name="description`+ (count-1) +`" class="form-control" value= "">
+                        </div>
+                        </div>
+                    <div class="col-auto">
+                        <label for="time" class="col-form-label">Start Time: </label>
+                        <input name="time`+ (count-1) +`" type="time" value= "">
+                    </div>
+                    <div class="col-auto">
+                        <label for="duration" class="col-form-label">Duration (mins): </label>
+                        <input name="duration`+ (count-1) +`" type="number" min="0" value= ""> 
+                    </div>
+                    </div>`;
+            form.insertBefore(template, form.childNodes[20]);
+        }
+</script>
