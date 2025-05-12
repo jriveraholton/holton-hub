@@ -1,6 +1,22 @@
 <div id="planner" class="carousel slide">
 <div class="container">
+<div id='carouselExampleIndicators' class='carousel slide'>
+  <div class="carousel-indicators <% if @active_team_color == 'white'%>white-user<% else%>blue-user<% end %>">
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="4" aria-label="Slide 5"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="5" aria-label="Slide 6"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="6" aria-label="Slide 7"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="7" aria-label="Slide 8"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="8" aria-label="Slide 9"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="9" aria-label="Slide 10"></button>
+  </div>
+
+<div class='carousel-inner'>
 <%@all_days.each do |schedule|%>
+  <div class="carousel-item <% if schedule['day']== 1 %> active <%end%>">
   <table class="table align-middle table-hover table-bordered border-primary">
     <thead>
       <tr>
@@ -12,16 +28,29 @@
       <%schedule["blocks"].each do |block| %> 
         <tr>
         <td>
-          <%=block.start.strftime("%k:%M")%> - 
+          <%=block.start.strftime("%I:%M%p")%> - 
           <%time = block.start + block.duration*60%> 
-          <%=time.strftime("%k:%M")%> 
+          <%=time.strftime("%I:%M%p")%> 
         </td>
         <td><%=block.description%></td>
         </tr>
       <% end %>
     </tbody>
   </table>
+  </div>
 <%end%>
+</div>
+
+<button class="carousel-control-prev sched" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+<span class="carousel-control-prev-icon <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" aria-hidden="true"></span>
+<span class="visually-hidden">Previous</span>
+</button>
+<button class="carousel-control-next sched" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+<span class="carousel-control-next-icon <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" aria-hidden="true"></span>
+<span class="visually-hidden">Next</span>
+</button>
+
+</div>
 
 <div class="modal fade" id="exampleModalToggle" aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
@@ -32,102 +61,23 @@
       </div>
       <div class="modal-body">
 
-  <form action="/" method="post">
+  <form action="/load_day" method="post">
   <div class="container">
-    <select class="form-select form-select-lg mb-3" aria-label="Large select example">
+    <select class="form-select form-select-lg mb-3" aria-label="Large select example" name="dayofweek">
       <option selected>Day</option>
-      <option value="1">Monday</option>
-      <option value="2">Tuesday</option>
-      <option value="3">Wednesday</option>
-      <option value="3">Thursday</option>
-      <option value="3">Friday</option>
+      <option value="monday">Monday</option>
+      <option value="tuesday">Tuesday</option>
+      <option value="wednesday">Wednesday</option>
+      <option value="thursday">Thursday</option>
+      <option value="friday">Friday</option>
     </select>
-    <select class="form-select form-select-lg mb-3" aria-label="Large select example">
+    <select class="form-select form-select-lg mb-3" aria-label="Large select example" name="weekcolor">
       <option selected>Week</option>
-      <option value="1">Blue</option>
-      <option value="2">White</option>
+      <option value="blue">Blue</option>
+      <option value="white">White</option>
     </select>
 
-    <select class="form-select form-select-lg mb-3" aria-label="Large select example">
-      <option selected>Timing</option>
-      <option value="2">8:00-3:30</option>
-      <option value="1">9:10-3:30</option>
-      <option value="2">10:00-3:30</option>
-      <option value="2">8:00-12:00</option>
-    </select>
-
-
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
-      <label class="form-check-label" for="inlineCheckbox1">U1</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
-      <label class="form-check-label" for="inlineCheckbox2">U2</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-      <label class="form-check-label" for="inlineCheckbox3">U3</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-      <label class="form-check-label" for="inlineCheckbox3">U4</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-      <label class="form-check-label" for="inlineCheckbox3">U5</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-      <label class="form-check-label" for="inlineCheckbox3">U6</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-      <label class="form-check-label" for="inlineCheckbox3">U7</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-      <label class="form-check-label" for="inlineCheckbox3">U8</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-      <label class="form-check-label" for="inlineCheckbox3">U9</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-      <label class="form-check-label" for="inlineCheckbox3">Break</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-      <label class="form-check-label" for="inlineCheckbox3">Lunch</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-      <label class="form-check-label" for="inlineCheckbox3">Morning Assembly</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-      <label class="form-check-label" for="inlineCheckbox3">Class Meeting</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-      <label class="form-check-label" for="inlineCheckbox3">Morning Advisory</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-      <label class="form-check-label" for="inlineCheckbox3">Afternoon Assembly</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-      <label class="form-check-label" for="inlineCheckbox3">Afternoon Class Meeting</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
-      <label class="form-check-label" for="inlineCheckbox3">Afternoon Advisory</label>
-    </div>
-<div>
-<button type="submit" class="btn btn-primary" href="">Update</button>
-</div>
+    <button type="submit" class="btn btn-primary">Update</button>
 </div>
 </form>
 </div>
@@ -136,9 +86,9 @@
 </div>
 </div>
 <% if @active_user.is_admin == true  %> 
-  <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Edit Schedule</button>
+    <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Edit</button>
   <a href="/edit_schedule">
-    <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Upload Schedule</button>
+    <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Upload</button>
   </a>
 <% end %> 
 

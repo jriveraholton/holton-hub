@@ -1328,6 +1328,8 @@ class HoltonHubApp < Sinatra::Base
     dayofweek = params[:dayofweek].downcase
     weekcolor = params[:weekcolor].downcase
     ds = DailySchedule.find_by(day_of_the_week: dayofweek, week_type: weekcolor)
+    p 'DAY: ' + dayofweek.to_s
+    p 'WEEK: ' + weekcolor.to_s 
     @schedule = {} 
     if ds != nil 
       @schedule = {"blocks" => []}
