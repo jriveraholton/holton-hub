@@ -1,0 +1,126 @@
+<!-- text boxes: description -->
+<!-- time element: start -->
+<!-- number: duration -->
+
+<div class='container'>
+    <h1 class="text-center">
+    Day <%=@schedule["day"]%> - <%=@schedule["week_color"].titleize%> <%=@schedule["day_of_week"].titleize%>
+    </h1>
+    <form action='/update_blocks' method="post" id="block_form"> 
+    <% block_num=1 %>
+    <% @schedule["blocks"].each do |block|%>
+    <div class="card mb-2" style="width: 22rem;" id="block<%=block_num%>">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <label for="description" class="col-form-label">Description </label>
+                </div>
+                <div class="col-auto" >
+                <input name="description<%=block_num%>" class="form-control" value= "<%=block.description%>">
+                </div>
+            </div>
+            <div class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label for="time" class="col-form-label">Start Time: </label>
+                <input name="time<%=block_num%>" type="time" value= "<%=block.start.strftime("%H:%M")%>">
+            </div>
+            </div>
+            <div class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label for="duration" class="col-form-label">Duration (mins): </label>
+                <input name="duration<%=block_num%>" type="number" min="0" value= "<%=block.duration%>">
+            </div>
+            </div>
+            <div class="row">
+            <div class="col-6">
+                <button type='button' class='btn btn-danger' onclick="remove_block(this.id)" id="button<%=block_num%>">Remove</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <% block_num = block_num+1%>
+    <% end %>
+    <div class="row" id='submit_row'>
+        <div class='col'>
+            <input name="block_count" id="block_count" type="hidden" value="<%=block_num%>">
+            <input type='submit' class="btn btn-primary mb-2">
+            <input name='id' type='hidden' value='<%=@schedule['id']%>'>
+        </div>
+    </div>
+    </form>
+    <div class="row">
+        <div class='col mb-3'>
+            <button class='btn btn-secondary' onclick="add_block()">Add Block</button>
+        </div>
+    </div>
+</div>
+<script>
+        function add_block(){
+            block_count = document.getElementById("block_count")
+            count = parseInt(block_count.value.toString())
+            form = document.getElementById("block_form");
+            submit_button = document.getElementById("submit_row")
+            template = document.createElement("div");
+            template.classList.add("card")
+            template.classList.add("mb-2")
+            template.style = "width: 22rem;"
+            template.id = "block" + count 
+            template.innerHTML = `
+                <div class="card-body">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-auto">
+                            <label for="description" class="col-form-label">Description </label>
+                        </div>
+                    </div>
+                    <div class="row g-3 align-items-center">
+                        <div class="col-auto" >
+                            <input name="description`+ count +`" class="form-control" value= "">
+                        </div>
+                    </div>
+                    <div class="row g-3 align-items-center">
+                        <div class="col-auto">
+                            <label for="time" class="col-form-label">Start Time: </label>
+                            <input name="time`+ count +`" type="time" value= "">
+                        </div>
+                    </div>
+                    <div class="row g-3 align-items-center">
+                        <div class="col-auto">
+                            <label for="duration" class="col-form-label">Duration (mins): </label>
+                            <input name="duration`+ count +`" type="number" min="0" value= ""> 
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <button type='button' class='btn btn-danger' onclick="remove_block(this.id)" id="button<%=block_num%>">Remove</button>
+                        </div>
+                    </div>
+                </div>`;
+            submit_button.before(template);
+            block_count.value = parseInt(count.toString()) + 1
+        }
+</script>
+
+<script>
+        function remove_block(clicked_id){
+            block_count = document.getElementById("block_count")
+            count = parseInt(block_count.value) - 1
+            block_count.value = count.toString()
+            form = document.getElementById("block_form");
+            button = document.getElementById(clicked_id)
+            card_id = 'block' + clicked_id.slice(6)
+            card = document.getElementById(card_id)
+            form.removeChild(card) 
+
+            /*relabel all card ids*/
+
+            block_num = 1
+            for (let i=0; i<form.children.length; i++){
+                child = form.children[i];
+                if (child.classList.contains("card")){
+                    child.id = "block" + block_num;
+                    block_num += 1;
+                    console.log(child.id) 
+                }
+            }
+    }
+</script> 

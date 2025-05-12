@@ -65,3 +65,12 @@ end
 
 class UserMessage < ActiveRecord::Base
 end
+
+class DailySchedule < ActiveRecord::Base 
+end 
+
+class ScheduleBlock < ActiveRecord::Base
+end 
+
+class DailyScheduleScheduleBlock < ActiveRecord::Base
+end 

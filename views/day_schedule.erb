@@ -1,599 +1,95 @@
 <div id="planner" class="carousel slide">
 <div class="container">
-<div id="carouselExampleIndicators" class="carousel slide">
-	<div class="carousel-indicators <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>">
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="4" aria-label="Slide 5"></button>
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="5" aria-label="Slide 6"></button>
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="6" aria-label="Slide 7"></button>
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="7" aria-label="Slide 8"></button>
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="8" aria-label="Slide 9"></button>
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="9" aria-label="Slide 10"></button>
+  <div id="carouselExampleIndicators" class="carousel slide">
+    <div class="carousel-indicators <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>">
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="4" aria-label="Slide 5"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="5" aria-label="Slide 6"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="6" aria-label="Slide 7"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="7" aria-label="Slide 8"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="8" aria-label="Slide 9"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="9" aria-label="Slide 10"></button>
     </div>
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-		<table class="table <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %> align-middle table-hover table-bordered border-primary">
-        <thead>
-          <tr>
-            <th scope="col">Time</th>
-            <th scope="col">1/9/25: Blue Thursday</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">8:00-8:15</th>
-            <td>Assembly</td>
-          </tr>
-          <tr>
-            <th scope="row">8:15-9:05</th>
-            <td>U1</td>
-          </tr>
-          <tr>
-            <th scope="row">9:10-10:00</th>
-            <td>U2</td>
-          </tr>
-          <tr>
-              <th scope="row">0:05-10:55</th>
-              <td>U4</td>
-          </tr>
-          <tr>
-              <th scope="row">10:55-11:15</th>
-              <td>Break</td>
-          </tr>
-          <tr>
-              <th scope="row">11:15-12:05</th>
-              <td>U5</td>
-          </tr>
-          <tr>
-              <th scope="row">12:10-1:00</th>
-              <td>U7</td>
-          </tr>
-          <tr>
-              <th scope="row">1:00-1:50</th>
-              <td>Lunch</td>
-          </tr>
-          <tr>
-              <th scope="row">1:50-2:40</th>
-              <td>Afternoon Assembly</td>
-          </tr>
-          <tr>
-              <th scope="row">2:45-3:30</th>
-              <td>U9</td>
-          </tr>
-          <tr>
-              <th scope="row">3:45-5:45</th>
-              <td>Sports and Extracurriculars</td>
-          </tr>
-        </tbody>
-		</table>
-		<br>
+    <div class="carousel-inner">
+      <%@all_days.each do |schedule|%>
+        <div class="carousel-item <% if schedule['day']== 1 %> active <%end%>">
+        <table class="table align-middle table-hover table-bordered border-primary">
+          <thead>
+            <tr>
+              <th scope="col">Time</th>
+              <th scope="col">Day <%=schedule["day"]%> - <%=schedule["week_color"].titleize%> <%=schedule["day_of_week"].titleize%></th>
+            </tr>
+          </thead>
+          <tbody> 
+            <%schedule["blocks"].each do |block| %> 
+              <tr>
+              <td>
+                <%=block.start.strftime("%I:%M%p")%> - 
+                <%time = block.start + block.duration*60%> 
+                <%=time.strftime("%I:%M%p")%> 
+              </td>
+              <td><%=block.description%></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+        </div>
+      <%end%>
+      <br>
     </div>
-    <div class="carousel-item">
-      <table class="table align-middle table-hover table-bordered border-primary">
-        <thead>
-          <tr>
-            <th scope="col">x</th>
-            <th scope="col">x</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-        </tbody>
-      </table>
-	  <br>
-    </div>
-    <div class="carousel-item">
-      <table class="table align-middle table-hover table-bordered border-primary">
-        <thead>
-          <tr>
-            <th scope="col">x</th>
-            <th scope="col">x</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-        </tbody>
-      </table>
-	  <br>
-    </div>
-    <div class="carousel-item">
-      <table class="table align-middle table-hover table-bordered border-primary">
-        <thead>
-          <tr>
-            <th scope="col">x</th>
-            <th scope="col">x</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-        </tbody>
-      </table>
-	  <br>
-    </div>
-    <div class="carousel-item">
-      <table class="table align-middle table-hover table-bordered border-primary">
-        <thead>
-          <tr>
-            <th scope="col">x</th>
-            <th scope="col">x</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-        </tbody>
-      </table>
-	  <br>
-    </div>
-    <div class="carousel-item">
-      <table class="table align-middle table-hover table-bordered border-primary">
-        <thead>
-          <tr>
-            <th scope="col">x</th>
-            <th scope="col">x</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-        </tbody>
-      </table>
-	  <br>
-    </div>
-    <div class="carousel-item">
-      <table class="table align-middle table-hover table-bordered border-primary">
-        <thead>
-          <tr>
-            <th scope="col">x</th>
-            <th scope="col">x</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-        </tbody>
-      </table>
-	  <br>
-    </div>
-    <div class="carousel-item">
-      <table class="table align-middle table-hover table-bordered border-primary">
-        <thead>
-          <tr>
-            <th scope="col">x</th>
-            <th scope="col">x</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-        </tbody>
-      </table>
-	  <br>
-    </div>
-    <div class="carousel-item">
-      <table class="table align-middle table-hover table-bordered border-primary">
-        <thead>
-          <tr>
-            <th scope="col">x</th>
-            <th scope="col">x</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-        </tbody>
-      </table>
-	  <br>
-    </div>
-    <div class="carousel-item">
-      <table class="table align-middle table-hover table-bordered border-primary">
-        <thead>
-          <tr>
-            <th scope="col">x</th>
-            <th scope="col">x</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-          <tr>
-            <th scope="row">x</th>
-            <td>x</td>
-          </tr>
-        </tbody>
-      </table>
-	  <br>
-    </div>
+    <button class="carousel-control-prev sched" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next sched" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+        <span class="carousel-control-next-icon <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
   </div>
-  <button class="carousel-control-prev sched" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next sched" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-      <span class="carousel-control-next-icon <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
+
+</div>
+
+<div class="modal fade" id="exampleModalToggle" aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalToggleLabel">Edit Schedule</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+  <form action="/load_day" method="post">
+  <div class="container">
+    <select class="form-select form-select-lg mb-3" aria-label="Large select example" name="dayofweek">
+      <option selected>Day</option>
+      <option value="monday">Monday</option>
+      <option value="tuesday">Tuesday</option>
+      <option value="wednesday">Wednesday</option>
+      <option value="thursday">Thursday</option>
+      <option value="friday">Friday</option>
+    </select>
+    <select class="form-select form-select-lg mb-3" aria-label="Large select example" name="weekcolor">
+      <option selected>Week</option>
+      <option value="blue">Blue</option>
+      <option value="white">White</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary">Update</button>
+</div>
+</form>
 </div>
 
 </div>
+</div>
+</div>
+<% if @active_user.is_admin == true  %> 
+    <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Edit</button>
+  <a href="/edit_schedule">
+    <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">Upload</button>
+  </a>
+<% end %> 
+
 </div>

@@ -118,10 +118,8 @@ class HoltonHubApp < Sinatra::Base
     find_meetings
     if @active_user != nil
       puts "LOGGED IN: " + @active_user.email
-      puts "TEAM COLOR: " + @active_team_color.to_s
-      
     end
-    erb :index
+    erb :index 
   end
 
   get '/sign_in' do
@@ -163,6 +161,7 @@ class HoltonHubApp < Sinatra::Base
 
   get '/student' do
     # NEED TO ONLY AUTHORIZE IF STUDENT!!!!
+    verify_user
     erb :student
   end
 
@@ -199,7 +198,6 @@ class HoltonHubApp < Sinatra::Base
     time = Time.now
     puts "TIMEINZONE: " + time.in_time_zone("Eastern Time (US & Canada)").to_s
     time = time.in_time_zone("Eastern Time (US & Canada)")
-    
     time = DateTime.new(time.year, time.month, time.day, time.strftime("%H").to_i + (time.strftime("%z").to_i/100), time.min, time.sec, time.zone)
     msg = Message.create(subject: subj, content: cont, sent_at: time, author_id: author)
     params[:tag].each do |tag|
@@ -224,14 +222,12 @@ class HoltonHubApp < Sinatra::Base
         #still need to do faculty staff
       else
         grp = Group.find_by(id: GroupMessagetag.find_by(messagetag_id: mt.id).group_id)
-        
         memb = Student.where(id: GroupMember.where(group_id: grp.id).select(:student_id)) + Student.where(id: GroupLeader.where(group_id: grp.id).select(:student_id))
         memb.each do |stu|
           if not UserMessage.where(user_id: stu.user_id, message_id: msg.id).exists?
             UserMessage.create(user_id: stu.user_id, message_id: msg.id)
           end
         end
-        
         fac = Facultystaff.where(id: GroupAdvisor.where(group_id: grp.id).select(:facultystaff_id))
         fac.each do |fs|
           if not UserMessage.where(user_id: fs.user_id, message_id: msg.id).exists?
@@ -239,7 +235,6 @@ class HoltonHubApp < Sinatra::Base
           end
         end
       end
-    end
     
     redirect '/announcements'
     # else
@@ -549,6 +544,29 @@ class HoltonHubApp < Sinatra::Base
 
   get '/today' do
     verify_user
+    fac = Facultystaff.find_by(id: @active_user.id)
+    if fac == nil
+      @fac_member = true
+    else
+      @fac_member = false 
+    end
+    @all_days = [] 
+    for i in 1..10 
+      ds = DailySchedule.find_by(day: i) 
+      if ds != nil 
+        schedule = {"blocks" => []}
+        schedule["day"] = i
+        schedule["day_of_week"] = ds.day_of_the_week 
+        schedule["week_color"] = ds.week_type
+        schedule["date"] = ds.date_of 
+        blocks = DailyScheduleScheduleBlock.where(dailyschedule_id: ds.id)
+        blocks.each do |b|
+          period = ScheduleBlock.find_by(id: b.block_id) 
+          schedule["blocks"] << period 
+        end
+        @all_days << schedule 
+      end 
+    end
     erb :day_schedule
   end
 
@@ -593,6 +611,34 @@ class HoltonHubApp < Sinatra::Base
     
     erb :"groups/my_clubs"
   end
+
+  get '/edit_schedule' do 
+    verify_user
+    erb :edit_schedule
+  end
+
+  post '/uploadcalander' do
+    if params[:accountsFile] && params[:accountsFile][:filename] #only reads file if it exists & has been submitted
+      file = params[:accountsFile][:tempfile].read
+    end
+    lines = file.split("\n") 
+    lines.each do |line| 
+      data = line.split(",")
+      if data[3] == "US"
+       p description = data[1] 
+       day_time = data[11..30]
+       day_time.each_slice(2) do |start, finish|
+        if start != "" 
+          p start = start.to_time
+          p finish = finish.to_time 
+          duration = (finish - start)/60
+          p "time difference: " + duration.to_s 
+        end
+       end
+      end
+    end
+    redirect '/today'
+  end 
   
   get '/all_clubs' do
     verify_user
@@ -674,8 +720,7 @@ class HoltonHubApp < Sinatra::Base
 
     @sports_seasons = Season.all
     
-    #create hashes that have all of the necessary information for students by grade
-    
+    #create hashes that have all of the necessary information for students by grade    
     grades = Student.select(:class_of).distinct.sort()
     
     soph = grades[2].class_of
@@ -822,12 +867,12 @@ class HoltonHubApp < Sinatra::Base
 
   get '/all_clubs/:club_name/add_member' do
     verify_user
+
     club = params['club_name']
     underscore = "_"
     club.gsub!(underscore, " ")
     club.downcase!
     @current_group = Group.find_by(name: club)
-  
     is_leader = false
     if Student.find_by(user_id: @active_user.id) != nil and GroupLeader.find_by(group_id: @current_group.id, student_id: Student.find_by(user_id: @active_user.id)) != nil
       is_leader = true
@@ -937,7 +982,6 @@ class HoltonHubApp < Sinatra::Base
         end
         @meetings = @meetings.sort_by {|meeting| meeting.event_date}
       end
-
       @images = {}
       n = 1
       club.gsub!(" ", "_")
@@ -948,9 +992,7 @@ class HoltonHubApp < Sinatra::Base
         @images[n] = '/clubs/'+ club + n.to_s + '.jpg'
         n += 1
         image_exists = File.file?(File.dirname(__FILE__) + '/public/clubs/'+ club + n.to_s + '.jpg') #checks if file exists
-        
-      end
-      
+      end 
       erb :"groups/club_page"
     else
       erb :error
@@ -968,7 +1010,6 @@ class HoltonHubApp < Sinatra::Base
     if GroupLeader.where(group_id: @current_group.id) != nil
       @leaders = User.where(id: (Student.where(id: GroupLeader.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
     end
-
     erb :'groups/manage_members'
   end
 
@@ -1281,7 +1322,6 @@ class HoltonHubApp < Sinatra::Base
     
     game.update(status: status, name: name, date: date, advantage: home, 
                 home_score: h_score, away_score: a_score, details: details, result: result)
-
     redirect "/all_sports/"+ sport.name.gsub(" ", "_").to_s
   end
 
@@ -1314,7 +1354,6 @@ class HoltonHubApp < Sinatra::Base
         UserMessage.create(user_id: fs.user_id, message_id: msg.id)
       end
     end
-
     game.delete
     redirect "/all_sports/"+ sport.name.gsub(" ", "_").to_s
   end
@@ -1460,13 +1499,11 @@ class HoltonHubApp < Sinatra::Base
   post '/update_meeting' do
     verify_user
     meeting = GroupMeeting.find_by(id: params[:id])
-    
     location = params[:location]
     date = params[:date].to_datetime #calendar on the frontend
     desc = params[:desc]
     meeting.update(location: location, event_date: date, description: desc) # this one - should be an edit 
-    
-    
+
     redirect '/meetings'
   end
 
@@ -1507,6 +1544,63 @@ class HoltonHubApp < Sinatra::Base
     
     @allgames=Game.where("date>=?", Date.today).order(:date)
     erb :'groups/games'
+  end 
+    redirect '/meetings'
+  end
+
+  post '/delete_meeting' do
+    meeting = GroupMeeting.find_by(id: params[:id])
+    meeting.delete
+    redirect '/meetings'
+  end
+
+  get '/sport_events' do
+    verify_user 
+    @allgames=Game.where("date>=?", Date.today)
+    erb :display_sport_events
+  end 
+
+  post '/load_day' do
+    dayofweek = params[:dayofweek].downcase
+    weekcolor = params[:weekcolor].downcase
+    ds = DailySchedule.find_by(day_of_the_week: dayofweek, week_type: weekcolor)
+    p 'DAY: ' + dayofweek.to_s
+    p 'WEEK: ' + weekcolor.to_s 
+    @schedule = {} 
+    if ds != nil 
+      @schedule = {"blocks" => []}
+      @schedule["day"] = ds.day
+      @schedule["day_of_week"] = ds.day_of_the_week 
+      @schedule["week_color"] = ds.week_type
+      @schedule["id"] = ds.id
+      blocks = DailyScheduleScheduleBlock.where(dailyschedule_id: ds.id)
+      blocks.each do |b|
+        period = ScheduleBlock.find_by(id: b.block_id) 
+        @schedule["blocks"] << period 
+      end
+      erb :edit_day
+    else
+      erb :error
+    end
+  end
+
+  post '/update_blocks' do
+    block_count = params[:block_count].to_i - 1
+    schedule_id = params[:id].to_i 
+    daily_blocks = DailyScheduleScheduleBlock.where(dailyschedule_id: schedule_id)
+    daily_blocks.each do |db|
+      block = ScheduleBlock.find_by(id: db.block_id)
+      block.delete
+      db.delete
+    end
+    for i in 1..block_count
+      desc = params["description" + i.to_s] 
+      time = params["time" + i.to_s]
+      dur = params["duration" + i.to_s]
+      block = ScheduleBlock.create(description: desc, start: time.to_datetime, duration: dur)
+      DailyScheduleScheduleBlock.create(dailyschedule_id: schedule_id, block_id: block.id)
+    end
+    redirect '/today'
   end 
 
   ##########################################

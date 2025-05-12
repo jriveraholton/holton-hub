@@ -30,6 +30,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_16_004252) do
     t.integer "win_count", default: 0, null: false
   end
 
+  create_table "daily_schedule_schedule_blocks", force: :cascade do |t|
+    t.integer "dailyschedule_id", null: false
+    t.integer "block_id", null: false
+  end
+
+  create_table "daily_schedules", force: :cascade do |t|
+    t.string "week_type", null: false
+    t.integer "day", null: false
+    t.string "day_of_the_week", null: false
+    t.datetime "date_of", null: false
+  end
+
   create_table "divisions", force: :cascade do |t|
     t.string "name", null: false
   end
@@ -112,6 +124,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_16_004252) do
     t.text "content", null: false
     t.datetime "sent_at", null: false
     t.integer "author_id", null: false
+  end
+
+  create_table "schedule_blocks", force: :cascade do |t|
+    t.text "description", null: false
+    t.datetime "start", null: false
+    t.integer "duration", null: false
   end
 
   create_table "seasons", force: :cascade do |t|
