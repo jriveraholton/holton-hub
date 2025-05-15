@@ -120,7 +120,8 @@ class HoltonHubApp < Sinatra::Base
     if @active_user != nil
       puts "LOGGED IN: " + @active_user.email
     end
-    erb :index 
+    #erb :index
+    redirect '/today'
   end
 
   get '/sign_in' do
