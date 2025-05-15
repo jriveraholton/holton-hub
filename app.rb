@@ -640,9 +640,9 @@ class HoltonHubApp < Sinatra::Base
     verify_user
     # all_sports = Group.where(group_type: "sport", active: true).order(level_id: :asc, name: :asc)
     #iterates thru and sorts all sports based on season
-    @fall_sports = Group.where(id: GroupSeason.where(season_id: Season.find_by(name: "Fall").id).select(:group_id)).order(level_id: :asc, name: :asc)
-    @winter_sports = Group.where(id: GroupSeason.where(season_id: Season.find_by(name: "Winter").id).select(:group_id)).order(level_id: :asc, name: :asc)
-    @spring_sports = Group.where(id: GroupSeason.where(season_id: Season.find_by(name: "Spring").id).select(:group_id)).order(level_id: :asc, name: :asc)
+    @fall_sports = Group.where(id: GroupSeason.where(season_id: Season.find_by(name: "Fall").id).select(:group_id), active: true).order(level_id: :asc, name: :asc)
+    @winter_sports = Group.where(id: GroupSeason.where(season_id: Season.find_by(name: "Winter").id).select(:group_id), active: true).order(level_id: :asc, name: :asc)
+    @spring_sports = Group.where(id: GroupSeason.where(season_id: Season.find_by(name: "Spring").id).select(:group_id), active: true).order(level_id: :asc, name: :asc)
     # @spring_sports = []
     # #there should be a way to do this w/o hardcoding every season
     # all_sports.each do |sport|
@@ -974,8 +974,11 @@ class HoltonHubApp < Sinatra::Base
 
   get '/all_sports/:sport/manage_members' do
     verify_user
-    grp = params[:sport].gsub!("_", " ")
-    @current_group = Group.find_by(name: grp)
+    sport = params[:sport]
+    underscore = "_"
+    sport.gsub!(underscore, " ")
+    sport.downcase!
+    @current_group = Group.find_by(name: sport)
 
     if GroupMember.where(group_id: @current_group.id) != nil
       @members = User.where(id: (Student.where(id: GroupMember.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
