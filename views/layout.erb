@@ -5,8 +5,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Holton Hub</title>
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-		<link rel="stylesheet" href="<%= url('/style.css') %>">
 		<script src="https://kit.fontawesome.com/7076f25b88.js" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="<%= url('/style.css') %>">
     </head>
 	<body class="<% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>">
 		<nav class="navbar navbar-expand-lg <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>">
@@ -16,19 +16,19 @@
 					<span class="navbar-toggler-icon"></span>
 				</button>
 				<% if @active_user != nil %>
-				<div class="collapse navbar-collapse" id="navbarNav">
-					<ul class="navbar-nav me-auto">
-						<li class="nav-item dropdown <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>">
-							<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" href="#">Schedule</a>
-							<ul class="dropdown-menu">
-								<li><a class="dropdown-item" href="/today">Daily Schedule</a></li>
-								<li><a class="dropdown-item" href="/meetings">Upcoming Meetings</a></li>
-								<li><a class="dropdown-item" href="/games">Upcoming Games</a></li>
-							</ul>
-						</li>
-						<li class="nav-item dropdown <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>">
-						<!-- groups dropdown -->
-							<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" href="#">Groups</a>
+					<div class="collapse navbar-collapse" id="navbarNav">
+						<ul class="navbar-nav me-auto">
+							<li class="nav-item dropdown <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>">
+								<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" href="#">Schedule</a>
+								<ul class="dropdown-menu">
+									<li><a class="dropdown-item" href="/today">Daily Schedule</a></li>
+									<li><a class="dropdown-item" href="/meetings">Upcoming Meetings</a></li>
+									<li><a class="dropdown-item" href="/games">Upcoming Games</a></li>
+								</ul>
+							</li>
+							<li class="nav-item dropdown <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>">
+								<!-- groups dropdown -->
+								<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" href="#">Groups</a>
 								<ul class="dropdown-menu">
 									<li><a class="dropdown-item" href="/my_clubs">My Clubs</a></li>
 									<li><a class="dropdown-item" href="/my_sports">My Sports</a></li>
@@ -36,36 +36,36 @@
 									<li><a class="dropdown-item" href="/all_clubs">Clubs List</a></li>
 									<li><a class="dropdown-item" href="/all_sports">Sports List</a></li>
 								</ul>
-						</li>
-						<!-- end groups dropdown -->
-						<a class="nav-link" href="/bw_events">Blue vs White</a>
-	
-						
-						<% if @active_user != nil and @active_user.is_admin %>
-							<li class="nav-item dropdown <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>">
-								<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" href="#">Manage</a>
+							</li>
+							<!-- end groups dropdown -->
+							<a class="nav-link" href="/bw_events">Blue vs White</a>
+							
+							
+							<% if @active_user != nil and @active_user.is_admin %>
+								<li class="nav-item dropdown <% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>">
+									<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" href="#">Manage</a>
 									<ul class="dropdown-menu">
 										<li><a class="dropdown-item" href="/manage/manage_users">Manage Users</a></li>
 										<li><a class="dropdown-item" href="/manage/manage_groups">Manage Groups</a></li>
 									</ul>
-							</li>
-						<% end %>
-					</ul>
-					<% #messages graphic %>
-					<span class="navbar-text me-3">
-					<a href="/send_message" title="Send message" class="nav-link">
-						<i class="fa-regular fa-envelope fa-2xl"></i>
-					</a>
-					</span>
-					<span class="navbar-text me-3">
-					<a href="/announcements" class="nav-link position-relative" <%= @active_user != nil and UserMessage.where(user_id: @active_user.id, unread: true).count > 0 ? 'title="Unread messages" ' : 'title="Read messages"' %>>
-					<i class="fa-regular fa-comment fa-2xl"></i>
-					<% if @active_user != nil and UserMessage.where(user_id: @active_user.id, unread: true).count > 0 %>
-						<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger"><%= UserMessage.where(user_id: @active_user.id, unread: true).count.to_s %></span>
-					<% end %>
-					</a>
-					</span>
-				</div>
+								</li>
+							<% end %>
+						</ul>
+						<% #messages graphic %>
+						<span class="navbar-text me-3">
+							<a href="/send_message" title="Send message" class="nav-link">
+								<i class="fa-regular fa-envelope fa-2xl"></i>
+							</a>
+						</span>
+						<span class="navbar-text me-3">
+							<a href="/announcements" class="nav-link position-relative" <%= @active_user != nil and UserMessage.where(user_id: @active_user.id, unread: true).count > 0 ? 'title="Unread messages" ' : 'title="Read messages"' %>>
+								<i class="fa-regular fa-comment fa-2xl"></i>
+								<% if @active_user != nil and UserMessage.where(user_id: @active_user.id, unread: true).count > 0 %>
+									<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger"><%= UserMessage.where(user_id: @active_user.id, unread: true).count.to_s %></span>
+								<% end %>
+							</a>
+						</span>
+					</div>
 				<%end%>
 			</div>
 		</nav>
@@ -92,13 +92,13 @@
 					</div>
 					<div class="col-lg-auto">
 						Links<br><br>
-						<p2>
+						<p>
 							Sitemap<br>
 							Accessibility<br>
-							News<br>
-							Calendar<br>
+							<a class="<% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" href="https://www.holton-arms.edu/about/news" >News</a><br>
+							<a class="<% if @active_team_color == 'white'%>white-user<% else %>blue-user<% end %>" href="/today">Calendar</a><br>
 							<hr class="d-block d-md-none">
-						</p2>
+						</p>
 					</div>
 					<div class="col-lg-3">
 						Connect

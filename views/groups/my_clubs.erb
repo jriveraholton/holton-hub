@@ -3,7 +3,9 @@
         <h1> My Clubs Page</h1>  
     </div>
     <div class="row">
+		<% no_clubs = true %>
         <% @leader_my_groups.each do |club| %>
+			<% no_clubs = false %>
             <div class="col-md-4 col-lg-3 mb-3">
                 <div class="card border-primary">
                     <h5 class="card-header" id="club-header"> 
@@ -20,7 +22,8 @@
             </div>
         <% end %>
         <% @member_my_groups.each do |club| %>
-            <div class="col-md-4 col-lg-3 mb-3">
+			<% no_clubs = false %>
+			<div class="col-md-4 col-lg-3 mb-3">
                 <div class="card border-primary">
                     <h5 class="card-header" id="club-header">
                         <%= club.name.titleize %>
@@ -38,6 +41,7 @@
             </div>
         <% end %>
         <% @advisor_my_groups.each do |club| %>
+			<% no_clubs = false %>
             <div class="col-md-4 col-lg-3 mb-3">
                 <div class="card border-primary">
                     <h5 class="card-header" id="club-header">
@@ -53,5 +57,8 @@
                 </div>
             </div>
         <% end %>
+		<% if no_clubs %>
+			<h1>No Clubs found Here...</h1>
+		<% end %>
     </div>
 </div>

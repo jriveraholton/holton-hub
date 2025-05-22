@@ -2,40 +2,46 @@
 <div class="container">
     <h1> Upcoming Sport Events:</h1>  
     <div class="row">
-    <% @allgames.each do |game| %>
-        <div class="col-md-4">
-            <div class="card mb-3">
-                <div class="card-header">
-                    <% @team=Group.find_by(id: game.team_id)%>
-                        <h5 class="sport-team"> <%= @team.name.titleize %> </h5>
-                    <p class="card-text"> <%=game.name %></p>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">Date: <%=game.date.strftime("%B %-d, %Y") %></li>
-                    <li class="list-group-item">Time: <%=game.date.strftime("%H:%M %P") %></li>
-                    <li class="list-group-item">Details: <%=game.details %></li>
-                    <li class="list-group-item">Status: 
-                        <% if game.status == true %>
-                            On time
-                        <% else %>
-                            Canceled
-                        <% end %>
-                    </li>
-                    <li class="list-group-item">Advantage:
-                        <% if game.advantage == true %>
-                            Home
-                        <% else %>
-                            Away
-                        <% end %>
-                    </li> 
-                </ul>
-                <div class="card-footer">
-                    <% if 
-                    <a href="/g/edit?id=<%= meeting.id%>" class="btn btn-primary">Edit</a>
-                    <% end %>
-                </div>
-            </div>
-        </div>
-    <% end %>
+		<% if @allgames.length > 0 %>
+			<% @allgames.each do |game| %>
+				<div class="col-md-4">
+					<div class="card mb-3">
+						<div class="card-header">
+							<% @team=Group.find_by(id: game.team_id)%>
+							<h5 class="sport-team"> <%= @team.name.titleize %> </h5>
+							<p class="card-text"> <%=game.name %></p>
+						</div>
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item">Date: <%=game.date.strftime("%B %-d, %Y") %></li>
+							<li class="list-group-item">Time: <%=game.date.strftime("%H:%M %P") %></li>
+							<li class="list-group-item">Details: <%=game.details %></li>
+							<li class="list-group-item">Status: 
+								<% if game.status == true %>
+									On time
+								<% else %>
+									Canceled
+								<% end %>
+							</li>
+							<li class="list-group-item">Advantage:
+								<% if game.advantage == true %>
+									Home
+								<% else %>
+									Away
+								<% end %>
+							</li> 
+						</ul>
+						<div class="card-footer">
+							<% if @active_user.is_admin %>
+								<a href="/g/edit?id=<%= meeting.id%>" class="btn btn-primary">Edit</a>
+							<% end %>
+						</div>
+					</div>
+				</div>
+			<% end %>
+		<% else %>
+			<div class="col mt-3 mb-3" >
+				<h1><strong>No Upcoming Games!</strong></h1>
+			</div>
+		<% end %>
     </div>
 </div>

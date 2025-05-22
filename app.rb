@@ -1026,10 +1026,10 @@ class HoltonHubApp < Sinatra::Base
       @coaches = User.where(id: (Facultystaff.where(id: GroupAdvisor.where(group_id: @current_group.id).select(:facultystaff_id)).select(:user_id))).order(firstname: :asc)
       @captains = User.where(id: (Student.where(id: GroupLeader.where(group_id: @current_group.id).select(:student_id)).select(:user_id))).order(firstname: :asc)
       is_leader = Student.find_by(user_id: @active_user.id) != nil && GroupLeader.find_by(group_id: @current_group.id, student_id: Student.find_by(user_id: @active_user.id).id) != nil
-      puts GroupLeader.find_by(group_id: @current_group.id, student_id: Student.find_by(user_id: @active_user.id).id) != nil  
+      # puts GroupLeader.find_by(group_id: @current_group.id, student_id: Student.find_by(user_id: @active_user.id).id) != nil  
       is_advisor = Facultystaff.find_by(user_id: @active_user.id) != nil && GroupAdvisor.find_by(group_id: @current_group.id, facultystaff_id: Facultystaff.find_by(user_id: @active_user.id).id) != nil
-      puts is_leader
-      puts is_advisor
+      #puts is_leader
+      #puts is_advisor
       @leader = @active_user.is_admin or is_leader or is_advisor
       @wins = 0
       @losses = 0
