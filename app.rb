@@ -949,8 +949,11 @@ class HoltonHubApp < Sinatra::Base
 
   get '/all_sports/:sport/manage_members' do
     verify_user
-    grp = params[:sport].gsub!("_", " ")
-    @current_group = Group.find_by(name: grp)
+    sport = params[:sport]
+    underscore = "_"
+    sport.gsub!(underscore, " ")
+    sport.downcase!
+    @current_group = Group.find_by(name: sport)
 
     if GroupMember.where(group_id: @current_group.id) != nil
       @members = User.where(id: (Student.where(id: GroupMember.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))

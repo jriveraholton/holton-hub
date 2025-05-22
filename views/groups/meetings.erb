@@ -1,11 +1,10 @@
 <div class="container">
   <div class="row">
-      <h1>Group Meetings</h1>
-      <p>All future club and sport meetings</p>
+      <h2>Upcoming Club and Sport meetings:</h2>
   </div>
   <div class="row">
     <div class="col-lg-6">
-      <p>Sort through groups</p>
+      
       <div id="myBtnContainer">
         <button class="btn active" onclick="filterSelection('all')">All Clubs and Sports</button>
         <button class="btn" onclick="filterSelection('mine')">My Clubs and Sports</button>
@@ -14,7 +13,7 @@
     </div>
 
   </div>
-  <br>x
+  <br>
   <br>
 
 
@@ -36,7 +35,7 @@
               <% end %>
               <p>Date: <%= meeting.event_date.strftime('%m/%d/%Y') %> <br>
               Time: <%= meeting.event_date.strftime('%I:%M %p')%> <br>
-              Location: <%= meeting.location %> <br>
+              Location: <%= meeting.location.titleize %> <br>
               <% if meeting.description != "" and meeting.description != nil %>
               Description: <%= meeting.description %> 
               <%end%></p>
