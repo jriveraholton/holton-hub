@@ -5,7 +5,7 @@
 		<% if @allgames.length > 0 %>
 			<% @allgames.each do |game| %>
 				<div class="col-md-4">
-					<div class="card mb-3">
+					<div class="card border-primary mb-3">
 						<div class="card-header">
 							<% @team=Group.find_by(id: game.team_id)%>
 							<h5 class="sport-team"> <%= @team.name.titleize %> </h5>
@@ -32,7 +32,7 @@
 						</ul>
 						<div class="card-footer">
 							<% if @active_user.is_admin %>
-								<a href="/g/edit?id=<%= meeting.id%>" class="btn btn-primary">Edit</a>
+								<a href="/all_sports/<%= @team.name.gsub(" ", "_")%>/edit?id=<%= game.id%>" class="btn btn-primary">Edit</a>
 							<% end %>
 						</div>
 					</div>

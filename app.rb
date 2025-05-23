@@ -514,8 +514,6 @@ class HoltonHubApp < Sinatra::Base
         @all_days << schedule 
       end 
     end
-
-    puts "DAY DATA" + @all_days.inspect.to_s
     
     erb :day_schedule
   end
@@ -896,8 +894,27 @@ class HoltonHubApp < Sinatra::Base
     underscore = "_"
     club.gsub!(underscore, " ")
     club.downcase!
-    
+
     @current_group = Group.find_by(name: club)
+    @canAccess = false
+    @canAddMeetings = false
+
+    if Student.find_by(user_id: @active_user.id) != nil
+      if GroupLeader.find_by(student_id: Student.find_by(user_id: @active_user.id).id, group_id: @current_group.id) != nil 
+        @canAccess = true
+        @canAddMeetings = true
+      end
+    end
+    if @active_user.is_admin
+      @canAccess = true
+    end
+    if Facultystaff.find_by(user_id: @active_user.id) != nil
+      if GroupAdvisor.find_by(facultystaff_id: Facultystaff.find_by(user_id: @active_user.id).id, group_id: @current_group.id)
+        @canAccess = true
+        @canAddMeetings = true
+      end
+    end
+
     if @current_group != nil and @current_group.active and @current_group.group_type == "club"
       @club_members = []
       @club_leaders = []
@@ -907,8 +924,8 @@ class HoltonHubApp < Sinatra::Base
       if GroupAdvisor.where(group_id: @current_group.id) != nil
         @adv = User.where(id: Facultystaff.where(id: GroupAdvisor.where(group_id: @current_group.id).select(:facultystaff_id)).select(:user_id))
       end
+
       all_meetings = GroupMeeting.where(group_id: @current_group.id)
-      puts all_meetings
       @meetings = []
       all_meetings.each do |meeting|
         if meeting.event_date > Time.now()
@@ -916,6 +933,7 @@ class HoltonHubApp < Sinatra::Base
         end
         @meetings = @meetings.sort_by {|meeting| meeting.event_date}
       end
+
       @images = {}
       n = 1
       club.gsub!(" ", "_")
@@ -927,6 +945,7 @@ class HoltonHubApp < Sinatra::Base
         n += 1
         image_exists = File.file?(File.dirname(__FILE__) + '/public/clubs/'+ club + n.to_s + '.jpg') #checks if file exists
       end 
+
       erb :"groups/club_page"
     else
       erb :error
@@ -944,6 +963,7 @@ class HoltonHubApp < Sinatra::Base
     if GroupLeader.where(group_id: @current_group.id) != nil
       @leaders = User.where(id: (Student.where(id: GroupLeader.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
     end
+    
     erb :'groups/manage_members'
   end
 
@@ -1135,8 +1155,15 @@ class HoltonHubApp < Sinatra::Base
     verify_user
     name = params[:name].gsub("_", " ")
     @current_group = Group.find_by(name: name)
-    if GroupLeader.find_by(group_id: @current_group.id, student_id: @active_user.id) != nil
-      erb :"groups/add_club_meeting"
+
+    if Student.find_by(user_id: @active_user.id) != nil
+      if GroupLeader.find_by(student_id: Student.find_by(user_id: @active_user.id).id, group_id: @current_group.id) != nil 
+        erb :"groups/add_club_meeting"
+      end
+    elsif Facultystaff.find_by(user_id: @active_user.id) != nil
+      if GroupAdvisor.find_by(facultystaff_id: Facultystaff.find_by(user_id: @active_user.id).id, group_id: @current_group.id)
+        erb :"groups/add_club_meeting"
+      end
     else
       erb :error
     end
@@ -1413,7 +1440,6 @@ class HoltonHubApp < Sinatra::Base
     @my_groups = []
     @meetings = GroupMeeting.where('event_date >= ?', Time.now.midnight).order(:event_date)
     
-    # @my_groups = Group.where(id: GroupLeader.where(student_id: @active_user.id).select(:group_id) + GroupMember.where(student_id: @active_user.id).select(:group_id))
     my_group_list.each do |group|
       @my_groups.push(@groups.find_by(id: group.group_id).id)
     end
@@ -1541,5 +1567,3 @@ class HoltonHubApp < Sinatra::Base
 
   ##########################################
 end
-
-

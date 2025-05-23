@@ -2,94 +2,91 @@
     <div class="row mb-3 align-items-end">
         <div class="col-md-12">
             <a href="/all_clubs" class="btn btn-outline-secondary" role="button"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-return-left" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5"/>
+				<path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5"/>
             </svg></a>
             <h1 class="text-center"> <%= @current_group.name.titleize %></h1>
             <hr> 
         </div>
     </div>
 
-
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <h3>Description:</h3>
-                <p><%= @current_group.description %> </p>
-            </div>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <h3>Description:</h3>
+            <p><%= @current_group.description %> </p>
         </div>
-        <div class="row mb-3">
-            <div class="col-md-3">
-                <h3>Club Leaders:</h3>
-                <p>
-                    <% @club_leaders.each do |st| %>
-                        <%= st.lastname + ", " + st.firstname %> <br>
-                    <% end %>
-                </p>
-            </div>
-            <div class="col-md-3">
-                <h3>Faculty Advisors:</h3>
-                <p>
-                    <% @adv.each do |st| %>
-                        <%= st.lastname + ", " + st.firstname %> <br>
-                    <% end %>
-                </p>
-            </div>
-            <% if not @images.empty? %>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <h3>Club Leaders:</h3>
+            <p>
+                <% @club_leaders.each do |st| %>
+                    <%= st.lastname + ", " + st.firstname %> <br>
+                <% end %>
+            </p>
+        </div>
+        <div class="col-md-3">
+            <h3>Faculty Advisors:</h3>
+            <p>
+                <% @adv.each do |st| %>
+                    <%= st.lastname + ", " + st.firstname %> <br>
+                <% end %>
+            </p>
+        </div>
+        <% if not @images.empty? %>
             <div class="col-md-6">
                 <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
                         <% @images.each do |n, img| %>
                             <div class="carousel-item <%= n == 1 ? 'active' : ''%>">
-                            <img src="<%= img %>" class="d-block club-img " alt="...">
+								<img src="<%= img %>" class="d-block club-img " alt="...">
                             </div>
                         <% end %>
                     </div>
                     <% if @images.count > 1 %>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
+						<button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+							<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+							<span class="visually-hidden">Previous</span>
+						</button>
+						<button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+							<span class="carousel-control-next-icon" aria-hidden="true"></span>
+							<span class="visually-hidden">Next</span>
+						</button>
                     <% end %>
                 </div>
             </div>
-            <% end %>
-        </div>
+        <% end %>
+    </div>
 
-        <div class="row mb-3">
-            <h3>Club Meetings:</h3>
-        </div>
-        <div class="row mb-3">
-            <% if @meetings != nil %>
-                <% @meetings.each do |meeting| %>
-                    <div class="col-md-4 col-lg-3 mb-3">
-                        <div class="card border-primary">                
-                            <div class="card-body" id="club-body">
-                                <% minute = meeting.event_date.min %>
-                                <% if minute == 0 %>
-                                    <%minute = "00" %>
-                                <% end %>
-                                <p>Date: <%= meeting.event_date.strftime('%m/%d/%Y') %> <br>
-                                    Time: <%= meeting.event_date.strftime('%I:%M %p')%> <br>
-                                    Location: <%= meeting.location %> <br>
-                                    <% if meeting.description != "" and meeting.description != nil %>
-                                        Description: <%= meeting.description %> 
-                                    <%end%>
-                                </p>
-                                <% if GroupLeader.find_by(group_id: meeting.group_id, student_id: @active_user.id) %>
-                                    <a href="/meetings/edit?id=<%= meeting.id%>" class="btn btn-primary">Edit</a>
-                                <% end %>
-                                
-                            </div>
+    <div class="row mb-3">
+        <h3>Club Meetings:</h3>
+    </div>
+    <div class="row mb-3">
+        <% if @meetings != nil %>
+            <% @meetings.each do |meeting| %>
+                <div class="col-md-4 col-lg-3 mb-3">
+                    <div class="card border-primary">                
+                        <div class="card-body" id="club-body">
+                            <% minute = meeting.event_date.min %>
+                            <% if minute == 0 %>
+                                <%minute = "00" %>
+                            <% end %>
+                            <p>Date: <%= meeting.event_date.strftime('%m/%d/%Y') %> <br>
+                                Time: <%= meeting.event_date.strftime('%I:%M %p')%> <br>
+                                Location: <%= meeting.location %> <br>
+                                <% if meeting.description != "" and meeting.description != nil %>
+                                    Description: <%= meeting.description %> 
+                                <%end%>
+                            </p>
+                            <% if GroupLeader.find_by(group_id: meeting.group_id, student_id: @active_user.id) %>
+                                <a href="/meetings/edit?id=<%= meeting.id%>" class="btn btn-primary">Edit</a>
+                            <% end %>
+                            
                         </div>
                     </div>
-                <% end %>
+                </div>
             <% end %>
-        </div>
-
-
+        <% end %>
+    </div>
     <br>
     <hr>
     <% if GroupLeader.find_by(group_id: @current_group.id, student_id: @active_user.id) != nil or @active_user.is_admin%>
@@ -104,16 +101,16 @@
             <div class="col-md-6">
                 <h3>Manage Club:</h3>
                 <div class="d-grid col-6">
-                <a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/add_member" class="btn btn-primary mb-2" role="button">Add Members</a>    
-                <a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/manage_members" class="btn btn-primary mb-2" role="button">Manage Members</a>
-                <a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/edit" class="btn btn-primary mb-2" role="button">Edit Club Page</a>
-                <a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/add_advisor" class="btn btn-primary mb-2" role="button">Add Club Advisor</a>
-                
-                <% if GroupLeader.find_by(group_id: @current_group.id, student_id: @active_user.id) %>
-                    <a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/add_meeting" class="btn btn-primary mb-2" role="button">Add Meeting</a>    
-                <% end%>
+					<a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/add_member" class="btn btn-primary mb-2" role="button">Add Members</a>    
+					<a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/manage_members" class="btn btn-primary mb-2" role="button">Manage Members</a>
+					<a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/edit" class="btn btn-primary mb-2" role="button">Edit Club Page</a>
+					<a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/add_advisor" class="btn btn-primary mb-2" role="button">Add Club Advisor</a>
+					
+					<% if GroupLeader.find_by(group_id: @current_group.id, student_id: @active_user.id) || @canAddMeetings %>
+						<a href="/all_clubs/<%= @current_group.name.gsub(" ", "_") %>/add_meeting" class="btn btn-primary mb-2" role="button">Add Meeting</a>    
+					<% end%>
                 </div>
             </div>
         </div>
-    <%end%>
+	<%end%>
 </div>
