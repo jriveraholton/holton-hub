@@ -89,7 +89,11 @@
     </div>
     <br>
     <hr>
-    <% if GroupLeader.find_by(group_id: @current_group.id, student_id: @active_user.id) != nil or @active_user.is_admin%>
+	<% stu = Student.find_by(user_id: @active_user.id)%>
+	<% fac =  Facultystaff.find_by(user_id: @active_user.id)%>
+	<% is_leader = stu != nil and GroupLeader.find_by(group_id: @current_group.id, student_id: stu.id) != nil%>
+	<% is_advisor = fac != nil and GroupAdvisor.find_by(group_id: @current_group.id, facultystaff_id: fac.id) != nil%>
+	<% if is_leader or is_advisor or @active_user.is_admin%>
         <div class="row mb-3">
             <div class="col-md-6 mb-3">
                 <h3>Club Members:</h3>
