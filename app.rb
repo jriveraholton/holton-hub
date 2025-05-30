@@ -386,17 +386,17 @@ class HoltonHubApp < Sinatra::Base
     is_admin = params[:is_admin] != nil ? true : false
     team_id = BwTeam.find_by(team_color: params[:team].downcase).id
     role = params[:role]
-    grade = params[:grade]
+    grade_year = params[:gradeyear]
 
 
     #determine class_of year based on selected grade and current date
-    current_month = Date.today.month
-    if current_month >= 1 and current_month <= 6
-      senior_year = Date.today.year
-    else
-      senior_year = Date.today.year + 1
-    end
-    class_of = senior_year + (12 - Integer(grade))
+    # current_month = Date.today.month
+    # if current_month >= 1 and current_month <= 6
+    #   senior_year = Date.today.year
+    # else
+    #   senior_year = Date.today.year + 1
+    # end
+    # class_of = senior_year + (12 - Integer(grade))
     
     #generates a default password in the format "gdingholtonarms"
     password = (fname.downcase[0] + lname.downcase + "holtonarms").to_s
@@ -404,9 +404,9 @@ class HoltonHubApp < Sinatra::Base
     new_user = User.create(firstname: fname, lastname: lname, 
                            email: email, secret: password, team_id: team_id, is_admin: is_admin, active: true)
     if role == "Student" 
-      Student.create(user_id: new_user.id, class_of: Integer(class_of)) 
+      Student.create(user_id: new_user.id, class_of: Integer(grade_year)) 
     else 
-      Facultystaff.create(user_id: new_user.id, grade: Integer(grade))
+      Facultystaff.create(user_id: new_user.id, grade: Integer(grade_year))
     end
     redirect '/manage/manage_users'
   end
