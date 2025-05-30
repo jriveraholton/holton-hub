@@ -470,6 +470,15 @@ class HoltonHubApp < Sinatra::Base
     team = BwTeam.find_by(team_color: params[:team])
     is_admin = params[:is_admin] != nil ? true : false
     user.update(firstname: params[:fname], lastname: params[:lname], team_id: team.id, is_admin: is_admin)
+
+    stu = Student.find_by(user_id: user.id)
+    if stu != nil
+      stu.update(class_of: Integer(params[:gradeyear]))
+    else
+      fac = Facultystaff.find_by(user_id: user.id)
+      fac.update(grade: Integer(params[:gradeyear]))
+    end
+    
     redirect '/manage/manage_users'
   end
   ## END USER MANAGEMENT ##
