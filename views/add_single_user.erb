@@ -54,10 +54,17 @@
 			<div class="col-md-4 mb-3" style="display:none;">
 				<select id="year" class="form-select" aria-label="Default select example" name="" required>
 					<option selected disabled value">Year</option>
-					<option value="2025">2025</option>
-					<option value="2026">2026</option>
-					<option value="2027">2027</option>
-					<option value="2028">2028</option>
+					<% curr_month = Date.today.month %>
+					<% if curr_month >= 1 and curr_month <= 6 %>
+						<% senior_year = Date.today.year %>
+					<% else %>
+						<% senior_year = Date.today.year + 1%>						
+					<% end %>
+
+					<% for i in 1..4 %>
+						<option value="<%=senior_year %>"><%= senior_year %></option>
+						<% senior_year += 1 %>
+					<% end %>
 				</select>
 			</div>
 		</div>

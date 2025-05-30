@@ -25,27 +25,38 @@
                     <option value="blue" <%= @use.team_id == BwTeam.find_by(team_color: 'blue').id ? 'selected' : '' %>>Blue</option>
                 </select>
             </div>
-			<% is_student = Student.find_by(user_id: @use.id) != nil %>
-			<% if is_student %>
+			<% stu =  Student.find_by(user_id: @use.id)%>
+			<% if stu != nil %>
 				<div class="col-md-6">
 					<label for="year" class="col-form-label">Year: </label>
-					<select id="year" class="form-select" aria-label="Default select example" name="" required>
-						<option selected disabled value">Year</option>
-						<option value="2025">2025</option>
-						<option value="2026">2026</option>
-						<option value="2027">2027</option>
-						<option value="2028">2028</option>
+					<select id="year" class="form-select" aria-label="Default select example" name="gradeyear" required>
+						<option disabled value">Year</option>
+						<% curr_month = Date.today.month %>
+						<% if curr_month >= 1 and curr_month <= 6 %>
+							<% senior_year = Date.today.year %>
+						<% else %>
+							<% senior_year = Date.today.year + 1%>						
+						<% end %>
+						<% for i in 1..4 %>
+							<% if senior_year == stu.class_of %>
+								<option selected value="<%=senior_year %>"><%= senior_year %></option>
+							<% else %>
+								<option value="<%=senior_year %>"><%= senior_year %></option>
+							<% end %>
+							<% senior_year += 1 %>
+						<% end %>
 					</select>
 				</div>
 			<% else %>
-				<div class="col-md-4">
-					<label for="team" class="col-form-label">Grade: </label>
-					<select id="grade" class="form-select" aria-label="Default select example" name="" required>
-						<option selected disabled value">Grade</option>
-						<option value="9">9</option>
-						<option value="10">10</option>
-						<option value="11">11</option>
-						<option value="12">12</option>
+				<% fac = Facultystaff.find_by(user_id: @use.id) %>
+				<div class="col-md-6">
+					<label for="grade" class="col-form-label">Grade: </label>
+					<select id="grade" class="form-select" aria-label="Default select example" name="gradeyear" required>
+						<option disabled value">Grade</option>
+
+						<% for i in 9..12 %>
+							<option <% if i == fac.grade %>selected<% end %> value="<%= i %>"><%= i %></option>
+						<% end %>
 					</select>
 				</div>
 			<% end %>
