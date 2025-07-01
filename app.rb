@@ -210,7 +210,7 @@ class HoltonHubApp < Sinatra::Base
           end
         end
       elsif tag.include? "Class of"
-        Student.where(class_of: tag[-4..-1].to_i).each do |stu|
+        Student.where(active: true, class_of: tag[-4..-1].to_i).each do |stu|
           puts tag[-4..-1]
           if not UserMessage.where(user_id: stu.user_id, message_id: msg.id).exists?
             UserMessage.create(user_id: stu.user_id, message_id: msg.id)
@@ -219,7 +219,7 @@ class HoltonHubApp < Sinatra::Base
       #still need to do faculty staff
       else
         grp = Group.find_by(id: GroupMessagetag.find_by(messagetag_id: mt.id).group_id)
-        memb = Student.where(id: GroupMember.where(group_id: grp.id).select(:student_id)) + Student.where(id: GroupLeader.where(group_id: grp.id).select(:student_id))
+        memb = Student.where(active: true, id: GroupMember.where(group_id: grp.id).select(:student_id)) + Student.where(active: true, id: GroupLeader.where(group_id: grp.id).select(:student_id))
         memb.each do |stu|
           if not UserMessage.where(user_id: stu.user_id, message_id: msg.id).exists?
             UserMessage.create(user_id: stu.user_id, message_id: msg.id)
@@ -416,7 +416,7 @@ class HoltonHubApp < Sinatra::Base
     check_admin
     all_users = User.all
     @all_by_groups = {}
-    grades = Student.select(:class_of).distinct.sort
+    grades = Student.where(active: true).select(:class_of).distinct.sort
     grades.each do |grade|
       @all_by_groups[grade.class_of] = []
     end
@@ -449,6 +449,19 @@ class HoltonHubApp < Sinatra::Base
     user.active = active
     user.save
     
+    redirect '/manage/manage_users'
+  end
+
+
+  post '/graduate' do
+    grad = params[:classYear].to_i
+    puts grad
+    puts "DEACTIVATING ACCOUNTS"
+    Student.where(class_of: grad).each do |stu|
+      use = User.find_by(id: stu.user_id)
+      use.update(active: false)
+      stu.update(active: false)
+    end
     redirect '/manage/manage_users'
   end
 
@@ -662,16 +675,16 @@ class HoltonHubApp < Sinatra::Base
     @sports_seasons = Season.all
     
     #create hashes that have all of the necessary information for students by grade    
-    grades = Student.select(:class_of).distinct.sort()
+    grades = Student.where(active: true).select(:class_of).distinct.sort()
     
     soph = grades[2].class_of
     jun = grades[1].class_of
     sen = grades[0].class_of
 
-    @seniors = User.where(id: Student.where(class_of: sen).select(:user_id)).order(:lastname)
-    @juniors = User.where(id: Student.where(class_of: jun).select(:user_id)).order(:lastname)
-    @sophomores = User.where(id: Student.where(class_of: soph).select(:user_id)).order(:lastname)
-    @freshmen = User.where(id: Student.where.not(class_of: [soph, jun, sen]).select(:user_id)).order(:lastname)
+    @seniors = User.where(id: Student.where(class_of: sen, active: true).select(:user_id)).order(:lastname)
+    @juniors = User.where(id: Student.where(class_of: jun, active: true).select(:user_id)).order(:lastname)
+    @sophomores = User.where(id: Student.where(class_of: soph, active: true).select(:user_id)).order(:lastname)
+    @freshmen = User.where(id: Student.where(active: true).where.not(class_of: [soph, jun, sen]).select(:user_id)).order(:lastname)
     
     
     erb :"groups/add_group"
@@ -820,10 +833,10 @@ class HoltonHubApp < Sinatra::Base
     end
     if is_leader or @active_user.is_admin
       @all_students = {}
-      Student.select(:class_of).distinct.order(:class_of).each do |grade|
+      Student.where(active: true).select(:class_of).distinct.order(:class_of).each do |grade|
         grade = grade.class_of
         puts "hello"
-        @all_students[grade] = User.where(id: Student.where(class_of: grade).select(:user_id)).order(:lastname) 
+        @all_students[grade] = User.where(id: Student.where(class_of: grade, active: true).select(:user_id)).order(:lastname) 
         @all_students[grade].each do |person|
           puts person.firstname
         end
@@ -851,10 +864,10 @@ class HoltonHubApp < Sinatra::Base
     end
     if is_leader or @active_user.is_admin
       @all_students = {}
-      Student.select(:class_of).distinct.order(:class_of).each do |grade|
+      Student.where(active: true).select(:class_of).distinct.order(:class_of).each do |grade|
         grade = grade.class_of
         puts "hello"
-        @all_students[grade] = User.where(id: Student.where(class_of: grade).select(:user_id)).order(:lastname) 
+        @all_students[grade] = User.where(id: Student.where(active: true, class_of: grade).select(:user_id)).order(:lastname) 
         @all_students[grade].each do |person|
           puts person.firstname
         end
@@ -927,8 +940,8 @@ class HoltonHubApp < Sinatra::Base
     if @current_group != nil and @current_group.active and @current_group.group_type == "club"
       @club_members = []
       @club_leaders = []
-      @club_members = User.where(id: Student.where(id: GroupMember.where(group_id: @current_group.id).select(:student_id)).select(:user_id)).order(:class_of, :lastname)
-      @club_leaders = User.where(id: Student.where(id: GroupLeader.where(group_id: @current_group.id).select(:student_id)).select(:user_id)).order(class_of: :asc, lastname: :desc)
+      @club_members = User.where(id: Student.where(active: true, id: GroupMember.where(group_id: @current_group.id).select(:student_id)).select(:user_id)).order(:class_of, :lastname)
+      @club_leaders = User.where(id: Student.where(active: true, id: GroupLeader.where(group_id: @current_group.id).select(:student_id)).select(:user_id)).order(class_of: :asc, lastname: :desc)
       leaders = GroupLeader.where(group_id: @current_group.id)
       if GroupAdvisor.where(group_id: @current_group.id) != nil
         @adv = User.where(id: Facultystaff.where(id: GroupAdvisor.where(group_id: @current_group.id).select(:facultystaff_id)).select(:user_id))
@@ -967,10 +980,10 @@ class HoltonHubApp < Sinatra::Base
     @current_group = Group.find_by(name: club)
 
     if GroupMember.where(group_id: @current_group.id) != nil
-      @members = User.where(id: (Student.where(id: GroupMember.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
+      @members = User.where(id: (Student.where(active: true, id: GroupMember.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
     end
     if GroupLeader.where(group_id: @current_group.id) != nil
-      @leaders = User.where(id: (Student.where(id: GroupLeader.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
+      @leaders = User.where(id: (Student.where(active: true, id: GroupLeader.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
     end
     
     erb :'groups/manage_members'
@@ -985,10 +998,10 @@ class HoltonHubApp < Sinatra::Base
     @current_group = Group.find_by(name: sport)
 
     if GroupMember.where(group_id: @current_group.id) != nil
-      @members = User.where(id: (Student.where(id: GroupMember.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
+      @members = User.where(id: (Student.where(active: true, id: GroupMember.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
     end
     if GroupLeader.where(group_id: @current_group.id) != nil
-      @leaders = User.where(id: (Student.where(id: GroupLeader.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
+      @leaders = User.where(id: (Student.where(active: true, id: GroupLeader.where(group_id: @current_group.id).select(:student_id)).select(:user_id)))
     end
 
     erb :'groups/manage_members'
@@ -1198,7 +1211,7 @@ class HoltonHubApp < Sinatra::Base
     msgtg = MessageTag.find_by(id: GroupMessagetag.find_by(group_id: grp.id).messagetag_id)
     MessageMessageTag.create(message_id: msg.id, message_tag_id: msgtg.id)
     
-    memb = Student.where(id: GroupMember.where(group_id: grp.id).select(:student_id)) + Student.where(id: GroupLeader.where(group_id: grp.id).select(:student_id))
+    memb = Student.where(active: true, id: GroupMember.where(group_id: grp.id).select(:student_id)) + Student.where(active: true, id: GroupLeader.where(group_id: grp.id).select(:student_id))
     memb.each do |stu|
       if not UserMessage.where(user_id: stu.user_id, message_id: msg.id).exists?
         UserMessage.create(user_id: stu.user_id, message_id: msg.id)
@@ -1276,7 +1289,7 @@ class HoltonHubApp < Sinatra::Base
       msgtg = MessageTag.find_by(id: GroupMessagetag.find_by(group_id: sport.id).messagetag_id)
       MessageMessageTag.create(message_id: msg.id, message_tag_id: msgtg.id)
       
-      memb = Student.where(id: GroupMember.where(group_id: sport.id).select(:student_id)) + Student.where(id: GroupLeader.where(group_id: sport.id).select(:student_id))
+      memb = Student.where(active: true, id: GroupMember.where(group_id: sport.id).select(:student_id)) + Student.where(id: GroupLeader.where(group_id: sport.id).select(:student_id))
       memb.each do |stu|
         if not UserMessage.where(user_id: stu.user_id, message_id: msg.id).exists?
           UserMessage.create(user_id: stu.user_id, message_id: msg.id)

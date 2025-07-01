@@ -140,6 +140,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_16_004252) do
   create_table "students", force: :cascade do |t|
     t.integer "class_of", null: false
     t.integer "user_id", null: false
+    t.boolean "active", default: true, null: false
   end
 
   create_table "user_messages", force: :cascade do |t|
